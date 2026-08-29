@@ -1,13 +1,16 @@
 <!--
 Sync Impact Report
-- Version change: 1.2.0 → 1.3.0 (MINOR — Development Workflow section
-  materially expanded)
-- Modified principles: n/a
-- Added sections: Development Workflow (Spec-Driven) gains a bullet
-  requiring the update-screen-flow-diagram skill to run (regenerating
-  specs/<feature>/screen-flow.md) whenever a screen's own
-  outbound-navigation FR changes — the screen-flow counterpart to the
-  existing check-openapi-contract rule.
+- Version change: 1.3.0 → 1.4.0 (MINOR — existing principle materially
+  expanded)
+- Modified principles: VI. Spec Documents State Requirements, Not Process
+  — added: every spec.md MUST have a table of contents; MUST NOT use
+  agile user-story framing (priority, independent-test notes); MUST use
+  SE-style use-case descriptions (actor/precondition/main flow/
+  alternate-exception flow/postcondition) instead of user stories and
+  Given/When/Then acceptance scenarios. Notes that
+  .specify/templates/overrides/spec-template.md now encodes this
+  structure so /speckit-specify produces it by default.
+- Added sections: n/a
 - Removed sections: n/a
 - Deferred TODOs: none
 -->
@@ -106,6 +109,22 @@ design. Concretely: a "new todo" screen's spec must not say it opens from
 the dashboard's Add button; the dashboard's spec must say its Add button
 opens the "new todo" screen.
 
+Every `spec.md` MUST include a table of contents. A screen's `spec.md`
+MUST NOT use agile user-story framing (prioritization, independent-test
+notes) — a user story and a screen specification are different things. In
+place of user stories and Given/When/Then acceptance scenarios, a screen's
+`spec.md` MUST describe each flow as a use case: actor, precondition, main
+flow, alternate/exception flows, postcondition. `.specify/templates/
+overrides/spec-template.md` holds this structure so `/speckit-specify`
+produces it by default; edit that file, not this constitution, to adjust
+the template itself.
+Rationale: user-story prioritization exists to sequence incremental
+delivery in a backlog — it says nothing about what a screen must do, and
+mixing it into a specification document that's supposed to state exact,
+implementer-facing behavior only adds noise. A table of contents and
+consistent use-case structure make a multi-screen feature's specs
+navigable instead of a wall of prose.
+
 ## Technology & Deployment Constraints
 
 - Frontend + BFF: Next.js App Router, deployed to Vercel (serverless).
@@ -149,4 +168,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 1.3.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
+**Version**: 1.4.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
