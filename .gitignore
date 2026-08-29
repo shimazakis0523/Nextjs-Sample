@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# openapi-generated (source of truth is the YAML under openapi/**;
+# regenerate with `npm run openapi:bundle:backend` / `npm run openapi:types`)
+/openapi/dist/
+/src/types/api/

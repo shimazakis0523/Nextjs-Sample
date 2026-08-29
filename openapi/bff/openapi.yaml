@@ -1,0 +1,91 @@
+openapi: 3.1.0
+info:
+  title: Nextjs Sample - BFF API
+  version: 1.0.0
+  description: |
+    Next.js が公開する BFF (Backend for Frontend) の API 契約。
+    ブラウザ (フロントエンド) がこのアプリ自身の `/api/**` に対して
+    呼び出すエンドポイントを定義する。実装は `src/app/api/**` の Route Handlers。
+servers:
+  - url: /api
+paths:
+  /health:
+    get:
+      summary: ヘルスチェック
+      operationId: getHealth
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /users:
+    get:
+      summary: ユーザー一覧取得
+      operationId: listUsers
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "../common/schemas/User.yaml#/User"
+
+  /todos:
+    get:
+      summary: Todo一覧取得
+      operationId: listTodos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "../common/schemas/Todo.yaml#/Todo"
+    post:
+      summary: Todo作成
+      operationId: createTodo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../common/schemas/Todo.yaml#/TodoInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "../common/schemas/Todo.yaml#/Todo"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "../common/schemas/Error.yaml#/Error"
+
+  /todos/{id}:
+    delete:
+      summary: Todo削除
+      operationId: deleteTodo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No Content

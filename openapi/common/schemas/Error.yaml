@@ -1,0 +1,7 @@
+Error:
+  type: object
+  required: [error]
+  properties:
+    error:
+      type: string
+      example: "title, dueDate, assignee, status are required"

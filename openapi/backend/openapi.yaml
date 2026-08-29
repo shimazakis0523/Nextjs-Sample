@@ -1,0 +1,74 @@
+openapi: 3.1.0
+info:
+  title: Nextjs Sample - Backend Contract
+  version: 1.0.0
+  description: |
+    Next.js の BFF 層 (`src/lib/backend.ts`) が、実バックエンド
+    (`BACKEND_API_URL`) に対して呼び出す想定の API 契約。実バックエンドの
+    実装者はこの仕様を満たすこと。`BACKEND_API_URL` が未設定の間は
+    `src/lib/mock-todos.ts` / `src/lib/mock-data.ts` がこの契約と同じ形の
+    データをアプリ内でモックしている。
+servers:
+  - url: "{backendApiUrl}"
+    variables:
+      backendApiUrl:
+        default: https://example.com/api
+        description: BACKEND_API_URL 環境変数の値
+paths:
+  /users:
+    get:
+      summary: ユーザー一覧取得
+      operationId: listUsers
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "../common/schemas/User.yaml#/User"
+
+  /todos:
+    get:
+      summary: Todo一覧取得
+      operationId: listTodos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "../common/schemas/Todo.yaml#/Todo"
+    post:
+      summary: Todo作成
+      operationId: createTodo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../common/schemas/Todo.yaml#/TodoInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "../common/schemas/Todo.yaml#/Todo"
+
+  /todos/{id}:
+    delete:
+      summary: Todo削除
+      operationId: deleteTodo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No Content

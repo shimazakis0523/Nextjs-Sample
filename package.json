@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "openapi:lint": "redocly lint",
+    "openapi:bundle:backend": "redocly bundle openapi/backend/openapi.yaml -o openapi/dist/backend.yaml",
+    "openapi:types": "openapi-typescript",
+    "openapi:mock:backend": "npm run openapi:bundle:backend && prism mock openapi/dist/backend.yaml"
   },
   "dependencies": {
     "next": "16.3.3",
@@ -14,11 +18,14 @@
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@redocly/cli": "^2.49.0",
+    "@stoplight/prism-cli": "^5.14.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.3",
+    "openapi-typescript": "^7.13.0",
     "typescript": "^5"
   }
 }

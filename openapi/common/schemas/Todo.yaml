@@ -1,0 +1,41 @@
+Todo:
+  type: object
+  required: [id, title, dueDate, assignee, status]
+  properties:
+    id:
+      type: string
+      example: "1"
+    title:
+      type: string
+      example: "サンプルタスク"
+    dueDate:
+      type: string
+      format: date
+      example: "2026-09-05"
+    assignee:
+      type: string
+      example: "山田太郎"
+    status:
+      $ref: "#/TodoStatus"
+
+TodoInput:
+  type: object
+  required: [title, dueDate, assignee, status]
+  properties:
+    title:
+      type: string
+      example: "サンプルタスク"
+    dueDate:
+      type: string
+      format: date
+      example: "2026-09-05"
+    assignee:
+      type: string
+      example: "山田太郎"
+    status:
+      $ref: "#/TodoStatus"
+
+TodoStatus:
+  type: string
+  enum: ["未着手", "進行中", "完了", "保留"]
+  example: "未着手"

@@ -46,6 +46,13 @@ for local development (`npm run dev`). Real persistence requires a real
 backend, which is why the swap point exists: point `BACKEND_API_URL` at one
 and nothing else here needs to change.
 
+### API contracts (OpenAPI)
+
+Both the BFF's public API (what the frontend calls) and the backend contract
+(what `backend.ts` expects from `BACKEND_API_URL`) are documented as OpenAPI
+specs under [`openapi/`](./openapi/README.md), including how to generate
+TypeScript types and a standalone mock server from them.
+
 ## Getting Started
 
 First, run the development server:

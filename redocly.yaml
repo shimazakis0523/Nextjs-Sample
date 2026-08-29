@@ -1,0 +1,11 @@
+extends:
+  - minimal
+apis:
+  bff:
+    root: openapi/bff/openapi.yaml
+    x-openapi-ts:
+      output: src/types/api/bff.d.ts
+  backend:
+    root: openapi/backend/openapi.yaml
+    x-openapi-ts:
+      output: src/types/api/backend.d.ts
