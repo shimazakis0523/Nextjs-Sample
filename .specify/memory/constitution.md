@@ -1,12 +1,15 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 → 1.0.1 (PATCH — wording clarification only)
-- Modified principles: n/a — bullet under "Technology & Deployment
-  Constraints" reworded (not a Core Principle). Old wording framed
-  "no login" as something features MUST satisfy; new wording states it as
-  a current infrastructure fact and keeps the actual rule (no ad-hoc
-  per-feature auth) as the governance concern.
-- Added sections: n/a
+- Version change: 1.0.1 → 1.1.0 (MINOR — new principle added)
+- Modified principles: n/a
+- Added sections: Core Principles > VI. Spec Documents State Requirements,
+  Not Process — codifies rules established while writing
+  specs/001-todo-dashboard/**: spec.md in Japanese; one screen (modal
+  included) per screens/<id>/spec.md, feature-level spec.md limited to
+  screen list + shared entities/assumptions; spec.md states only its own
+  screen/feature's requirements, no authoring-process or other-feature/
+  infrastructure-status commentary; checklists/requirements.md is exempt
+  as a quality-detection harness.
 - Removed sections: n/a
 - Deferred TODOs: none
 -->
@@ -69,6 +72,29 @@ Rationale: this is a small sample/learning project; every added layer of
 indirection has to earn its place by making something easier to change,
 not harder to read.
 
+### VI. Spec Documents State Requirements, Not Process
+`spec.md` files under `specs/**` MUST be written in Japanese. One screen —
+including a modal or any other UI with its own layout and flow, even
+without an independent URL — gets exactly one `screens/<screen-id>/spec.md`.
+A feature directory's top-level `spec.md` is limited to the screen list,
+cross-screen entities, and cross-screen assumptions; it MUST NOT duplicate
+per-screen requirement detail. A `spec.md` MUST state only what its own
+screen or feature does. It MUST NOT reference how or when it was authored
+(e.g. "written retroactively"), project-management facts (branch names,
+when a tool was adopted), or the current state of unrelated, not-yet-built
+features or infrastructure (e.g. that login doesn't exist yet, that no
+real backend is connected) — if a fact isn't one of this screen's own
+requirements, it doesn't belong in this screen's spec. `checklists/
+requirements.md` is exempt from this: it is a quality-detection harness,
+not a requirements document, and may reference tooling, process, or
+anything else needed to reliably catch and correct spec defects.
+Rationale: a spec is handed to an implementer expecting it to describe
+only what to build; process commentary and other features' status are
+noise at best and, as happened when "no login yet" read as this feature
+requiring no login, get mistaken for actual requirements. Splitting large
+features into one file per screen keeps each file reviewable instead of
+growing into one sprawling document.
+
 ## Technology & Deployment Constraints
 
 - Frontend + BFF: Next.js App Router, deployed to Vercel (serverless).
@@ -107,4 +133,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 1.0.1 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
+**Version**: 1.1.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
