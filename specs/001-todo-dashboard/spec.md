@@ -12,11 +12,6 @@ built before Spec Kit was introduced)
 ダッシュボード画面を作りたい。Todo情報はTodo名・期限・担当者・ステータスのみ。追加は『+ Add』
 ボタンからモーダルでSaveする形。"
 
-> **要確認 (Open Points)**: このspecは既存実装を精査して書き起こしたものです。実装は動くが、
-> 顧客要件として明示的に決定されたわけではなく、実装上の成り行きになっている箇所が数点ありま
-> す。該当箇所には **[要確認]** を付けています。レビューして、このまま仕様として確定するか、
-> 修正するか判断してください。
-
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - View the todo list (Priority: P1)
@@ -61,24 +56,17 @@ independently of deletion.
 2. **Given** the add modal is open with all required fields filled, **When** the visitor
    clicks "Save", **Then** the todo is created, the modal closes, and the new todo appears at
    the end of the list.
-3. **Given** the add modal is open, **When** the visitor clicks "Cancel", clicks outside the
-   modal (on the dimmed background), **Then** the modal closes and no todo is created.
-   **[要確認]**: pressing the Escape key currently does **not** close the modal (no keyboard
-   handler exists). Confirm whether Escape should also close it.
+3. **Given** the add modal is open, **When** the visitor clicks "Cancel" or clicks outside the
+   modal (on the dimmed background), **Then** the modal closes and no todo is created. The
+   Escape key does NOT close the modal — Cancel or clicking outside are the only ways.
 4. **Given** the add modal is open, **When** the visitor tries to submit with `Todo名`,
-   `期限`, or `担当者` empty, **Then** the browser blocks submission natively (via HTML
-   required-field validation) and the request is never sent — see FR-011.
-   **[要確認]**: this uses the browser's own built-in validation UI (a small native tooltip
-   in the browser's language, not a message drawn by this app). Confirm whether that native
-   browser behavior is acceptable or whether the app should render its own inline message
-   instead.
+   `期限`, or `担当者` empty, **Then** the browser's native required-field validation blocks
+   submission and shows its own built-in message; the request is never sent — see FR-011.
 5. **Given** the add modal is open and submission is attempted, **When** the server rejects
-   the request or the network request fails for any reason, **Then** the text
+   the request or the network request fails for any reason, **Then** the fixed text
    "保存に失敗しました" is shown inside the modal, and the visitor's entered values remain in
-   the form. **[要確認]**: this message is the same fixed text regardless of the actual
-   cause (missing field rejected server-side, network failure, etc.) — the server's more
-   specific reason is not shown to the visitor. Confirm whether a generic message is
-   sufficient or whether the specific reason should be surfaced.
+   the form. This message text does not vary by cause — the same text is shown whether the
+   server rejected the data or the network request failed outright.
 
 ---
 
@@ -101,9 +89,8 @@ and verify it is gone from the list.
 3. **Given** the confirmation dialog is shown, **When** the visitor dismisses it (Cancel),
    **Then** the todo remains in the list, unchanged.
 4. **Given** the delete request fails (server or network error), **When** this happens after
-   the visitor confirmed, **Then** the todo remains in the list. **[要確認]**: no error
-   message is shown to the visitor in this case — the delete simply appears to do nothing.
-   Confirm whether a failure message is required.
+   the visitor confirmed, **Then** the todo remains in the list and no error message is
+   shown — the failed delete simply appears to do nothing.
 
 ### Edge Cases
 
@@ -125,12 +112,12 @@ and verify it is gone from the list.
   row's delete control.
 - **FR-002**: Each row MUST show, for one todo: its name, its due date, its assignee, and a
   status badge showing the status text.
-- **FR-003**: Todos MUST be listed in the order they were added, oldest first. **[要確認]**:
-  no other sort (e.g. by due date or status) exists. Confirm this is the intended order.
+- **FR-003**: Todos MUST be listed in the order they were added, oldest first. No other sort
+  (e.g. by due date or status) is offered.
 - **FR-004**: When there are zero todos, the System MUST show the text "Todoがありません" in
   place of the table rows.
 - **FR-005**: The System MUST NOT provide sorting, filtering, or search controls for the
-  list. **[要確認]**: confirm this is an accepted boundary and not a missing capability.
+  list.
 - **FR-006**: The System MUST NOT provide any way to edit an existing todo's fields — only
   add and delete are supported.
 
@@ -145,23 +132,21 @@ and verify it is gone from the list.
 
   | # | Label | Input type | Required | Allowed values / format | Length limit |
   |---|-------|-----------|----------|--------------------------|--------------|
-  | 1 | Todo名 (title) | free-text | Yes | any text | none enforced **[要確認]** |
-  | 2 | 期限 (dueDate) | date picker | Yes | any calendar date (past or future) **[要確認]** | n/a |
-  | 3 | 担当者 (assignee) | free-text | Yes | any text | none enforced **[要確認]** |
+  | 1 | Todo名 (title) | free-text | Yes | any text | none |
+  | 2 | 期限 (dueDate) | date picker | Yes | any calendar date, including past dates | n/a |
+  | 3 | 担当者 (assignee) | free-text | Yes | any text | none |
   | 4 | ステータス (status) | dropdown | Yes (has default) | exactly one of: 未着手, 進行中, 完了, 保留, in that order | n/a |
 
-  **[要確認]**: `Todo名` and `担当者` currently accept text of any length — there is no
-  maximum character count either in the form or on the server. Confirm whether a maximum
-  should be defined (a common screen-definition requirement) or whether unlimited length is
-  intentional. Same question for whether `期限` should reject past dates.
+  `Todo名` and `担当者` accept text of any length — there is no maximum character count.
+  `期限` accepts any calendar date, including dates in the past.
 
 - **FR-011**: If a required field (`Todo名`, `期限`, `担当者`) is left empty, the System MUST
-  prevent the form from being submitted (currently via the browser's native required-field
-  validation, before any network request is made).
+  prevent the form from being submitted (via the browser's native required-field validation,
+  before any network request is made).
 - **FR-012**: The add modal MUST provide two explicit ways to close it without saving: a
-  button labeled "Cancel", and clicking the dimmed area outside the modal. **[要確認]**: the
-  Cancel/Save/Saving labels are in English while the rest of the screen is in Japanese;
-  confirm whether that is intentional or should be localized (e.g. "キャンセル"/"保存").
+  button labeled "Cancel", and clicking the dimmed area outside the modal. The Cancel/Save
+  buttons are labeled in English; the rest of the screen is in Japanese — this mixed labeling
+  is the confirmed requirement, not a placeholder.
 - **FR-013**: While a save is in progress, the Save button MUST show the text "Saving..." and
   both the Cancel and Save buttons MUST be disabled until the request finishes.
 - **FR-014**: On successful save, the System MUST close the modal and add the new todo to the
@@ -179,8 +164,7 @@ and verify it is gone from the list.
 - **FR-018**: If the visitor confirms, the System MUST remove the todo from the list
   immediately; if the visitor cancels the dialog, the todo MUST remain unchanged.
 - **FR-019**: If the delete request fails after confirmation, the System MUST leave the todo
-  in the list. **[要確認]**: no failure message is currently shown to the visitor in this
-  case. Confirm whether one should be.
+  in the list. No failure message is shown to the visitor in this case.
 
 ### Key Entities
 
