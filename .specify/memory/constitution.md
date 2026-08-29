@@ -1,15 +1,13 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.1 → 1.1.0 (MINOR — new principle added)
-- Modified principles: n/a
-- Added sections: Core Principles > VI. Spec Documents State Requirements,
-  Not Process — codifies rules established while writing
-  specs/001-todo-dashboard/**: spec.md in Japanese; one screen (modal
-  included) per screens/<id>/spec.md, feature-level spec.md limited to
-  screen list + shared entities/assumptions; spec.md states only its own
-  screen/feature's requirements, no authoring-process or other-feature/
-  infrastructure-status commentary; checklists/requirements.md is exempt
-  as a quality-detection harness.
+- Version change: 1.1.0 → 1.2.0 (MINOR — existing principle materially
+  expanded)
+- Modified principles: VI. Spec Documents State Requirements, Not Process
+  — added a MUST NOT (no entry-point/launch-source references) paired
+  with a MUST (a screen states its own outbound navigation as its own
+  functional requirement), replacing the earlier permissive framing
+  ("stating your own outbound nav is fine") with a binary rule.
+- Added sections: n/a
 - Removed sections: n/a
 - Deferred TODOs: none
 -->
@@ -95,6 +93,19 @@ requiring no login, get mistaken for actual requirements. Splitting large
 features into one file per screen keeps each file reviewable instead of
 growing into one sprawling document.
 
+A screen's `spec.md` MUST NOT state which screen(s) launch it (its entry
+point). A screen's `spec.md` MUST state its own outbound navigation — each
+of its own buttons/links and which screen each one leads to — as a
+functional requirement of that screen.
+Rationale: any screen can be launched from any screen, now or in a future
+change, so recording an entry point bakes in a dependency that doesn't
+reflect reality and will drift the moment a second entry point exists.
+Describing a screen's own outbound actions is different in kind: that is
+the screen stating its own behavior, not depending on another screen's
+design. Concretely: a "new todo" screen's spec must not say it opens from
+the dashboard's Add button; the dashboard's spec must say its Add button
+opens the "new todo" screen.
+
 ## Technology & Deployment Constraints
 
 - Frontend + BFF: Next.js App Router, deployed to Vercel (serverless).
@@ -133,4 +144,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 1.1.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
+**Version**: 1.2.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
