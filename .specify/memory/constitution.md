@@ -1,9 +1,12 @@
 <!--
 Sync Impact Report
-- Version change: (none) → 1.0.0 (initial ratification)
-- Modified principles: n/a (first version)
-- Added sections: Core Principles (I–V), Technology & Deployment Constraints,
-  Development Workflow (Spec-Driven), Governance
+- Version change: 1.0.0 → 1.0.1 (PATCH — wording clarification only)
+- Modified principles: n/a — bullet under "Technology & Deployment
+  Constraints" reworded (not a Core Principle). Old wording framed
+  "no login" as something features MUST satisfy; new wording states it as
+  a current infrastructure fact and keeps the actual rule (no ad-hoc
+  per-feature auth) as the governance concern.
+- Added sections: n/a
 - Removed sections: n/a
 - Deferred TODOs: none
 -->
@@ -71,9 +74,10 @@ not harder to read.
 - Frontend + BFF: Next.js App Router, deployed to Vercel (serverless).
 - No database in this app. Data is either mocked in-app (Principle II) or
   served by a real backend reached via `BACKEND_API_URL`.
-- No authentication yet. Features MUST remain usable without login until a
-  future amendment adds an auth principle — do not gate features behind
-  ad-hoc, unspecified auth checks.
+- Authentication is not yet part of this project's infrastructure. Do not
+  add feature-specific or ad-hoc login/session checks to work around that —
+  when authentication is introduced, it MUST be its own amendment applied
+  consistently across features, not bolted onto one feature at a time.
 
 ## Development Workflow (Spec-Driven)
 
@@ -103,4 +107,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 1.0.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
+**Version**: 1.0.1 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
