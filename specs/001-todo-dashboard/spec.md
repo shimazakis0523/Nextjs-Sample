@@ -14,12 +14,10 @@
 
 ## 画面一覧
 
-| 画面ID | 画面名 | 起動方法 | 仕様書 |
+| 画面ID | 画面名 | URL | 仕様書 |
 |---|---|---|---|
-| `todo-list` | Todo一覧画面 | URL `/dashboard` に直接アクセス | [screens/todo-list/spec.md](screens/todo-list/spec.md) |
-| `todo-new` | Todo新規登録画面 | Todo一覧画面からの操作で開く(詳細は[todo-list](screens/todo-list/spec.md)を参照) | [screens/todo-new/spec.md](screens/todo-new/spec.md) |
-
-Todo新規登録画面は独立したURLを持たない別画面として扱う(一覧画面内の一部品ではない)。
+| `todo-list` | Todo一覧画面 | `/dashboard` | [screens/todo-list/spec.md](screens/todo-list/spec.md) |
+| `todo-new` | Todo新規登録画面 | なし(モーダル) | [screens/todo-new/spec.md](screens/todo-new/spec.md) |
 
 ## 主要エンティティ *(機能内の全画面で共通)*
 
