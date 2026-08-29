@@ -1,22 +1,15 @@
 <!--
 Sync Impact Report
-- Version change: 1.4.0 → 2.0.0 (MAJOR — backward-incompatible
-  redefinition of an existing principle's required document shape)
-- Modified principles: VI. Spec Documents State Requirements, Not Process
-  — replaced the earlier "user story -> use case" swap with a full
-  document-shape redefinition: a screen's spec.md is now exactly two
-  parts, ユースケース定義 (use-case descriptions, unchanged) and 画面定義
-  (新設, split into 画面入出力仕様 — every rendered element, one
-  self-contained row each, no prose outside the table — and 処理仕様 —
-  one row per trigger, 初期表示 first, frontend-scope only, no API/DB
-  internals). Functional-requirement (FR-xxx) lists, a Success Criteria
-  section, and a Key Entities section are no longer part of a screen's
-  spec.md; entity/data-model definition is now explicitly out of scope
-  for any spec.md (that's openapi/common/schemas/**'s job).
-  .specify/templates/overrides/spec-template.md rewritten to match.
-- Added sections: n/a
-- Removed sections: n/a
-- Deferred TODOs: none
+- Version change: 2.0.0 → 2.0.1 (PATCH — clarification/correction)
+- Modified: VI's 処理仕様 rule corrected. It previously banned naming a
+  called API entirely; that was too strict — the endpoint (method + path)
+  is a contract fact needed to implement the screen and already governed
+  by Principle III, so a row MUST name it. What stays out is the
+  endpoint's own request/response shape and backend-internal behavior
+  (still openapi/bff/openapi.yaml's job, cited not restated). Also fixed
+  a wrong reference (openapi/backend/openapi.yaml -> openapi/bff/
+  openapi.yaml — a screen calls this app's own BFF endpoints per
+  Principle I, not the upstream backend contract directly).
 -->
 
 # Nextjs Sample (BFF) Constitution
@@ -107,12 +100,14 @@ A screen's `spec.md` MUST be organized as exactly two parts:
   - **処理仕様**: one row per trigger (initial display, or a screen
     operation). The 初期表示 (initial display) row MUST be first; other
     rows SHOULD follow the on-screen order of the controls they respond
-    to. This table MUST stay scoped to frontend-observable behavior: it
-    MAY say a backend process is invoked and how success/failure branch
-    from the screen's point of view, but MUST NOT describe that process's
-    own internals (request/response shape, persistence, database
-    writes) — that belongs to the backend's own contract
-    (`openapi/backend/openapi.yaml`), not this screen's spec.
+    to. This table MUST stay scoped to frontend-observable behavior: when
+    a row calls a BFF endpoint, it MUST name that endpoint (method + path,
+    e.g. `POST /api/todos`) — that's a contract fact both sides need, not
+    an internal detail — but MUST NOT restate that endpoint's own request/
+    response shape, status codes, or backend-internal behavior (database
+    writes, persistence); those stay solely in `openapi/bff/openapi.yaml`,
+    cited by reference. A row states only how success/failure branch from
+    the screen's own point of view.
 
 `.specify/templates/overrides/spec-template.md` holds this structure so
 `/speckit-specify` produces it by default; edit that file, not this
@@ -187,4 +182,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 2.0.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
+**Version**: 2.0.1 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
