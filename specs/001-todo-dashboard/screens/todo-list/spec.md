@@ -2,13 +2,9 @@
 
 **画面ID**: `todo-list`
 
-**親機能**: `001-todo-dashboard`
-
 **対象URL**: `/dashboard`
 
 **作成日**: 2026-08-29
-
-**ステータス**: Draft
 
 ## 目次
 

@@ -1,15 +1,14 @@
 <!--
 Sync Impact Report
-- Version change: 2.0.0 → 2.0.1 (PATCH — clarification/correction)
-- Modified: VI's 処理仕様 rule corrected. It previously banned naming a
-  called API entirely; that was too strict — the endpoint (method + path)
-  is a contract fact needed to implement the screen and already governed
-  by Principle III, so a row MUST name it. What stays out is the
-  endpoint's own request/response shape and backend-internal behavior
-  (still openapi/bff/openapi.yaml's job, cited not restated). Also fixed
-  a wrong reference (openapi/backend/openapi.yaml -> openapi/bff/
-  openapi.yaml — a screen calls this app's own BFF endpoints per
-  Principle I, not the upstream backend contract directly).
+- Version change: 2.0.1 → 2.0.2 (PATCH — existing rule extended to two
+  more header fields)
+- Modified: VI now additionally bans two spec.md header fields: a
+  cross-reference to the parent feature directory (redundant with the
+  file's own path) and a document status/workflow field like "Draft"
+  (process tracking, not design content — same category as the
+  authoring-process ban already in this principle). Removed 親機能 and
+  ステータス from specs/001-todo-dashboard/**/spec.md and from
+  .specify/templates/overrides/spec-template.md.
 -->
 
 # Nextjs Sample (BFF) Constitution
@@ -118,6 +117,10 @@ NOT reference how or when it was authored (e.g. "written retroactively"),
 project-management facts (branch names, when a tool was adopted), or the
 current state of unrelated, not-yet-built features or infrastructure
 (e.g. that login doesn't exist yet, that no real backend is connected).
+A `spec.md`'s own header MUST NOT include a cross-reference to its parent
+feature directory (its file path already shows that) or a document
+status/workflow field (e.g. "Draft") — document lifecycle is tracked by
+the PR/review process, not written into the design content itself.
 A screen's `spec.md` MUST NOT state which screen(s) launch it (its entry
 point) — any screen can be launched from any screen, now or in a future
 change, so recording an entry point bakes in a dependency that doesn't
@@ -182,4 +185,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 2.0.1 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
+**Version**: 2.0.2 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
