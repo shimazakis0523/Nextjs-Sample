@@ -1,13 +1,13 @@
 <!--
 Sync Impact Report
-- Version change: 1.1.0 → 1.2.0 (MINOR — existing principle materially
-  expanded)
-- Modified principles: VI. Spec Documents State Requirements, Not Process
-  — added a MUST NOT (no entry-point/launch-source references) paired
-  with a MUST (a screen states its own outbound navigation as its own
-  functional requirement), replacing the earlier permissive framing
-  ("stating your own outbound nav is fine") with a binary rule.
-- Added sections: n/a
+- Version change: 1.2.0 → 1.3.0 (MINOR — Development Workflow section
+  materially expanded)
+- Modified principles: n/a
+- Added sections: Development Workflow (Spec-Driven) gains a bullet
+  requiring the update-screen-flow-diagram skill to run (regenerating
+  specs/<feature>/screen-flow.md) whenever a screen's own
+  outbound-navigation FR changes — the screen-flow counterpart to the
+  existing check-openapi-contract rule.
 - Removed sections: n/a
 - Deferred TODOs: none
 -->
@@ -128,6 +128,11 @@ opens the "new todo" screen.
 - Any task that touches `src/app/api/**` or `src/lib/backend.ts` MUST
   include updating the relevant `openapi/**/*.yaml` as part of the task
   itself, not as a follow-up.
+- Adding, changing, or removing a functional requirement that states a
+  screen's own outbound navigation (Principle VI) MUST be followed by
+  running the `update-screen-flow-diagram` skill to regenerate the
+  corresponding `specs/<feature-directory>/screen-flow.md` before the
+  change is considered complete.
 
 ## Governance
 
@@ -144,4 +149,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 1.2.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
+**Version**: 1.3.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
