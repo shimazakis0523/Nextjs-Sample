@@ -1,44 +1,44 @@
-# Specification Quality Checklist: Todo Dashboard
+# 仕様品質チェックリスト: Todoダッシュボード
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-08-29
-**Feature**: [spec.md](../spec.md)
+**目的**: 設計(`/speckit-plan`)に進む前に、仕様の完全性と品質を検証する
+**作成日**: 2026-08-29
+**対象**: [spec.md](../spec.md)
 
-## Content Quality
+## 内容の品質
 
-- [x] No implementation details (languages, frameworks, APIs)
-- [x] Focused on user value and business needs
-- [x] Written for non-technical stakeholders
-- [x] All mandatory sections completed
+- [x] 実装詳細(言語・フレームワーク・API等)が含まれていない
+- [x] ユーザー価値・業務要求に焦点が当たっている
+- [x] 非技術者が読んでも理解できる記述になっている
+- [x] 必須セクションが全て記載されている
 
-## Requirement Completeness
+## 要件の網羅性
 
-- [x] No [NEEDS CLARIFICATION] markers remain
-- [x] Requirements are testable and unambiguous
-- [x] Success criteria are measurable
-- [x] Success criteria are technology-agnostic (no implementation details)
-- [x] All acceptance scenarios are defined
-- [x] Edge cases are identified
-- [x] Scope is clearly bounded
-- [x] Dependencies and assumptions identified
+- [x] [要確認]マーカーが残っていない
+- [x] 各要件がテスト可能かつ曖昧さがない
+- [x] 成功基準が測定可能である
+- [x] 成功基準が技術非依存である(実装詳細を含まない)
+- [x] 受け入れシナリオが全て定義されている
+- [x] エッジケースが洗い出されている
+- [x] スコープの境界が明確である
+- [x] 前提事項・依存関係が明記されている
 
-## Feature Readiness
+## 画面としてのReadiness
 
-- [x] All functional requirements have clear acceptance criteria
-- [x] User scenarios cover primary flows
-- [x] Feature meets measurable outcomes defined in Success Criteria
-- [x] No implementation details leak into specification
+- [x] 全ての機能要件に明確な受け入れ基準がある
+- [x] ユーザーシナリオが主要フローを網羅している
+- [x] 成功基準で定義した成果を満たしている
+- [x] 実装詳細が仕様に漏れ出していない
 
-## Notes
+## 備考
 
-- Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`
-- This spec documents an already-implemented feature at screen-definition granularity: exact
-  labels, field constraints, ordering, and validation/error behavior, extracted directly from
-  `TodoDashboard.tsx` and `src/app/api/todos/route.ts` rather than paraphrased.
-- Extracting that level of detail surfaced 8 points where the built behavior was not
-  previously a decided requirement (English/Japanese-mixed button labels, no character
-  limits, no past-date check on `期限`, insertion-order-only sorting, no sort/filter,
-  native-browser validation messaging, a single generic save-failure message regardless of
-  cause, and no failure message on delete). Per explicit product decision, all 8 were
-  resolved by adopting the current implementation's behavior as the confirmed requirement —
-  spec.md now states each definitively, with no remaining markers.
+- 未完了の項目がある場合は、`/speckit-clarify`または`/speckit-plan`に進む前にspec.mdを
+  修正すること
+- この仕様は既に実装済みの画面を、画面定義書相当の粒度(正確な文言・項目制約・並び順・
+  バリデーション/エラー時の挙動)で記述したもの。`TodoDashboard.tsx`と
+  `src/app/api/todos/route.ts`を直接確認して書き起こしている
+- 精査の過程で、実装上の成り行きであり明示的な要件として決定されていなかった箇所が8件
+  見つかった(英語/日本語混在のボタン文言、Todo名/担当者の文字数上限なし、期限の過去日
+  制限なし、並び順が追加順のみでソート/絞り込み無し、ブラウザ標準のバリデーション表示、
+  保存失敗時の理由非表示・固定文言のみ、削除失敗時のエラーメッセージ無し)。プロダクト
+  判断として、これら8件は現状の実装の挙動をそのまま確定要件として採用することとした。
+  spec.mdは全て確定した記述になっており、残課題は無い

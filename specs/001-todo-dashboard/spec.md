@@ -1,198 +1,191 @@
-# Feature Specification: Todo Dashboard
+# 画面仕様書: Todoダッシュボード
 
-**Feature Branch**: `001-todo-dashboard` (spec directory; documented retroactively on the
-existing working branch `claude/nextjs-blank-bff-project-qvd8tc` — this feature was already
-built before Spec Kit was introduced)
+**画面ディレクトリ**: `001-todo-dashboard`（既存実装を精査して後追いで作成。作業ブランチ
+`claude/nextjs-blank-bff-project-qvd8tc` 上に作成。Spec Kit導入前に実装済みだった画面）
 
-**Created**: 2026-08-29
+**対象画面**: `/dashboard`
 
-**Status**: Draft (retroactive — describes an already-implemented feature)
+**作成日**: 2026-08-29
 
-**Input**: User description: "ログイン不要で誰でも使える、Todoの一覧表示・追加・削除ができる
-ダッシュボード画面を作りたい。Todo情報はTodo名・期限・担当者・ステータスのみ。追加は『+ Add』
-ボタンからモーダルでSaveする形。"
+**ステータス**: Draft（後追い仕様化 — 既に実装済みの画面の挙動を記述したもの）
 
-## User Scenarios & Testing *(mandatory)*
+## ユーザーシナリオ・受け入れテスト *(必須)*
 
-### User Story 1 - View the todo list (Priority: P1)
+### ユーザーストーリー1 - Todo一覧の閲覧 (優先度: P1)
 
-Any visitor opens the dashboard and sees every current todo, with its name, due date,
-assignee, and status.
+訪問者がダッシュボードを開くと、現在存在する全てのTodoが、名前・期限・担当者・ステータス
+とともに表示される。
 
-**Why this priority**: Without a visible list, there is nothing to act on — this is the
-minimum viable slice of the feature.
+**この優先度の理由**: 一覧が見えなければ何も操作できない。この機能の最小構成(MVP)。
 
-**Independent Test**: Open the dashboard with no prior setup. If todos already exist, they
-are listed with all four fields. If none exist, a clear "no todos" message is shown instead
-of an empty table.
+**独立テスト方法**: 事前準備なしにダッシュボードを開く。Todoが既にあれば4項目とともに一覧
+表示される。1件も無ければ、空である旨のメッセージが表示される。
 
-**Acceptance Scenarios**:
+**受け入れシナリオ**:
 
-1. **Given** one or more todos exist, **When** a visitor opens the dashboard, **Then** each
-   todo's name, due date, assignee, and status are displayed, in the order the todos were
-   added (oldest first) — see FR-003.
-2. **Given** no todos exist, **When** a visitor opens the dashboard, **Then** the text
-   "Todoがありません" is shown instead of an empty table.
+1. **前提** Todoが1件以上存在する、**操作** 訪問者がダッシュボードを開く、**結果** 各Todo
+   の名前・期限・担当者・ステータスが、追加された順(古い順)に表示される — FR-003参照。
+2. **前提** Todoが1件も存在しない、**操作** 訪問者がダッシュボードを開く、**結果**
+   「Todoがありません」というテキストが、空のテーブルの代わりに表示される。
 
 ---
 
-### User Story 2 - Add a todo (Priority: P2)
+### ユーザーストーリー2 - Todoの追加 (優先度: P2)
 
-A visitor adds a new todo by opening a form, filling in its details, and saving it, and sees
-it appear in the list immediately.
+訪問者がフォームを開いて内容を入力し、保存することで新しいTodoを追加し、即座に一覧に反映
+される。
 
-**Why this priority**: The list is only useful if visitors can add to it; this is the second
-most critical capability after viewing.
+**この優先度の理由**: 一覧を見るだけでなく追加できて初めて実用的になる。閲覧の次に重要な
+機能。
 
-**Independent Test**: From the dashboard, trigger the add action, fill in all required
-fields, and save. The new todo appears in the list without reloading the page. Can be tested
-independently of deletion.
+**独立テスト方法**: ダッシュボードから追加操作を行い、必須項目を全て入力して保存する。
+ページを再読み込みすることなく、新しいTodoが一覧に追加される。削除機能とは独立してテスト
+可能。
 
-**Acceptance Scenarios**:
+**受け入れシナリオ**:
 
-1. **Given** the dashboard is open, **When** a visitor clicks the "+ Add" button, **Then** a
-   modal titled "Todoを追加" opens, containing the fields defined in FR-010, and the
-   `Todo名` input has whatever value is typed into it (form starts empty).
-2. **Given** the add modal is open with all required fields filled, **When** the visitor
-   clicks "Save", **Then** the todo is created, the modal closes, and the new todo appears at
-   the end of the list.
-3. **Given** the add modal is open, **When** the visitor clicks "Cancel" or clicks outside the
-   modal (on the dimmed background), **Then** the modal closes and no todo is created. The
-   Escape key does NOT close the modal — Cancel or clicking outside are the only ways.
-4. **Given** the add modal is open, **When** the visitor tries to submit with `Todo名`,
-   `期限`, or `担当者` empty, **Then** the browser's native required-field validation blocks
-   submission and shows its own built-in message; the request is never sent — see FR-011.
-5. **Given** the add modal is open and submission is attempted, **When** the server rejects
-   the request or the network request fails for any reason, **Then** the fixed text
-   "保存に失敗しました" is shown inside the modal, and the visitor's entered values remain in
-   the form. This message text does not vary by cause — the same text is shown whether the
-   server rejected the data or the network request failed outright.
+1. **前提** ダッシュボードが表示されている、**操作** 訪問者が「+ Add」ボタンをクリックする、
+   **結果** タイトルが「Todoを追加」のモーダルが開き、FR-010で定義するフォームが表示される
+   (フォームは空の状態で開始する)。
+2. **前提** 追加モーダルが開いており必須項目が全て入力済み、**操作** 訪問者が「Save」を
+   クリックする、**結果** Todoが作成され、モーダルが閉じ、新しいTodoが一覧の末尾に追加され
+   る。
+3. **前提** 追加モーダルが開いている、**操作** 訪問者が「Cancel」をクリックする、または
+   モーダル外側(暗くなっている背景部分)をクリックする、**結果** モーダルが閉じ、Todoは作成
+   されない。なお、Escキーを押してもモーダルは閉じない(「Cancel」またはモーダル外クリック
+   のみが閉じる手段)。
+4. **前提** 追加モーダルが開いている、**操作** 訪問者が`Todo名`・`期限`・`担当者`のいずれ
+   かを空欄のまま保存しようとする、**結果** ブラウザ標準の必須入力チェックにより送信がブロ
+   ックされ、リクエストは送信されない — FR-011参照。
+5. **前提** 追加モーダルが開いており送信操作が行われた、**操作** サーバーがリクエストを
+   拒否する、またはネットワークエラーが発生する、**結果** 「保存に失敗しました」という固定
+   文言がモーダル内に表示され、訪問者が入力した値は消えずに残る。この文言は原因(サーバー側
+   の拒否かネットワーク障害か等)によらず常に同じ固定文言である。
 
 ---
 
-### User Story 3 - Delete a todo (Priority: P3)
+### ユーザーストーリー3 - Todoの削除 (優先度: P3)
 
-A visitor removes a todo they no longer need, after confirming the action.
+訪問者が不要になったTodoを、確認操作を経て削除する。
 
-**Why this priority**: Useful for keeping the list current, but the feature is usable without
-it (view and add already deliver value), so it is the lowest-priority independent slice.
+**この優先度の理由**: 一覧を整理する上で有用だが、閲覧・追加だけでも機能として成立するため
+優先度は最も低い。
 
-**Independent Test**: With at least one todo in the list, trigger its delete action, confirm,
-and verify it is gone from the list.
+**独立テスト方法**: 一覧に1件以上Todoがある状態で削除操作を行い、確認後に一覧から消える
+ことを確認する。
 
-**Acceptance Scenarios**:
+**受け入れシナリオ**:
 
-1. **Given** a todo exists in the list, **When** a visitor clicks its "削除" button, **Then**
-   a confirmation dialog with the text "このTodoを削除しますか？" appears.
-2. **Given** the confirmation dialog is shown, **When** the visitor confirms (OK), **Then**
-   the todo is removed from the list immediately.
-3. **Given** the confirmation dialog is shown, **When** the visitor dismisses it (Cancel),
-   **Then** the todo remains in the list, unchanged.
-4. **Given** the delete request fails (server or network error), **When** this happens after
-   the visitor confirmed, **Then** the todo remains in the list and no error message is
-   shown — the failed delete simply appears to do nothing.
+1. **前提** 一覧にTodoが存在する、**操作** 訪問者がその行の「削除」ボタンをクリックする、
+   **結果** 「このTodoを削除しますか？」という文言の確認ダイアログが表示される。
+2. **前提** 確認ダイアログが表示されている、**操作** 訪問者が確認する(OK)、**結果** その
+   Todoが一覧から即座に削除される。
+3. **前提** 確認ダイアログが表示されている、**操作** 訪問者がキャンセルする、**結果** Todo
+   は変更されず一覧に残る。
+4. **前提** 訪問者が確認操作を行った後、**操作** 削除リクエストがサーバーエラーまたは
+   ネットワークエラーで失敗する、**結果** Todoは一覧に残り、訪問者にはエラーメッセージは
+   表示されない(削除操作は何も起きなかったように見える)。
 
-### Edge Cases
+### エッジケース
 
-- Zero todos: the text "Todoがありません" is shown, spanning the full table width, instead of
-  an empty table (User Story 1).
-- Missing required field on add: blocked client-side by the browser before any request is
-  sent (User Story 2, Scenario 4).
-- Add/delete request failure: see User Story 2 Scenario 5 and User Story 3 Scenario 4.
-- Delete confirmation dismissed: no change (User Story 3, Scenario 3).
-- Todos added or deleted in a previous visit may be missing on a later visit — an accepted
-  limitation of the current data stage (see Assumptions), not something this feature governs.
+- Todoが0件のとき: テーブル全幅にわたって「Todoがありません」が表示される(ユーザースト
+  ーリー1)。
+- 追加時の必須項目未入力: ブラウザによりリクエスト送信前にブロックされる(ユーザーストー
+  リー2 シナリオ4)。
+- 追加/削除リクエストの失敗: ユーザーストーリー2 シナリオ5、ユーザーストーリー3 シナリオ4
+  を参照。
+- 削除確認のキャンセル: 変更なし(ユーザーストーリー3 シナリオ3)。
+- 過去の操作で追加/削除したTodoが、別のタイミングで見えなくなっている場合がある — 現在の
+  データ基盤の既知の制約であり(Assumptions参照)、この画面の仕様の範囲外。
 
-## Requirements *(mandatory)*
+## 要件 *(必須)*
 
-### Functional Requirements — List Display
+### 機能要件 — 一覧表示
 
-- **FR-001**: System MUST display a table with exactly these columns, in this order:
-  `Todo名`, `期限`, `担当者`, `ステータス`, and an unlabeled action column containing each
-  row's delete control.
-- **FR-002**: Each row MUST show, for one todo: its name, its due date, its assignee, and a
-  status badge showing the status text.
-- **FR-003**: Todos MUST be listed in the order they were added, oldest first. No other sort
-  (e.g. by due date or status) is offered.
-- **FR-004**: When there are zero todos, the System MUST show the text "Todoがありません" in
-  place of the table rows.
-- **FR-005**: The System MUST NOT provide sorting, filtering, or search controls for the
-  list.
-- **FR-006**: The System MUST NOT provide any way to edit an existing todo's fields — only
-  add and delete are supported.
+- **FR-001**: 画面は以下の列をこの順番で持つテーブルを表示しなければならない: `Todo名`、
+  `期限`、`担当者`、`ステータス`、および各行の削除操作を含む見出しなしの操作列。
+- **FR-002**: 各行は1件のTodoについて、その名前・期限・担当者・ステータスバッジ(ステータ
+  ス文字列)を表示しなければならない。
+- **FR-003**: Todoは追加された順(古い順)で一覧表示されなければならない。それ以外の並び順
+  (期限順・ステータス順など)は提供しない。
+- **FR-004**: Todoが0件のとき、画面はテーブル行の代わりに「Todoがありません」というテキス
+  トを表示しなければならない。
+- **FR-005**: 画面は一覧に対するソート・絞り込み・検索の機能を提供してはならない。
+- **FR-006**: 画面は既存Todoの編集機能を提供してはならない — 追加と削除のみサポートする。
 
-### Functional Requirements — Add Todo
+### 機能要件 — Todoの追加
 
-- **FR-007**: The System MUST provide a button labeled "+ Add" that opens the add-todo modal.
-- **FR-008**: The add modal MUST be titled "Todoを追加".
-- **FR-009**: Opening the add modal MUST start with all fields empty and Status defaulted to
-  "未着手".
-- **FR-010**: The add modal MUST contain exactly these fields, top to bottom, each with the
-  constraints below:
+- **FR-007**: 画面は「+ Add」というラベルのボタンを提供し、これをクリックすると追加用
+  モーダルが開かなければならない。
+- **FR-008**: 追加モーダルのタイトルは「Todoを追加」でなければならない。
+- **FR-009**: 追加モーダルを開いた直後は全項目が空欄で、ステータスは「未着手」が初期値と
+  して選択されていなければならない。
+- **FR-010**: 追加モーダルは、上から下へ以下の項目をこの順で、それぞれ次の制約とともに
+  含まなければならない:
 
-  | # | Label | Input type | Required | Allowed values / format | Length limit |
+  | # | ラベル | 入力種別 | 必須 | 許容される値・形式 | 文字数制限 |
   |---|-------|-----------|----------|--------------------------|--------------|
-  | 1 | Todo名 (title) | free-text | Yes | any text | none |
-  | 2 | 期限 (dueDate) | date picker | Yes | any calendar date, including past dates | n/a |
-  | 3 | 担当者 (assignee) | free-text | Yes | any text | none |
-  | 4 | ステータス (status) | dropdown | Yes (has default) | exactly one of: 未着手, 進行中, 完了, 保留, in that order | n/a |
+  | 1 | Todo名 | 自由入力テキスト | 必須 | 任意のテキスト | 上限なし |
+  | 2 | 期限 | 日付ピッカー | 必須 | 任意の暦日(過去日も可) | 該当なし |
+  | 3 | 担当者 | 自由入力テキスト | 必須 | 任意のテキスト | 上限なし |
+  | 4 | ステータス | ドロップダウン | 必須(初期値あり) | 「未着手」「進行中」「完了」「保留」のいずれか一つ、この順で選択肢を表示 | 該当なし |
 
-  `Todo名` and `担当者` accept text of any length — there is no maximum character count.
-  `期限` accepts any calendar date, including dates in the past.
+  `Todo名`・`担当者`は任意の長さのテキストを受け付け、文字数上限は設けない。`期限`は過去日
+  を含む任意の暦日を受け付ける。
 
-- **FR-011**: If a required field (`Todo名`, `期限`, `担当者`) is left empty, the System MUST
-  prevent the form from being submitted (via the browser's native required-field validation,
-  before any network request is made).
-- **FR-012**: The add modal MUST provide two explicit ways to close it without saving: a
-  button labeled "Cancel", and clicking the dimmed area outside the modal. The Cancel/Save
-  buttons are labeled in English; the rest of the screen is in Japanese — this mixed labeling
-  is the confirmed requirement, not a placeholder.
-- **FR-013**: While a save is in progress, the Save button MUST show the text "Saving..." and
-  both the Cancel and Save buttons MUST be disabled until the request finishes.
-- **FR-014**: On successful save, the System MUST close the modal and add the new todo to the
-  end of the list without a full page reload.
-- **FR-015**: On save failure (validation rejected by the server, or a network error), the
-  System MUST keep the modal open, MUST show the fixed text "保存に失敗しました" inside the
-  modal, and MUST NOT clear the fields the visitor had entered.
+- **FR-011**: `Todo名`・`期限`・`担当者`のいずれかが未入力のとき、画面はフォームの送信を
+  阻止しなければならない(ブラウザ標準の必須入力チェックにより、ネットワークリクエストが
+  発生する前にブロックする)。
+- **FR-012**: 追加モーダルは、保存せずに閉じる手段を2つ明示的に提供しなければならない:
+  「Cancel」ボタン、およびモーダル外側(暗くなっている背景部分)のクリック。「Cancel」
+  「Save」ボタンの文言は英語であり(画面の他の部分は日本語)、これは仮の文言ではなく確定した
+  仕様である。
+- **FR-013**: 保存処理中は、Saveボタンの表示文言が「Saving...」に変わり、CancelボタンとSave
+  ボタンの両方が、リクエストが完了するまで操作不可(disabled)にならなければならない。
+- **FR-014**: 保存が成功した場合、画面はモーダルを閉じ、ページの再読み込みなしに新しいTodo
+  を一覧の末尾に追加しなければならない。
+- **FR-015**: 保存が失敗した場合(サーバー側のバリデーション拒否、またはネットワークエラー)、
+  画面はモーダルを開いたままにし、「保存に失敗しました」という固定文言をモーダル内に表示し、
+  訪問者が入力した値を消してはならない。
 
-### Functional Requirements — Delete Todo
+### 機能要件 — Todoの削除
 
-- **FR-016**: Each row MUST have a button labeled "削除" that starts deletion of that row's
-  todo.
-- **FR-017**: Clicking "削除" MUST show a confirmation dialog with the exact text
-  "このTodoを削除しますか？" before anything is deleted.
-- **FR-018**: If the visitor confirms, the System MUST remove the todo from the list
-  immediately; if the visitor cancels the dialog, the todo MUST remain unchanged.
-- **FR-019**: If the delete request fails after confirmation, the System MUST leave the todo
-  in the list. No failure message is shown to the visitor in this case.
+- **FR-016**: 各行は「削除」というラベルのボタンを持ち、これをクリックするとそのTodoの削除
+  処理が始まらなければならない。
+- **FR-017**: 「削除」をクリックすると、実際の削除処理が行われる前に「このTodoを削除します
+  か？」という正確な文言の確認ダイアログを表示しなければならない。
+- **FR-018**: 訪問者が確認した場合、画面は該当Todoを即座に一覧から削除しなければならない。
+  訪問者がダイアログをキャンセルした場合、Todoは変更されずに残らなければならない。
+- **FR-019**: 確認後の削除リクエストが失敗した場合、画面はそのTodoを一覧に残さなければなら
+  ない。この場合、訪問者にエラーメッセージは表示されない。
 
-### Key Entities
+### 主要エンティティ
 
-- **Todo**: A task tracked on the dashboard. Attributes: name (`Todo名`), due date
-  (`期限`), assignee (`担当者`, a free-text name of the person responsible), and status
-  (`ステータス`, one of the four fixed values in FR-010). The dashboard has a single shared
-  list — todos are not scoped per user or per team.
+- **Todo**: ダッシュボードで管理するタスク。属性: 名前(`Todo名`)、期限(`期限`)、担当者
+  (`担当者`、担当する人物名の自由入力テキスト)、ステータス(`ステータス`、FR-010で定義する
+  4つの固定値のいずれか)。ダッシュボードは単一の共有一覧であり、ユーザーやチームごとに
+  Todoが区分されることはない。
 
-## Success Criteria *(mandatory)*
+## 成功基準 *(必須)*
 
-### Measurable Outcomes
+### 測定可能な成果
 
-- **SC-001**: A visitor sees the full current list of todos, in the defined order (FR-003),
-  as soon as the dashboard page finishes loading, with no separate loading step required.
-- **SC-002**: A visitor can add a new todo and see it appear at the end of the list in under
-  15 seconds, without leaving the dashboard page.
-- **SC-003**: A visitor can delete a todo, confirm the action via the exact confirmation text
-  in FR-017, and see it removed from the list in under 10 seconds.
-- **SC-004**: 100% of add attempts missing a required field are blocked before a request is
-  sent, and never silently create an incomplete todo.
-- **SC-005**: 0% of single delete-button clicks result in a deletion without the visitor
-  seeing and confirming the FR-017 dialog first.
+- **SC-001**: 訪問者は、ダッシュボードページの読み込みが完了した時点で、定義された並び順
+  (FR-003)のTodo一覧全体を、追加の読み込みステップなしに確認できる。
+- **SC-002**: 訪問者は新しいTodoを追加し、ダッシュボードページから離れることなく、15秒以内
+  に一覧の末尾にそれが表示されるのを確認できる。
+- **SC-003**: 訪問者はTodoを削除でき、FR-017の正確な確認文言を経て、10秒以内に一覧から削除
+  されたことを確認できる。
+- **SC-004**: 必須項目が未入力の追加操作は、100%リクエスト送信前にブロックされ、不完全な
+  Todoが作成されることは一切ない。
+- **SC-005**: 削除ボタンの単純なクリックだけでは、FR-017の確認ダイアログを経ずに削除が実行
+  されることは0%である。
 
-## Assumptions
+## 前提事項
 
-- Deletion is immediate and permanent once confirmed; there is no undo or recovery step.
-- The four status values (未着手/進行中/完了/保留) and their display order are fixed for this
-  version and not user-customizable.
-- Todos added or deleted may not reliably persist across every future visit until this
-  feature is connected to a permanent backend. This is an accepted limitation of the current
-  data stage, not something this feature is required to fix.
+- 削除は確認後に即座かつ恒久的に行われ、取り消し(undo)や復元の手段は無い。
+- 4つのステータス値(未着手/進行中/完了/保留)とその表示順は、このバージョンでは固定であり、
+  ユーザーがカスタマイズすることはできない。
+- 過去に追加・削除したTodoが、この画面が恒久的なバックエンドに接続されるまでは、以降の
+  アクセス時に必ず反映されているとは限らない。これは現在のデータ基盤段階における既知の
+  制約であり、この画面の仕様が解決すべき事項ではない。
