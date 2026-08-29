@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [x] No [NEEDS CLARIFICATION] markers remain
+- [ ] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -32,6 +32,13 @@
 ## Notes
 
 - Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`
-- This spec documents an already-implemented feature (retroactive spec). All items passed on
-  first review — no [NEEDS CLARIFICATION] markers were needed since the actual, already-built
-  behavior (confirmed against the running app earlier in this project) was the source of truth.
+- This spec documents an already-implemented feature at screen-definition granularity: exact
+  labels, field constraints, ordering, and validation/error behavior, extracted directly from
+  `TodoDashboard.tsx` and `src/app/api/todos/route.ts` rather than paraphrased.
+- Extracting that level of detail surfaced 8 points where the built behavior is an
+  implementation accident rather than a decided requirement (marked **[要確認]** inline in
+  spec.md — English/Japanese-mixed button labels, no character limits, no past-date check on
+  `期限`, insertion-order-only sorting, no sort/filter, native-browser validation messaging,
+  a single generic save-failure message regardless of cause, and no failure message on
+  delete). These are the reason "No [NEEDS CLARIFICATION] markers remain" is unchecked — this
+  spec is not yet ready for `/speckit-plan` until each is confirmed or corrected.
