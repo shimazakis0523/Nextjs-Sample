@@ -18,7 +18,7 @@ how the existing implementation maps to these requirements)
 ### User Story 1 - View the todo list (Priority: P1)
 
 Any visitor opens the dashboard and sees every current todo, with its name, due date,
-assignee, and status, without needing to sign in.
+assignee, and status.
 
 **Why this priority**: Without a visible list, there is nothing to act on — this is the
 minimum viable slice of the feature.
@@ -94,25 +94,30 @@ and verify it is gone from the list.
 
 ### Functional Requirements
 
-- **FR-001**: System MUST allow any visitor to view the current list of todos without
-  requiring login or any authentication.
-- **FR-002**: System MUST display, for each todo, its name, due date, assignee, and status.
-- **FR-003**: System MUST show a message indicating there are no todos when the list is
+- **FR-001**: System MUST display, for each todo, its name, due date, assignee, and status.
+- **FR-002**: System MUST show a message indicating there are no todos when the list is
   empty, instead of an empty table.
-- **FR-004**: System MUST let a visitor open an add-todo form from the dashboard.
-- **FR-005**: The add form MUST require a name, due date, assignee, and status before it can
+- **FR-003**: System MUST let a visitor open an add-todo form from the dashboard.
+- **FR-004**: The add form MUST require a name, due date, assignee, and status before it can
   be submitted.
-- **FR-006**: The status field MUST only accept one of exactly four values: 未着手 (not
+- **FR-005**: The status field MUST only accept one of exactly four values: 未着手 (not
   started), 進行中 (in progress), 完了 (done), 保留 (on hold).
-- **FR-007**: Submitting the add form successfully MUST close the form and immediately show
+- **FR-006**: Submitting the add form successfully MUST close the form and immediately show
   the new todo in the list.
-- **FR-008**: If submitting the add form fails, System MUST show an error message within the
+- **FR-007**: If submitting the add form fails, System MUST show an error message within the
   form, MUST NOT lose the visitor's entered data, and MUST NOT add the todo to the list.
-- **FR-009**: The add form MUST offer a way to cancel and close without creating a todo.
-- **FR-010**: System MUST let a visitor delete any todo from the list.
-- **FR-011**: Before deleting, System MUST ask the visitor to confirm the action.
-- **FR-012**: If the visitor confirms, System MUST remove the todo from the list immediately;
+- **FR-008**: The add form MUST offer a way to cancel and close without creating a todo.
+- **FR-009**: System MUST let a visitor delete any todo from the list.
+- **FR-010**: Before deleting, System MUST ask the visitor to confirm the action.
+- **FR-011**: If the visitor confirms, System MUST remove the todo from the list immediately;
   if the visitor cancels, the todo MUST remain unchanged.
+
+### Out of Scope
+
+- **Authentication/authorization**: no login system exists anywhere in the wider application
+  yet — this is a gap in the application as a whole, not a design decision made for this
+  feature. This spec neither requires nor forbids a login step; it simply does not address
+  access control, because there is nothing yet to integrate with. See Assumptions.
 
 ### Key Entities
 
@@ -138,9 +143,12 @@ and verify it is gone from the list.
 
 ## Assumptions
 
-- No authentication or authorization exists yet; anyone who can reach the dashboard can view,
-  add, and delete any todo. This is an accepted temporary state until a login feature is
-  added in a future feature.
+- No authentication exists anywhere in the application yet — it has simply not been built,
+  as a system-wide gap that is not specific to this feature. As a direct consequence, anyone
+  who can currently reach the dashboard can view, add, and delete any todo; this is not a
+  requirement or design goal of this feature. Once a login feature exists elsewhere in the
+  system, this dashboard is expected to require it too, and this spec should be amended to
+  reflect that (see Requirements > Out of Scope).
 - There is a single, shared todo list — todos are not scoped per user or per team.
 - Deletion is immediate and permanent once confirmed; there is no undo or recovery step.
 - The four status values (未着手/進行中/完了/保留) are fixed for this version and not
