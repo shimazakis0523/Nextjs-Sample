@@ -21,6 +21,30 @@ Sample BFF endpoints:
 - `src/app/api/health/route.ts` — health check.
 - `src/app/api/users/route.ts` — returns user data via `src/lib/backend.ts`
   (mock data today; the real backend once `BACKEND_API_URL` is set).
+- `src/app/api/todos/route.ts` (`GET`/`POST`) and `src/app/api/todos/[id]/route.ts`
+  (`DELETE`) — power the Todo dashboard at `/dashboard`.
+
+### Todo dashboard
+
+`/dashboard` lists, adds, and deletes todos (title, due date, assignee,
+status). It has no auth yet — anyone who can reach the app can use it. The
+page (`src/app/dashboard/page.tsx`) fetches the initial list directly via
+`getTodos()`, per Next.js's own guidance to read Server Component data from
+its source rather than through a Route Handler; `TodoDashboard.tsx` is the
+Client Component that handles the add-modal and delete confirmation, calling
+`/api/todos` for mutations.
+
+Mock data lives in `src/lib/mock-todos.ts`, kept in memory behind
+`src/lib/backend.ts` — Route Handlers and Server Components never touch it
+directly, only ever call `getTodos()` / `createTodo()` / `deleteTodo()`, the
+same calls they'll make once a real backend exists. **Caveat:** on a
+serverless deployment (e.g. Vercel), [Route Handlers can't share data across
+requests](https://nextjs.org/docs/app/guides/backend-for-frontend#deployment-environment)
+— different requests can land on different instances — so added/deleted
+todos may not reliably persist or stay in sync in production. It's stable
+for local development (`npm run dev`). Real persistence requires a real
+backend, which is why the swap point exists: point `BACKEND_API_URL` at one
+and nothing else here needs to change.
 
 ## Getting Started
 

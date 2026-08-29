@@ -1,0 +1,172 @@
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  font-size: 24px;
+}
+
+.addButton {
+  background: #171717;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+  .addButton {
+    background: #ededed;
+    color: #0a0a0a;
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 12px 8px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.25);
+}
+
+.empty {
+  text-align: center;
+  color: rgba(128, 128, 128, 0.9);
+  padding: 32px 0;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.statusTodo {
+  background: rgba(128, 128, 128, 0.18);
+}
+
+.statusInProgress {
+  background: rgba(37, 99, 235, 0.18);
+  color: #2563eb;
+}
+
+.statusDone {
+  background: rgba(22, 163, 74, 0.18);
+  color: #16a34a;
+}
+
+.statusOnHold {
+  background: rgba(217, 119, 6, 0.18);
+  color: #d97706;
+}
+
+.deleteButton {
+  background: none;
+  border: 1px solid rgba(220, 38, 38, 0.5);
+  color: #dc2626;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 10;
+}
+
+.modal {
+  background: var(--background);
+  color: var(--foreground);
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal h2 {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.field input,
+.field select {
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.error {
+  color: #dc2626;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.modalActions button {
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  background: transparent;
+  color: var(--foreground);
+}
+
+.saveButton {
+  background: #171717;
+  color: #fff;
+  border-color: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  .saveButton {
+    background: #ededed;
+    color: #0a0a0a;
+  }
+}
