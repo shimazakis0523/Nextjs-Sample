@@ -1,15 +1,19 @@
 <!--
 Sync Impact Report
-- Version change: 1.3.0 → 1.4.0 (MINOR — existing principle materially
-  expanded)
+- Version change: 1.4.0 → 2.0.0 (MAJOR — backward-incompatible
+  redefinition of an existing principle's required document shape)
 - Modified principles: VI. Spec Documents State Requirements, Not Process
-  — added: every spec.md MUST have a table of contents; MUST NOT use
-  agile user-story framing (priority, independent-test notes); MUST use
-  SE-style use-case descriptions (actor/precondition/main flow/
-  alternate-exception flow/postcondition) instead of user stories and
-  Given/When/Then acceptance scenarios. Notes that
-  .specify/templates/overrides/spec-template.md now encodes this
-  structure so /speckit-specify produces it by default.
+  — replaced the earlier "user story -> use case" swap with a full
+  document-shape redefinition: a screen's spec.md is now exactly two
+  parts, ユースケース定義 (use-case descriptions, unchanged) and 画面定義
+  (新設, split into 画面入出力仕様 — every rendered element, one
+  self-contained row each, no prose outside the table — and 処理仕様 —
+  one row per trigger, 初期表示 first, frontend-scope only, no API/DB
+  internals). Functional-requirement (FR-xxx) lists, a Success Criteria
+  section, and a Key Entities section are no longer part of a screen's
+  spec.md; entity/data-model definition is now explicitly out of scope
+  for any spec.md (that's openapi/common/schemas/**'s job).
+  .specify/templates/overrides/spec-template.md rewritten to match.
 - Added sections: n/a
 - Removed sections: n/a
 - Deferred TODOs: none
@@ -74,56 +78,71 @@ indirection has to earn its place by making something easier to change,
 not harder to read.
 
 ### VI. Spec Documents State Requirements, Not Process
-`spec.md` files under `specs/**` MUST be written in Japanese. One screen —
-including a modal or any other UI with its own layout and flow, even
-without an independent URL — gets exactly one `screens/<screen-id>/spec.md`.
-A feature directory's top-level `spec.md` is limited to the screen list,
-cross-screen entities, and cross-screen assumptions; it MUST NOT duplicate
-per-screen requirement detail. A `spec.md` MUST state only what its own
-screen or feature does. It MUST NOT reference how or when it was authored
-(e.g. "written retroactively"), project-management facts (branch names,
-when a tool was adopted), or the current state of unrelated, not-yet-built
-features or infrastructure (e.g. that login doesn't exist yet, that no
-real backend is connected) — if a fact isn't one of this screen's own
-requirements, it doesn't belong in this screen's spec. `checklists/
-requirements.md` is exempt from this: it is a quality-detection harness,
-not a requirements document, and may reference tooling, process, or
-anything else needed to reliably catch and correct spec defects.
-Rationale: a spec is handed to an implementer expecting it to describe
-only what to build; process commentary and other features' status are
-noise at best and, as happened when "no login yet" read as this feature
-requiring no login, get mistaken for actual requirements. Splitting large
-features into one file per screen keeps each file reviewable instead of
-growing into one sprawling document.
+`spec.md` files under `specs/**` MUST be written in Japanese, and MUST
+include a table of contents. One screen — including a modal or any other
+UI with its own layout and flow, even without an independent URL — gets
+exactly one `screens/<screen-id>/spec.md`, titled after the business
+action it performs (e.g. "Todo新規登録"), not after "screen" (not
+"Todoダッシュボード画面"). A feature directory's top-level `spec.md` is
+limited to the screen list; it MUST NOT duplicate per-screen detail and
+MUST NOT define an entity/data model — the data model is a server-side
+concern already captured in `openapi/common/schemas/**`, and a screen's
+own field-level constraints belong in that screen's own 画面入出力仕様
+table instead.
 
+A screen's `spec.md` MUST be organized as exactly two parts:
+
+- **ユースケース定義** (use-case definitions): one or more ユースケース
+  記述, each with アクター, 事前条件, 基本フロー, 代替/例外フロー, and
+  事後条件. A screen's `spec.md` MUST NOT use agile user-story framing
+  (prioritization, independent-test notes) or Given/When/Then acceptance
+  scenarios — a user story and a screen specification are different
+  things.
+- **画面定義** (screen definition), split into:
+  - **画面入出力仕様**: every element rendered on the screen — inputs,
+    static or conditionally-shown text, badges, buttons, dialogs, all of
+    it, not just input fields. One row per element. An element's
+    look-and-feel and constraints MUST live entirely inside that
+    element's own row; MUST NOT be described in prose outside the table.
+  - **処理仕様**: one row per trigger (initial display, or a screen
+    operation). The 初期表示 (initial display) row MUST be first; other
+    rows SHOULD follow the on-screen order of the controls they respond
+    to. This table MUST stay scoped to frontend-observable behavior: it
+    MAY say a backend process is invoked and how success/failure branch
+    from the screen's point of view, but MUST NOT describe that process's
+    own internals (request/response shape, persistence, database
+    writes) — that belongs to the backend's own contract
+    (`openapi/backend/openapi.yaml`), not this screen's spec.
+
+`.specify/templates/overrides/spec-template.md` holds this structure so
+`/speckit-specify` produces it by default; edit that file, not this
+constitution, to adjust the template itself.
+
+A `spec.md` MUST state only what its own screen or feature does. It MUST
+NOT reference how or when it was authored (e.g. "written retroactively"),
+project-management facts (branch names, when a tool was adopted), or the
+current state of unrelated, not-yet-built features or infrastructure
+(e.g. that login doesn't exist yet, that no real backend is connected).
 A screen's `spec.md` MUST NOT state which screen(s) launch it (its entry
-point). A screen's `spec.md` MUST state its own outbound navigation — each
-of its own buttons/links and which screen each one leads to — as a
-functional requirement of that screen.
-Rationale: any screen can be launched from any screen, now or in a future
+point) — any screen can be launched from any screen, now or in a future
 change, so recording an entry point bakes in a dependency that doesn't
-reflect reality and will drift the moment a second entry point exists.
-Describing a screen's own outbound actions is different in kind: that is
-the screen stating its own behavior, not depending on another screen's
-design. Concretely: a "new todo" screen's spec must not say it opens from
-the dashboard's Add button; the dashboard's spec must say its Add button
-opens the "new todo" screen.
-
-Every `spec.md` MUST include a table of contents. A screen's `spec.md`
-MUST NOT use agile user-story framing (prioritization, independent-test
-notes) — a user story and a screen specification are different things. In
-place of user stories and Given/When/Then acceptance scenarios, a screen's
-`spec.md` MUST describe each flow as a use case: actor, precondition, main
-flow, alternate/exception flows, postcondition. `.specify/templates/
-overrides/spec-template.md` holds this structure so `/speckit-specify`
-produces it by default; edit that file, not this constitution, to adjust
-the template itself.
-Rationale: user-story prioritization exists to sequence incremental
-delivery in a backlog — it says nothing about what a screen must do, and
-mixing it into a specification document that's supposed to state exact,
-implementer-facing behavior only adds noise. A table of contents and
-consistent use-case structure make a multi-screen feature's specs
-navigable instead of a wall of prose.
+reflect reality. A screen's `spec.md` MUST state its own outbound
+navigation instead: each of its own buttons/links, as a row in 画面入出力
+仕様, and where it leads, as a row in 処理仕様. `checklists/requirements.md`
+is exempt from all of the above: it is a quality-detection harness, not a
+requirements document, and may reference tooling, process, or anything
+else needed to reliably catch and correct spec defects.
+Rationale: a spec is handed to an implementer expecting it to describe
+exactly what to build, in the shape a screen designer actually needs —
+item-level detail and event-by-event behavior — not a backlog artifact
+(user stories exist to sequence incremental delivery, not to state what a
+screen does) and not process commentary or another feature's status
+(noise at best, and as happened when "no login yet" read as this feature
+requiring no login, mistaken for actual requirements). A data model
+belongs with the API contract that defines it, not repeated into every
+screen that happens to display it. Splitting large features into one file
+per screen, each with its own table of contents, keeps every file
+reviewable instead of growing into one sprawling document.
 
 ## Technology & Deployment Constraints
 
@@ -147,11 +166,11 @@ navigable instead of a wall of prose.
 - Any task that touches `src/app/api/**` or `src/lib/backend.ts` MUST
   include updating the relevant `openapi/**/*.yaml` as part of the task
   itself, not as a follow-up.
-- Adding, changing, or removing a functional requirement that states a
-  screen's own outbound navigation (Principle VI) MUST be followed by
-  running the `update-screen-flow-diagram` skill to regenerate the
-  corresponding `specs/<feature-directory>/screen-flow.md` before the
-  change is considered complete.
+- Adding, changing, or removing a 処理仕様 row that states a screen's own
+  outbound navigation (Principle VI) MUST be followed by running the
+  `update-screen-flow-diagram` skill to regenerate the corresponding
+  `specs/<feature-directory>/screen-flow.md` before the change is
+  considered complete.
 
 ## Governance
 
@@ -168,4 +187,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 1.4.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
+**Version**: 2.0.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29

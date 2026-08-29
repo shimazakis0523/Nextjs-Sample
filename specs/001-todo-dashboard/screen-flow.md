@@ -4,20 +4,20 @@
 
 **最終更新**: 2026-08-29
 
-このドキュメントは、`screens/*/spec.md` 内の各画面が自ら記述する遷移先(機能要件)から
-生成したものであり、手作業で遷移元情報を追記する場所ではない。画面ごとの詳細仕様は各
-`screens/<画面ID>/spec.md` を参照すること。
+このドキュメントは、`screens/*/spec.md` の「画面定義 > 処理仕様」内で各画面が自ら記述する
+遷移先から生成したものであり、手作業で遷移元情報を追記する場所ではない。画面ごとの詳細
+仕様は各`screens/<画面ID>/spec.md`を参照すること。
 
 ```mermaid
 flowchart LR
-    todo-list["Todo一覧画面<br/>/dashboard"]
-    todo-new["Todo新規登録画面<br/>(モーダル)"]
+    todo-list["Todo一覧<br/>/dashboard"]
+    todo-new["Todo新規登録<br/>(モーダル)"]
 
-    todo-list -- "+ Add" --> todo-new
+    todo-list -- "Addボタン" --> todo-new
 ```
 
 ## 遷移一覧
 
-| 元画面 | 操作 | 先画面 | 根拠 |
+| 元画面 | 発火契機 | 先画面 | 根拠 |
 |---|---|---|---|
-| `todo-list` | 「+ Add」ボタンをクリック | `todo-new` | [todo-list/spec.md FR-006](screens/todo-list/spec.md) |
+| `todo-list` | Addボタンをクリック | `todo-new` | [todo-list/spec.md 処理仕様 #2](screens/todo-list/spec.md#処理仕様) |
