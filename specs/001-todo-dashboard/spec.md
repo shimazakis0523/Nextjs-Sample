@@ -112,19 +112,11 @@ and verify it is gone from the list.
 - **FR-011**: If the visitor confirms, System MUST remove the todo from the list immediately;
   if the visitor cancels, the todo MUST remain unchanged.
 
-### Out of Scope
-
-- **Authentication/authorization**: no login system exists anywhere in the wider application
-  yet — this is a gap in the application as a whole, not a design decision made for this
-  feature. This spec neither requires nor forbids a login step; it simply does not address
-  access control, because there is nothing yet to integrate with. See Assumptions.
-
 ### Key Entities
 
 - **Todo**: A task tracked on the dashboard. Attributes: name, due date, assignee (a
   free-text name of the person responsible), and status (one of the four fixed values above).
-  Not owned by or scoped to any particular user — visible to and editable by anyone who can
-  reach the dashboard.
+  The dashboard has a single shared list — todos are not scoped per user or per team.
 
 ## Success Criteria *(mandatory)*
 
@@ -143,13 +135,6 @@ and verify it is gone from the list.
 
 ## Assumptions
 
-- No authentication exists anywhere in the application yet — it has simply not been built,
-  as a system-wide gap that is not specific to this feature. As a direct consequence, anyone
-  who can currently reach the dashboard can view, add, and delete any todo; this is not a
-  requirement or design goal of this feature. Once a login feature exists elsewhere in the
-  system, this dashboard is expected to require it too, and this spec should be amended to
-  reflect that (see Requirements > Out of Scope).
-- There is a single, shared todo list — todos are not scoped per user or per team.
 - Deletion is immediate and permanent once confirmed; there is no undo or recovery step.
 - The four status values (未着手/進行中/完了/保留) are fixed for this version and not
   user-customizable.
