@@ -11,8 +11,16 @@ Next.js serves as both the frontend and the BFF (Backend for Frontend):
 - `src/lib/backend-client.ts` is a thin server-only helper for calling the
   upstream backend from Route Handlers or Server Components, using the
   `BACKEND_API_URL` environment variable (see `.env.example`).
+- `src/lib/backend.ts` is the swap point between a mock backend and the real
+  one: while `BACKEND_API_URL` is unset it returns data from
+  `src/lib/mock-data.ts`; once it's set, the same functions call the real
+  backend through `backend-client.ts` instead. Route Handlers should import
+  from here rather than calling `backend-client.ts` directly.
 
-A sample health-check BFF endpoint is provided at `src/app/api/health/route.ts`.
+Sample BFF endpoints:
+- `src/app/api/health/route.ts` — health check.
+- `src/app/api/users/route.ts` — returns user data via `src/lib/backend.ts`
+  (mock data today; the real backend once `BACKEND_API_URL` is set).
 
 ## Getting Started
 
