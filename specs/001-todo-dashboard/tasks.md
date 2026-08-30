@@ -6,7 +6,7 @@ description: "Task list for feature implementation"
 
 **Input**: Design documents from `/specs/001-todo-dashboard/`
 
-**Prerequisites**: [plan.md](./plan.md), [spec.md](./spec.md), [research.md](./research.md), [data-model.md](./data-model.md), [contracts/](./contracts/)
+**Prerequisites**: [plan.md](./plan.md), [spec.md](./spec.md), [docs/architecture.md](../../docs/architecture.md), [openapi/](../../openapi/)
 
 **Note**: この機能は実装済みのため、以下は「新規実装タスク」ではなく「既存実装が仕様
 (spec.md / openapi/**)と一致しているかを確認するタスク」である。差分が見つかった場合は、
@@ -118,8 +118,8 @@ TC-014をモーダル表示状態で手動実行する
 - [ ] T018 [P] [screen-flow.md](./screen-flow.md)が両画面の実際の遷移(Addボタン→Todo新規登録)
       と一致していることを確認する(`update-screen-flow-diagram`スキル)
 - [ ] T019 [P] `check-openapi-contract`スキルで`openapi/**`と実装の整合性を最終確認する
-- [ ] T020 [quickstart.md](./quickstart.md)の検証シナリオを`npm run dev`で実行し、全て期待結果通りに
-      なることを確認する
+- [ ] T020 `npm run dev`で起動し`/dashboard`を開いて、[todo-list/test-spec.md](./screens/todo-list/test-spec.md)
+      と[todo-new/test-spec.md](./screens/todo-new/test-spec.md)の全テストケースを手動で確認する
 
 ## Dependencies & Execution Order
 

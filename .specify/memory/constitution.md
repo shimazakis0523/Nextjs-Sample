@@ -1,25 +1,25 @@
 <!--
 Sync Impact Report
-- Version change: 2.3.0 → 2.4.0 (MINOR — new mandatory pre-step for
-  screen-bearing features, plus a new optional spec.md header field)
+- Version change: 2.4.0 → 2.5.0 (MINOR — new docs/architecture.md
+  convention for app-wide technical facts, referenced instead of
+  repeated from each feature's plan.md)
 - Modified sections:
-  - Development Workflow (Spec-Driven) gains a bullet requiring a
-    screen-bearing feature to start from an agreed mockup (`design`
-    skill) before `/speckit-specify` runs; `/speckit-specify` MUST check
-    for one and halt (directing to `design`) if absent.
-  - Principle VI gains an exception to the no-header-cross-reference
-    rule: a screen's spec.md header MAY cite a `**モックアップ**` field
-    (the mockup's Artifact URL), explicitly distinguished from the
-    openapi.yaml citation — the mockup is a point-in-time visual
-    agreement, not a contract the spec defers to, so 画面入出力仕様/
-    処理仕様 must remain fully self-contained and spec.md stays
-    authoritative once it and the mockup diverge.
-  - `.specify/templates/overrides/spec-template.md` gains the
-    `**モックアップ**` header line and matching guidance.
-- Rationale: agreeing on visual design and outward functionality via a
-  mockup before writing spec.md removes the ambiguity/drift of
-  describing a screen in natural-language prose alone. See ADR-0004 in
-  docs/adr/.
+  - Development Workflow (Spec-Driven) gains a bullet requiring app-wide
+    Technical Context facts (language/version, dependencies, target
+    platform, project type, storage mechanism, repository layout) to
+    live once in `docs/architecture.md`, referenced (not repeated) from
+    each feature's `plan.md`; `plan.md` states only what's specific to
+    that feature.
+  - `.specify/templates/overrides/plan-template.md` added (new
+    override), trimming Technical Context to feature-specific fields
+    and dropping the research.md/data-model.md/quickstart.md/contracts/
+    Documentation entries per the existing Principle III/VI prohibition.
+- Rationale: this is a single-app project, so most of each plan.md's
+  Technical Context (language/version, dependencies, target platform,
+  storage mechanism, repo layout) was identical across every feature;
+  centralizing it in docs/architecture.md removes that duplication
+  while plan.md stays focused on what's actually feature-specific. See
+  ADR-0005 in docs/adr/.
 -->
 
 # Nextjs Sample (BFF) Constitution
@@ -189,6 +189,10 @@ reviewable instead of growing into one sprawling document.
 
 ## Technology & Deployment Constraints
 
+See `docs/architecture.md` for the concrete current tech stack, dependency
+list, and repository layout; this section states binding constraints, not
+an inventory.
+
 - Frontend + BFF: Next.js App Router, deployed to Vercel (serverless).
 - No database in this app. Data is either mocked in-app (Principle II) or
   served by a real backend reached via `BACKEND_API_URL`.
@@ -210,6 +214,17 @@ reviewable instead of growing into one sprawling document.
   directing to the `design` skill, if none exists. This does not apply
   to features with no screen (e.g. a purely internal BFF change). See
   ADR-0004 in `docs/adr/`.
+- App-wide technical facts (language/version, primary dependencies,
+  target platform, project type, storage mechanism, repository layout)
+  that hold for every feature MUST be documented once in
+  `docs/architecture.md`, not repeated in each feature's `plan.md`. A
+  feature's `plan.md` Technical Context MUST reference
+  `docs/architecture.md` instead of restating it, and state only what is
+  specific to that feature (Performance Goals, Scale/Scope, any
+  feature-specific Constraints); a field with no feature-specific value
+  is omitted rather than left blank. `plan.md`'s Project Structure MUST
+  likewise list only the paths that feature adds or changes, not paths
+  `docs/architecture.md` already documents. See ADR-0005 in `docs/adr/`.
 - Use `/speckit-clarify` when requirements are ambiguous, before
   `/speckit-plan`.
 - Run `/speckit-analyze` after `/speckit-tasks` and before
@@ -259,4 +274,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 2.4.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
+**Version**: 2.5.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
