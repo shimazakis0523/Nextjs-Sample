@@ -1,5 +1,32 @@
 <!--
 Sync Impact Report
+- Version change: 2.8.1 → 2.8.2 (PATCH — clarifies, does not change, the
+  existing "docs/architecture.md documents app-wide facts" rule: it
+  documents shared *patterns*, not every specific instance of them. A
+  feature introducing a new entity's backend.ts functions and
+  mock-<entity>.ts file MUST list them in its own Project Structure,
+  not omit them as "common infra" by pattern-matching the file name.)
+- Modified sections:
+  - Development Workflow (Spec-Driven): the "App-wide technical facts"
+    bullet gains the pattern-vs-instance distinction above and
+    references ADR-0009.
+  - `docs/architecture.md`'s repository layout gains a clarifying note
+    with the same distinction.
+  - `.specify/templates/overrides/plan-template.md` and `speckit-plan`
+    updated with the same guidance.
+  - `specs/001-todo-dashboard/plan.md` corrected: `src/lib/mock-todos.ts`
+    (new) and the `getTodos`/`createTodo`/`deleteTodo` functions added
+    to `src/lib/backend.ts` (change) were previously omitted as "common
+    infra, see docs/architecture.md" — both were in fact introduced by
+    this feature's own implementation commit.
+- Rationale: applied to 001-todo-dashboard, `git log` showed
+  `mock-todos.ts` and the three Todo-specific `backend.ts` functions
+  were added in the same commit that implemented the Todo dashboard
+  feature itself — not pre-existing infrastructure. plan.md's Project
+  Structure had been silently omitting them because they share a file
+  name/pattern with docs/architecture.md's generic description, which
+  hid this feature's own touch-points instead of documenting them. See
+  ADR-0009 in docs/adr/.
 - Version change: 2.8.0 → 2.8.1 (PATCH — reorders 登場するコンポーネント
   と関係's content, same two-section scope as 2.8.0: the Mermaid diagram
   now comes first as a whole-picture overview, followed by a `###`
@@ -269,8 +296,16 @@ an inventory.
   that hold for every feature MUST be documented once in
   `docs/architecture.md`, not repeated in any `plan.md`. `plan.md`'s
   Project Structure MUST list only the paths that plan's own scope adds
-  or changes, not paths `docs/architecture.md` already documents. See
-  ADR-0005 in `docs/adr/`.
+  or changes, not paths `docs/architecture.md` documents as shared
+  across every feature. `docs/architecture.md` documenting a *pattern*
+  (e.g. `backend.ts` hosting every entity's swap-point functions in one
+  file, or the `mock-<entity>.ts` naming convention) does NOT make a
+  specific instance of that pattern shared: a feature introducing a new
+  entity MUST list the specific functions it adds to `backend.ts` (as a
+  change) and its specific `mock-<entity>.ts` file (as an addition) in
+  its own Project Structure, not omit them as "common infra" merely
+  because they live in or resemble an already-documented shared file.
+  See ADR-0005 and ADR-0009 in `docs/adr/`.
 - A feature MUST have exactly one `plan.md`, at `specs/<feature>/plan.md`
   — always at feature level, never split per screen, even when the
   feature has multiple screens (ADR-0007, superseding ADR-0006's
@@ -338,4 +373,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 2.8.1 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
+**Version**: 2.8.2 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30

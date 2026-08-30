@@ -76,16 +76,25 @@ You **MUST** consider the user input before proceeding (if not empty).
      whatever detail the diagram can't show (props/state it holds, which API calls
      it makes, what it does and doesn't own). When a component's detail mentions
      calling a function that is not itself one of this feature's new components
-     (e.g. `getTodos()` from `src/lib/backend.ts`, shared infra documented in
-     docs/architecture.md), name the file it comes from and note it's an existing
-     function, not a new one — otherwise it reads as an unexplained component of
-     its own. Omit this section entirely when
+     (e.g. `getTodos()` from `src/lib/backend.ts`), name the file it comes from —
+     otherwise it reads as an unexplained component of its own — and check whether
+     that function itself is new or pre-existing (see the Project Structure note
+     below on docs/architecture.md's "pattern vs. instance" distinction: a new
+     entity's swap-point functions and mock file are this feature's own additions,
+     not shared infra, even though they live in the shared `backend.ts` file).
+     Omit this section entirely when
      every screen's component is fully self-contained (no shared parent or state).
    - Fill Project Structure's Source Code section with only the paths this
      feature adds or changes — not paths already documented in
-     `docs/architecture.md`'s repository layout, and do not include a
-     "Documentation (this feature)" file-tree section (identical boilerplate
-     across every plan.md)
+     `docs/architecture.md`'s repository layout as shared. docs/architecture.md
+     documents *patterns* (backend.ts hosting every entity's swap-point
+     functions in one file; the `mock-<entity>.ts` naming convention), not
+     specific instances of them: if this feature introduces a new entity, list
+     the specific functions it adds to `backend.ts` (as a change to that
+     existing file) and its specific `mock-<entity>.ts` file (as a new file) —
+     do not wave them away as "common infra" just because the file name
+     matches the pattern. Do not include a "Documentation (this feature)"
+     file-tree section (identical boilerplate across every plan.md)
 
 ## Mandatory Post-Execution Hooks
 

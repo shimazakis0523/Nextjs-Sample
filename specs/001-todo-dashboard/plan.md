@@ -27,9 +27,9 @@ flowchart TD
 
 役割: 画面のエントリ(Server Component)。
 
-[docs/architecture.md](../../docs/architecture.md)の共通インフラである`src/lib/backend.ts`
-の`getTodos()`(新規実装ではない、既存の関数)を呼んで初期データを取得し、
-`TodoDashboard`に`initialTodos`として渡すだけ。自身は状態を持たない。
+`src/lib/backend.ts`の`getTodos()`(swap pointという既存ファイルに、この機能で追加する
+関数。下記Project Structure参照)を呼んで初期データを取得し、`TodoDashboard`に
+`initialTodos`として渡すだけ。自身は状態を持たない。
 
 ### `TodoDashboard.tsx`
 
@@ -61,9 +61,11 @@ flowchart TD
 
 ### Source Code (この機能が追加/変更するパス)
 
-共通インフラ(`src/lib/backend.ts`・`backend-client.ts`・`mock-*.ts`・`openapi/**`)は
-[docs/architecture.md](../../docs/architecture.md)のリポジトリレイアウトを参照。以下は
-この機能固有のパスのみ。
+`backend.ts`がswap pointという1ファイルに集約される構成自体、および`mock-<entity>.ts`と
+いう命名規則は[docs/architecture.md](../../docs/architecture.md)に記載の共通パターンで
+あり、ここでは繰り返さない。ただし`backend.ts`内の個別の関数や個別の`mock-*.ts`ファイルは
+共通インフラではなく、それを導入した機能自身の成果物であるため、以下に明記する
+(docs/architecture.mdの「注意」参照)。
 
 ```text
 src/app/
@@ -76,6 +78,10 @@ src/app/
 └── api/todos/
     ├── route.ts               # GET /api/todos, POST /api/todos
     └── [id]/route.ts          # DELETE /api/todos/{id}
+
+src/lib/
+├── backend.ts        # 変更: getTodos/createTodo/deleteTodoをこの機能で追加(既存ファイル)
+└── mock-todos.ts      # 新規: この機能のインメモリモック(globalThisキャッシュ)
 
 openapi/common/schemas/Todo.yaml  # 共有Todoスキーマ
 ```

@@ -54,9 +54,14 @@ flowchart TD
 ### Source Code (この機能が追加/変更するパスのみ)
 
 <!--
-  ACTION REQUIRED: docs/architecture.md のリポジトリレイアウトに既に載っている共通パス
-  (src/lib/backend.ts, src/lib/mock-*.ts, openapi/** など)は再掲しない。この機能が
-  新規に追加する、または変更する具体的なファイルパスのみを列挙する。
+  ACTION REQUIRED: docs/architecture.md が「共通」として記載しているのはパターン
+  (backend.tsに全エンティティのswap point関数が集約される構成、mock-<entity>.tsという
+  命名規則)であり、個別の中身ではない。「backend.ts」「mock-*.ts」というファイル名の
+  形だけを見て省略しない — この機能が新しいエンティティを導入するなら、backend.ts内に
+  追加する具体的な関数名(変更として)と、新規に作る具体的なmock-<entity>.tsファイル
+  (新規追加として)を必ず列挙する。省略してよいのは、他の機能が既に導入済みの
+  エンティティに対する処理(swap pointの分岐ロジックそのもの等)だけ。それ以外の、この
+  機能が新規に追加する、または変更する具体的なファイルパスも列挙する。
 -->
 
 ```text

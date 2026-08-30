@@ -68,6 +68,17 @@ openapi/
 └── common/schemas/             # 両方から$refする共有スキーマ
 ```
 
+**注意: ここに書かれているのは「パターン」であり「個別の中身」ではない。** `backend.ts`が
+swap pointという1ファイルに集約される構成、`mock-<entity>.ts`という命名規則は全機能で
+共通の事実だが、`backend.ts`内の個別の関数(`getTodos`/`createTodo`/`deleteTodo`等)や、
+個別の`mock-todos.ts`のような具体的ファイルは、そのエンティティを導入した機能自身の
+成果物である。例えば`getTodos`/`createTodo`/`deleteTodo`と`mock-todos.ts`は
+`001-todo-dashboard`を実装したコミットで追加されたものであり、他の機能が新しいエンティ
+ティを導入するときも同様に「既存の`backend.ts`に関数を追加する」「新しい`mock-<entity>.ts`
+を追加する」という変更が発生する。これらは「共通インフラだから機能のplan.mdへの記載を
+省略してよいもの」ではなく、その機能の`plan.md`のProject StructureにMUSTで記載する
+(新規追加なら追加、既存ファイルへの追記なら変更、として明記する)。
+
 ## 制約
 
 - Route Handlerはリクエスト間でメモリを共有しない前提で実装する(Principle IV)。
