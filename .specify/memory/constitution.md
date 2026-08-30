@@ -1,19 +1,25 @@
 <!--
 Sync Impact Report
-- Version change: 2.2.0 → 2.3.0 (MINOR — Development Workflow section
-  gains a rule covering the post-completion lifecycle)
-- Modified sections: Development Workflow (Spec-Driven) gains a bullet
-  stating that a feature is never permanently "done": a later spec
-  change or bug fix flows through `/speckit-converge` (appends a new
-  Convergence phase to tasks.md) → `/speckit-taskstoissues` (creates
-  Issues for the new tasks AND registers the new phase in the GitHub
-  Issues mapping tables — a project-specific step added to that skill)
-  → `/speckit-implement` (gated as usual). Without this, the 2.2.0 gate
-  had no defined behavior for a phase appended after the original
-  tasks.md was converted to Issues; `/speckit-implement`'s gate is
-  clarified to fail closed (treat an unmapped phase as blocked, never
-  as unconstrained) rather than silently skip the check. See
-  ADR-0003 in docs/adr/.
+- Version change: 2.3.0 → 2.4.0 (MINOR — new mandatory pre-step for
+  screen-bearing features, plus a new optional spec.md header field)
+- Modified sections:
+  - Development Workflow (Spec-Driven) gains a bullet requiring a
+    screen-bearing feature to start from an agreed mockup (`design`
+    skill) before `/speckit-specify` runs; `/speckit-specify` MUST check
+    for one and halt (directing to `design`) if absent.
+  - Principle VI gains an exception to the no-header-cross-reference
+    rule: a screen's spec.md header MAY cite a `**モックアップ**` field
+    (the mockup's Artifact URL), explicitly distinguished from the
+    openapi.yaml citation — the mockup is a point-in-time visual
+    agreement, not a contract the spec defers to, so 画面入出力仕様/
+    処理仕様 must remain fully self-contained and spec.md stays
+    authoritative once it and the mockup diverge.
+  - `.specify/templates/overrides/spec-template.md` gains the
+    `**モックアップ**` header line and matching guidance.
+- Rationale: agreeing on visual design and outward functionality via a
+  mockup before writing spec.md removes the ambiguity/drift of
+  describing a screen in natural-language prose alone. See ADR-0004 in
+  docs/adr/.
 -->
 
 # Nextjs Sample (BFF) Constitution
@@ -135,6 +141,19 @@ navigation instead: each of its own buttons/links, as a row in 画面入出力
 is exempt from all of the above: it is a quality-detection harness, not a
 requirements document, and may reference tooling, process, or anything
 else needed to reliably catch and correct spec defects.
+
+A screen's `spec.md` header MAY cite a `**モックアップ**` field naming the
+Artifact URL of the mockup (produced by the `design` skill) that its
+ユースケース定義/画面入出力仕様 were authored from — see Development
+Workflow below for when a mockup is required. This is the one exception
+to the no-header-cross-reference rule above, and it works differently
+from the `openapi/bff/openapi.yaml` citation in 処理仕様: that citation
+defers to a contract that MUST stay in sync with the spec, so the spec
+never restates it, whereas the mockup is a snapshot of the visual
+agreement at authoring time — 画面入出力仕様/処理仕様 MUST still be fully
+self-contained (never "see mockup for details"), spec.md is authoritative
+over the mockup once they diverge, and the mockup is not required to be
+kept current after spec.md changes.
 Rationale: a spec is handed to an implementer expecting it to describe
 exactly what to build, in the shape a screen designer actually needs —
 item-level detail and event-by-event behavior — not a backlog artifact
@@ -162,6 +181,14 @@ reviewable instead of growing into one sprawling document.
 - New features go through `/speckit-specify` → `/speckit-plan` →
   `/speckit-tasks` → `/speckit-implement`, not straight from conversation
   to code.
+- A new feature that introduces one or more screens MUST start from an
+  agreed mockup (the `design` skill), before `/speckit-specify` runs —
+  agreeing on visual design and outward functionality as a mockup first
+  removes the ambiguity of describing a screen in natural-language prose
+  alone. `/speckit-specify` MUST check for an agreed mockup and halt,
+  directing to the `design` skill, if none exists. This does not apply
+  to features with no screen (e.g. a purely internal BFF change). See
+  ADR-0004 in `docs/adr/`.
 - Use `/speckit-clarify` when requirements are ambiguous, before
   `/speckit-plan`.
 - Run `/speckit-analyze` after `/speckit-tasks` and before
@@ -211,4 +238,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 2.3.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
+**Version**: 2.4.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
