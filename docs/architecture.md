@@ -45,10 +45,18 @@ src/lib/backend.ts  (swap point。BACKEND_API_URLの有無で分岐。Principle 
 
 ## テスト基盤
 
-ユニットテストは Jest、E2Eテストは Playwright を採用する(`package.json`未導入、
-今後の導入タスクで追加)。各画面のE2Eテストケースは
-`specs/<feature>/screens/<screen>/e2e-test-spec.md`に定義し、Playwright導入時に
-これを自動化する。ユニットテストは各機能の`plan.md`の設計に基づいて別途起こす。
+ユニットテストは Jest(`jest.config.ts`、`next/jest`経由でNext.jsのSWCトランスパイルを
+利用)、E2Eテストは Playwright(`playwright.config.ts`)を採用する。
+
+- ユニットテスト: `src/**/*.test.ts`に対象コードと同じディレクトリで配置する。
+  `npm test`で実行。
+- E2Eテスト: `e2e/*.spec.ts`に画面単位でファイルを分ける。各画面の
+  `specs/<feature>/screens/<screen>/e2e-test-spec.md`のTCをそのままテストケースに
+  対応させ、テスト名にTC番号を含める。`npm run test:e2e`で実行(`webServer`設定により
+  `npm run dev`を自動起動)。テストは`playwright.config.ts`で`fullyParallel: false`・
+  `workers: 1`にしている — `mock-todos.ts`の状態が`globalThis`キャッシュで全テストに
+  共有されるため、各テストは`beforeEach`で一覧をクリアしてから自分のデータを用意する
+  ことで実行順に依存しないようにする。
 
 ## リポジトリレイアウト
 
@@ -66,6 +74,11 @@ openapi/
 ├── bff/openapi.yaml            # このアプリの/api/**契約
 ├── backend/openapi.yaml        # BACKEND_API_URL契約
 └── common/schemas/             # 両方から$refする共有スキーマ
+
+e2e/                            # Playwright E2Eテスト(画面単位でファイルを分ける)
+
+jest.config.ts / jest.setup.ts  # Jestユニットテスト設定
+playwright.config.ts            # Playwright E2Eテスト設定
 ```
 
 **注意: ここに書かれているのは「パターン」であり「個別の中身」ではない。** `backend.ts`が

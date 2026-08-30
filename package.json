@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "jest",
+    "test:e2e": "playwright test",
     "openapi:lint": "redocly lint",
     "openapi:bundle:backend": "redocly bundle openapi/backend/openapi.yaml -o openapi/dist/backend.yaml",
     "openapi:types": "openapi-typescript",
@@ -18,13 +20,19 @@
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@redocly/cli": "^2.49.0",
     "@stoplight/prism-cli": "^5.14.2",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.3",
+    "jest": "^30.5.0",
+    "jest-environment-jsdom": "^30.5.0",
     "js-yaml": "^4.3.2",
     "openapi-typescript": "^7.13.0",
     "typescript": "^5"
