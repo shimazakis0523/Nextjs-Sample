@@ -238,8 +238,8 @@ an inventory.
   `specs/<feature-directory>/screen-flow.md` before the change is
   considered complete.
 - Adding, changing, or removing a screen's ユースケース定義, 画面入出力
-  仕様, or 処理仕様 MUST be followed by running the `update-test-spec`
-  skill to regenerate that screen's `test-spec.md` (its "仕様から導出した
+  仕様, or 処理仕様 MUST be followed by running the `update-e2e-test-spec`
+  skill to regenerate that screen's `e2e-test-spec.md` (its "仕様から導出した
   テストケース" section only — "追加のテスト観点" is preserved) before the
   change is considered complete.
 - When a feature's `tasks.md` carries the GitHub Issues mapping tables

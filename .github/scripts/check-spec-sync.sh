@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# spec.md を変更したPRが、対応するtest-spec.md(常に)とscreen-flow.md
+# spec.md を変更したPRが、対応するe2e-test-spec.md(常に)とscreen-flow.md
 # (画面遷移を記述する行を変更した場合)を同じPRで追従させているかを検査する。
 #
 # constitution.md Development Workflow:
 #   - screens/*/spec.md のユースケース定義/画面入出力仕様/処理仕様の変更は
-#     update-test-spec スキルでtest-spec.mdを追従させること
+#     update-e2e-test-spec スキルでe2e-test-spec.mdを追従させること
 #   - screens/*/spec.md の処理仕様(遷移先を記述する行)の変更は
 #     update-screen-flow-diagram スキルでscreen-flow.mdを追従させること
 #
@@ -22,12 +22,12 @@ while IFS= read -r spec_file; do
 
   screen_dir="$(dirname "$spec_file")"
   feature_dir="$(echo "$screen_dir" | sed -E 's#(specs/[^/]+)/.*#\1#')"
-  test_spec_file="$screen_dir/test-spec.md"
+  e2e_test_spec_file="$screen_dir/e2e-test-spec.md"
   screen_flow_file="$feature_dir/screen-flow.md"
 
-  if ! echo "$CHANGED_FILES" | grep -qxF "$test_spec_file"; then
-    echo "NG: $spec_file を変更していますが $test_spec_file が同じ変更に含まれていません。" >&2
-    echo "    update-test-spec スキルで test-spec.md を再生成してください。" >&2
+  if ! echo "$CHANGED_FILES" | grep -qxF "$e2e_test_spec_file"; then
+    echo "NG: $spec_file を変更していますが $e2e_test_spec_file が同じ変更に含まれていません。" >&2
+    echo "    update-e2e-test-spec スキルで e2e-test-spec.md を再生成してください。" >&2
     fail=1
   fi
 
@@ -48,4 +48,4 @@ if [ "$fail" -ne 0 ]; then
   exit 1
 fi
 
-echo "spec.md の変更と test-spec.md / screen-flow.md の追従に不整合はありません。"
+echo "spec.md の変更と e2e-test-spec.md / screen-flow.md の追従に不整合はありません。"

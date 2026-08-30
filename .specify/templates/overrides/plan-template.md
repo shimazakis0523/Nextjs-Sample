@@ -45,7 +45,7 @@
 specs/[###-feature]/
 ├── plan.md               # This file (/speckit-plan command output)
 ├── screen-flow.md         # 画面遷移図(update-screen-flow-diagramスキルが管理。画面遷移が無い機能では省略)
-├── screens/                # 画面ごとのspec.md/test-spec.md/checklists/(画面が無い機能では省略)
+├── screens/                # 画面ごとのspec.md/e2e-test-spec.md/checklists/(画面が無い機能では省略)
 └── tasks.md               # Phase 2 output (/speckit-tasks command)
 ```
 

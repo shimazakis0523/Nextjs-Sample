@@ -45,7 +45,7 @@ Todo一覧画面(`/dashboard`)とTodo新規登録モーダルの2画面で構成
 specs/001-todo-dashboard/
 ├── plan.md              # This file (/speckit-plan command output)
 ├── screen-flow.md        # 画面遷移図(update-screen-flow-diagramスキルが管理)
-├── screens/               # 画面ごとのspec.md/test-spec.md/checklists/
+├── screens/               # 画面ごとのspec.md/e2e-test-spec.md/checklists/
 └── tasks.md              # Phase 2 output (/speckit-tasks command)
 ```
 

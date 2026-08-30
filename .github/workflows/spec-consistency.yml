@@ -6,7 +6,7 @@ on:
 
 jobs:
   spec-sync:
-    name: spec.md / test-spec.md / screen-flow.md sync
+    name: spec.md / e2e-test-spec.md / screen-flow.md sync
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

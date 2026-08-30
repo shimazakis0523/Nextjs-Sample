@@ -47,7 +47,7 @@ src/lib/backend.ts  (swap point。BACKEND_API_URLの有無で分岐。Principle 
 
 ユニットテストは Jest、E2Eテストは Playwright を採用する(`package.json`未導入、
 今後の導入タスクで追加)。各画面のE2Eテストケースは
-`specs/<feature>/screens/<screen>/test-spec.md`に定義し、Playwright導入時に
+`specs/<feature>/screens/<screen>/e2e-test-spec.md`に定義し、Playwright導入時に
 これを自動化する。ユニットテストは各機能の`plan.md`の設計に基づいて別途起こす。
 
 ## リポジトリレイアウト

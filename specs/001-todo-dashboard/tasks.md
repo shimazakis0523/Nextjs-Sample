@@ -62,25 +62,25 @@ description: "Task list for feature implementation"
 **Goal**: [screens/todo-list/spec.md](./screens/todo-list/spec.md) の内容通りに一覧表示・新規登録
 導線・削除が動作することを確認する
 
-**Independent Test**: [screens/todo-list/test-spec.md](./screens/todo-list/test-spec.md) のTC-001〜
+**Independent Test**: [screens/todo-list/e2e-test-spec.md](./screens/todo-list/e2e-test-spec.md) のTC-001〜
 TC-012を`/dashboard`で手動実行する
 
 ### 実装確認
 
 - [ ] T006 [P] [US1] `src/app/dashboard/page.tsx`・`TodoDashboard.tsx`の初期表示が
       `GET /api/todos`(`src/app/api/todos/route.ts`)を呼び出し、取得順(追加順)で一覧表示する
-      ことを確認する(spec.md 処理仕様 #1、test-spec.md TC-011)
+      ことを確認する(spec.md 処理仕様 #1、e2e-test-spec.md TC-011)
 - [ ] T007 [US1] Todoが0件のとき空状態メッセージ「Todoがありません」が表示されることを確認する
-      (spec.md 画面入出力仕様 #8、test-spec.md TC-002)
+      (spec.md 画面入出力仕様 #8、e2e-test-spec.md TC-002)
 - [ ] T008 [US1] 一覧テーブルの名前・期限・担当者・ステータスバッジが行ごとに正しく表示されることを
-      確認する(spec.md 画面入出力仕様 #3〜#6、test-spec.md TC-008, TC-009)
+      確認する(spec.md 画面入出力仕様 #3〜#6、e2e-test-spec.md TC-008, TC-009)
 - [ ] T009 [US1] Addボタンクリックで[Todo新規登録](./screens/todo-new/spec.md)が表示されることを
-      確認する(spec.md 処理仕様 #2、test-spec.md TC-003)
+      確認する(spec.md 処理仕様 #2、e2e-test-spec.md TC-003)
 - [ ] T010 [US1] 削除ボタン→確認ダイアログ→OKで`DELETE /api/todos/{id}`
       (`src/app/api/todos/[id]/route.ts`)が呼ばれ、該当行のみ一覧から消えることを確認する
-      (spec.md 処理仕様 #3, #4、test-spec.md TC-004, TC-010, TC-012)
+      (spec.md 処理仕様 #3, #4、e2e-test-spec.md TC-004, TC-010, TC-012)
 - [ ] T011 [US1] 削除確認ダイアログでキャンセルした場合、およびDELETE失敗時に一覧が変更されない
-      ことを確認する(spec.md 処理仕様 #4, #5、test-spec.md TC-005, TC-006)
+      ことを確認する(spec.md 処理仕様 #4, #5、e2e-test-spec.md TC-005, TC-006)
 
 **Checkpoint**: Todo一覧画面がspec.md通りに動作することを確認できた状態
 
@@ -89,25 +89,25 @@ TC-012を`/dashboard`で手動実行する
 **Goal**: [screens/todo-new/spec.md](./screens/todo-new/spec.md) の内容通りに入力・保存・
 キャンセルが動作することを確認する
 
-**Independent Test**: [screens/todo-new/test-spec.md](./screens/todo-new/test-spec.md) のTC-001〜
+**Independent Test**: [screens/todo-new/e2e-test-spec.md](./screens/todo-new/e2e-test-spec.md) のTC-001〜
 TC-014をモーダル表示状態で手動実行する
 
 ### 実装確認
 
 - [ ] T012 [US2] モーダル初期表示で`Todo名`・`期限`・`担当者`が空欄、`ステータス`が「未着手」に
-      なっていることを確認する(spec.md 処理仕様 #1、test-spec.md TC-006)
+      なっていることを確認する(spec.md 処理仕様 #1、e2e-test-spec.md TC-006)
 - [ ] T013 [US2] 必須項目(`Todo名`・`期限`・`担当者`)のいずれかが未入力の状態でSaveをクリックすると
       送信がブロックされ、`POST /api/todos`が呼ばれないことを確認する
-      (spec.md 処理仕様 #2、test-spec.md TC-002, TC-007〜TC-009)
+      (spec.md 処理仕様 #2、e2e-test-spec.md TC-002, TC-007〜TC-009)
 - [ ] T014 [US2] 必須項目入力後にSaveをクリックすると`POST /api/todos`
       (`src/app/api/todos/route.ts`)が呼ばれ、成功時はモーダルが閉じることを確認する
-      (spec.md 処理仕様 #3、test-spec.md TC-001, TC-012, TC-013)
+      (spec.md 処理仕様 #3、e2e-test-spec.md TC-001, TC-012, TC-013)
 - [ ] T015 [US2] `POST /api/todos`が失敗した場合、モーダルは開いたままとなり「保存に失敗しました」が
-      表示され、入力内容が保持されることを確認する(spec.md 処理仕様 #3、test-spec.md TC-003)
+      表示され、入力内容が保持されることを確認する(spec.md 処理仕様 #3、e2e-test-spec.md TC-003)
 - [ ] T016 [US2] Cancelボタン、およびモーダル外側クリックでモーダルが閉じ、登録処理が呼ばれない
-      ことを確認する(spec.md 処理仕様 #4, #5、test-spec.md TC-004, TC-005)
+      ことを確認する(spec.md 処理仕様 #4, #5、e2e-test-spec.md TC-004, TC-005)
 - [ ] T017 [US2] Escキー押下ではモーダルが閉じないことを確認する(spec.md 処理仕様 #6、
-      test-spec.md TC-014)
+      e2e-test-spec.md TC-014)
 
 **Checkpoint**: 両画面がspec.md通りに動作することを確認できた状態
 
@@ -118,8 +118,8 @@ TC-014をモーダル表示状態で手動実行する
 - [ ] T018 [P] [screen-flow.md](./screen-flow.md)が両画面の実際の遷移(Addボタン→Todo新規登録)
       と一致していることを確認する(`update-screen-flow-diagram`スキル)
 - [ ] T019 [P] `check-openapi-contract`スキルで`openapi/**`と実装の整合性を最終確認する
-- [ ] T020 `npm run dev`で起動し`/dashboard`を開いて、[todo-list/test-spec.md](./screens/todo-list/test-spec.md)
-      と[todo-new/test-spec.md](./screens/todo-new/test-spec.md)の全テストケースを手動で確認する
+- [ ] T020 `npm run dev`で起動し`/dashboard`を開いて、[todo-list/e2e-test-spec.md](./screens/todo-list/e2e-test-spec.md)
+      と[todo-new/e2e-test-spec.md](./screens/todo-new/e2e-test-spec.md)の全テストケースを手動で確認する
 
 ## Dependencies & Execution Order
 
