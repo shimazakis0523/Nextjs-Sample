@@ -1,5 +1,27 @@
 <!--
 Sync Impact Report
+- Version change: 2.8.3 → 2.9.0 (MINOR — new Core Principle VII,
+  Component Test Coverage: every src/app/**/*.tsx component MUST have a
+  colocated unit test, added in the same change, mechanically enforced
+  by a new CI job)
+- Modified sections:
+  - New Core Principle VII (Component Test Coverage) added after
+    Principle VI.
+  - New `.github/scripts/check-component-tests.sh` and a new
+    `component-test-coverage` job in the "Spec consistency" workflow.
+  - `speckit-plan`/`speckit-tasks`/`speckit-implement` updated to write
+    or require component tests as part of the same task that adds/
+    changes a component, not a separate, skippable follow-up.
+- Rationale: applied to `001-todo-dashboard`, the T021 component split
+  (TodoList.tsx/TodoNewModal.tsx/TodoDashboard.tsx) shipped with zero
+  unit tests — the task description only asked for E2E re-verification,
+  and nothing mechanically checked for missing unit coverage until a
+  human caught it after the fact. Matching this project's existing
+  preference for deterministic gates over relying on an instruction
+  being remembered (the same reasoning behind check-spec-sync.sh and
+  the Issue-based task-order gate), test coverage for components is now
+  enforced by CI, not just documented as an expectation. See ADR-0011
+  in docs/adr/.
 - Version change: 2.8.2 → 2.8.3 (PATCH — 登場するコンポーネントと関係's
   scope explicitly includes this feature's own BFF Route Handlers, not
   React components only; diagram edges MUST be labelled by relationship
@@ -288,6 +310,29 @@ screen that happens to display it. Splitting large features into one file
 per screen, each with its own table of contents, keeps every file
 reviewable instead of growing into one sprawling document.
 
+### VII. Component Test Coverage
+
+Every React component this project authors under `src/app/**` (any `.tsx`
+file whose name is not one of Next.js App Router's own special filenames —
+`page`, `layout`, `template`, `loading`, `error`, `global-error`,
+`not-found`, `default`, which are framework entry points, not this
+project's own components) MUST have a colocated unit test
+(`<Component>.test.tsx`, Jest + `@testing-library/react`) covering its own
+props/callback contract and its success/failure paths. The test MUST be
+added or updated in the same change that adds or changes the component —
+not deferred to a follow-up task.
+`.github/scripts/check-component-tests.sh` (the `component-test-coverage`
+job in the "Spec consistency" GitHub Actions workflow) enforces this on
+every PR against `main`: a changed component file with no matching test
+file fails CI.
+Rationale: a skill instruction alone already failed to catch this once —
+`TodoList.tsx`/`TodoNewModal.tsx`/`TodoDashboard.tsx` (the component split
+from Principle-driven `plan.md` design) shipped with zero unit tests,
+found only after the fact, because the task that created them asked only
+for E2E re-verification and nothing mechanically checked for missing unit
+coverage. A deterministic CI gate, not reliance on remembering, is what
+guarantees this doesn't recur. See ADR-0011 in `docs/adr/`.
+
 ## Technology & Deployment Constraints
 
 See `docs/architecture.md` for the concrete current tech stack, dependency
@@ -403,6 +448,8 @@ materially expanding one, PATCH for wording/clarification only.
 
 Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
-skill to confirm no contract drift was introduced.
+skill to confirm no contract drift was introduced. Before marking a task
+that adds or changes a component under `src/app/**` as complete, confirm
+its `<Component>.test.tsx` exists and `npm test` passes (Principle VII).
 
-**Version**: 2.8.3 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
+**Version**: 2.9.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30

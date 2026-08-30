@@ -144,6 +144,22 @@ The tasks.md should be immediately executable - each task must be specific enoug
 
 **Tests are OPTIONAL**: Only generate test tasks if explicitly requested in the feature specification or if user requests TDD approach.
 
+**Exception — component unit tests are NEVER optional (constitution.md Core
+Principle VII, ADR-0011)**: any task that creates or changes a `src/app/**`
+component (a `.tsx` file whose name is not one of Next.js App Router's own
+special filenames — `page`, `layout`, `template`, `loading`, `error`,
+`global-error`, `not-found`, `default`) MUST fold writing/updating its
+`<Component>.test.tsx` (Jest + `@testing-library/react`, covering the
+component's props/callback contract and success/failure paths) into that
+same task's description and file-path list. Do NOT split the unit test out
+into a separate task — a separate task can be scheduled after the component
+task and then never reached, or dropped during scope trimming, which is
+exactly how `TodoList.tsx`/`TodoNewModal.tsx`/`TodoDashboard.tsx` shipped
+with zero unit tests the first time. `.github/scripts/check-component-tests.sh`
+(the `component-test-coverage` CI job) enforces this mechanically on every
+PR — a task that doesn't fold in the test will fail CI regardless of how
+tasks.md is worded, so word it correctly from the start.
+
 ### Checklist Format (REQUIRED)
 
 Every task MUST strictly follow this format:
@@ -213,5 +229,6 @@ Every task MUST strictly follow this format:
 ## Done When
 
 - [ ] tasks.md generated with all phases, task IDs, and file paths
+- [ ] Every task that creates/changes a `src/app/**` component (excluding Next.js special filenames) includes writing/updating its `<Component>.test.tsx` in the same task, not a separate one
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with task count, story breakdown, and MVP scope

@@ -108,6 +108,17 @@ You **MUST** consider the user input before proceeding (if not empty).
      do not wave them away as "common infra" just because the file name
      matches the pattern. Do not include a "Documentation (this feature)"
      file-tree section (identical boilerplate across every plan.md)
+   - For every `src/app/**` component this feature adds or changes (any
+     `.tsx` file whose name is not one of Next.js App Router's own special
+     filenames — `page`, `layout`, `template`, `loading`, `error`,
+     `global-error`, `not-found`, `default`), list its sibling
+     `<Component>.test.tsx` immediately next to it in the same Source Code
+     listing, even though the test file itself needs no separate design
+     discussion. This is not optional detail: constitution.md Core Principle
+     VII requires the test to exist, and `check-component-tests.sh` (the
+     `component-test-coverage` CI job) fails the PR if a listed component
+     ships without one. A plan.md that lists the component but not its test
+     is an incomplete plan.
 
 ## Mandatory Post-Execution Hooks
 
@@ -166,9 +177,14 @@ Project Structure are filled in. Report branch and IMPL_PLAN path.
   or Complexity Tracking section — only 登場するコンポーネントと関係 and Project
   Structure (ADR-0008). Do not regenerate these dropped sections even if an
   older plan.md on disk still has them; replace them, don't append alongside them.
+- Every planned `src/app/**` component (excluding Next.js special filenames)
+  MUST appear in Project Structure together with its `<Component>.test.tsx`
+  sibling (constitution.md Core Principle VII, ADR-0011). Do not list a
+  component without also listing its test file.
 
 ## Done When
 
 - [ ] plan.md holds only 登場するコンポーネントと関係 (or is intentionally omitted) and Project Structure
+- [ ] Every `src/app/**` component in Project Structure (excluding Next.js special filenames) has its sibling `<Component>.test.tsx` listed alongside it
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with branch and plan path

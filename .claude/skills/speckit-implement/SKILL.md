@@ -183,6 +183,20 @@ You **MUST** consider the user input before proceeding (if not empty).
      after the original implementation, for later spec changes or bug fixes, and this gate applies
      identically to those phases once `speckit-taskstoissues` has registered them.
 
+5.6. **コンポーネントテストゲート(constitution.md Core Principle VII, ADR-0011)** — before
+   marking **any** task complete that creates or changes a file under `src/app/**` whose
+   name is not one of Next.js App Router's special filenames (`page`, `layout`, `template`,
+   `loading`, `error`, `global-error`, `not-found`, `default`), confirm both of the following,
+   even if the task's own description text doesn't mention tests:
+   - Its sibling `<Component>.test.tsx` exists (write/update it now if it doesn't — do not
+     defer to a later task or to Polish phase).
+   - `npm test` passes for that test file.
+   This mirrors 5.5's gate-fail-closed posture: `.github/scripts/check-component-tests.sh`
+   (the `component-test-coverage` CI job) will fail the PR mechanically if this is skipped,
+   so treat a missing test as a task that is not actually done, not as a nice-to-have —
+   this is exactly the gap that shipped `TodoList.tsx`/`TodoNewModal.tsx`/`TodoDashboard.tsx`
+   with zero unit tests the first time.
+
 6. Execute implementation following the task plan:
    - **Phase-by-phase execution**: Complete each phase before moving to the next
    - **Respect dependencies**: Run sequential tasks in order, parallel tasks [P] can run together
@@ -204,6 +218,8 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Provide clear error messages with context for debugging
    - Suggest next steps if implementation cannot proceed
    - **IMPORTANT** For completed tasks, make sure to mark the task off as [X] in the tasks file.
+     For a task touching a `src/app/**` component, only mark it [X] once step 5.6's gate
+     (sibling `.test.tsx` exists and `npm test` passes) is satisfied.
 
 9. Completion validation:
    - Verify all required tasks are completed
@@ -255,6 +271,7 @@ Report final status with summary of completed work.
 ## Done When
 
 - [ ] All tasks in tasks.md completed and marked `[X]`
+- [ ] Every completed task touching a `src/app/**` component (excluding Next.js special filenames) has a sibling `<Component>.test.tsx` and `npm test` passes for it (Principle VII gate, step 5.6)
 - [ ] Implementation validated against specification, plan, and test coverage
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with summary of completed work
