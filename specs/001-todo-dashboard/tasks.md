@@ -132,7 +132,7 @@ TC-014をモーダル表示状態で手動実行する
       `src/app/dashboard/TodoList.tsx`と、新規登録モーダルを担当する
       `src/app/dashboard/TodoNewModal.tsx`に分割する。`todos`一覧stateとモーダル開閉state
       は`TodoDashboard.tsx`(親コンテナとして存続)が持ち、`TodoList`には
-      `todos`・`onDelete`・`onAddClick`を、`TodoNewModal`には`onSaved`・`onCancel`を
+      `todos`・`onDeleted`・`onAddClick`を、`TodoNewModal`には`onSaved`・`onCancel`を
       propsで渡す(各screens/plan.mdのStructure Decision参照)。分割後、
       [todo-list/e2e-test-spec.md](./screens/todo-list/e2e-test-spec.md)と
       [todo-new/e2e-test-spec.md](./screens/todo-new/e2e-test-spec.md)の全テストケースが

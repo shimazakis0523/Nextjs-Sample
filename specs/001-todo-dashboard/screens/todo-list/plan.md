@@ -6,12 +6,18 @@
 
 ## Summary
 
-`/dashboard`の一覧表示・削除を担当する`TodoList.tsx`を実装する。初期表示はServer
-Component(`page.tsx`)側で`getTodos()`を呼び、`TodoList`にはpropsとして渡す。削除は
-`TodoList.tsx`自身が`DELETE /api/todos/{id}`を呼ぶ。Todo新規登録モーダル
-([todo-new](../todo-new/spec.md))の開閉状態と、登録成功時に一覧へ追加する処理は、
-`todo-list`と`todo-new`で共有する`todos`一覧state自体を持つ親コンテナ
-(`TodoDashboard.tsx`)が担当し、`TodoList`はその子として一覧描画のみを担当する。
+この画面(`todo-list`)が担当するのは一覧表示と削除の2つだけ。
+
+- **一覧表示**: 表示するデータは`page.tsx`(Server Component)が`getTodos()`で取得し、
+  `TodoList`にpropsとして渡す。`TodoList`は受け取ったデータを描画するだけ。
+- **削除**: `TodoList.tsx`自身が`DELETE /api/todos/{id}`を呼ぶ。成功したら
+  `onDeleted(id)`で親に「このTodoが消えた」と伝える(親側の状態更新は下記参照)。
+
+一覧データ(`todos`)そのものは`TodoList.tsx`ではなく、親コンポーネント
+`TodoDashboard.tsx`が保持する。理由: このデータは[todo-new](../todo-new/spec.md)
+(新規登録モーダル)からも変更される(登録されると1件増える)。`todo-list`と`todo-new`
+の両方が同じ一覧データに影響するため、データは片方の画面ではなく両方の親である
+`TodoDashboard.tsx`に置く。
 
 ## Technical Context
 
@@ -41,8 +47,11 @@ Component(`page.tsx`)側で`getTodos()`を呼び、`TodoList`にはpropsとし�
 
 **Structure Decision**: `todos`一覧stateと[todo-new](../todo-new/spec.md)モーダルの
 開閉stateは、`TodoList`と`TodoNewModal`の親である`src/app/dashboard/TodoDashboard.tsx`
-が保持する。`TodoList`は`todos`・`onDelete`・`onAddClick`をpropsで受け取り、一覧描画と
-削除確認ダイアログの表示のみを担当する。
+が保持する。`TodoList`がpropsで受け取るのは3つ: `todos`(表示するデータ)、
+`onDeleted(id)`(削除成功後に呼ぶ。親はこれを受けて`todos`からその1件を除く)、
+`onAddClick`(Addボタン押下時に呼ぶ。親はこれを受けてモーダルを開く)。`TodoList`自身が
+持つ責務は一覧描画・削除確認ダイアログの表示・`DELETE`リクエストの送信までで、
+`todos`配列の書き換えは行わない。
 
 ## Complexity Tracking
 

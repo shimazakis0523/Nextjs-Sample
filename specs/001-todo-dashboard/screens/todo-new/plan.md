@@ -7,9 +7,18 @@
 ## Summary
 
 [todo-list](../todo-list/spec.md)のAddボタンから開くモーダルとして`TodoNewModal.tsx`を
-実装する。入力state・バリデーション・保存中state・失敗メッセージはこのコンポーネント
-自身が持つ。登録成功時、新しいTodoを一覧stateへ追加する処理は、`todo-list`と共有する
-`todos`一覧stateを持つ親コンテナ(`TodoDashboard.tsx`)側のコールバックに委譲する。
+実装する。
+
+- **入力〜保存**: 入力内容・バリデーション・保存中の表示・失敗メッセージは、すべて
+  `TodoNewModal.tsx`自身が持つ。Saveボタン押下時、`POST /api/todos`を呼ぶのもこの
+  コンポーネント自身。
+- **保存成功後**: 新しいTodoを一覧に追加する処理は、`TodoNewModal.tsx`ではなく親
+  `TodoDashboard.tsx`が行う(`onSaved(todo)`で通知するだけ)。
+
+一覧データ(`todos`)を`TodoNewModal.tsx`に持たせない理由: このデータは
+[todo-list](../todo-list/spec.md)(一覧画面)からも変更される(削除すると1件減る)。
+`todo-list`と`todo-new`の両方が同じ一覧データに影響するため、データは片方の画面ではなく
+両方の親である`TodoDashboard.tsx`に置く(todo-list側のplan.mdと同じ理由)。
 
 ## Technical Context
 
