@@ -1,25 +1,33 @@
 <!--
 Sync Impact Report
-- Version change: 2.4.0 → 2.5.0 (MINOR — new docs/architecture.md
-  convention for app-wide technical facts, referenced instead of
-  repeated from each feature's plan.md)
+- Version change: 2.5.0 → 2.6.0 (MINOR — plan.md moves from one file per
+  feature to one file per screen, reversing ADR-0005's decision to keep
+  plan.md at feature level)
 - Modified sections:
-  - Development Workflow (Spec-Driven) gains a bullet requiring app-wide
-    Technical Context facts (language/version, dependencies, target
-    platform, project type, storage mechanism, repository layout) to
-    live once in `docs/architecture.md`, referenced (not repeated) from
-    each feature's `plan.md`; `plan.md` states only what's specific to
-    that feature.
-  - `.specify/templates/overrides/plan-template.md` added (new
-    override), trimming Technical Context to feature-specific fields
-    and dropping the research.md/data-model.md/quickstart.md/contracts/
-    Documentation entries per the existing Principle III/VI prohibition.
-- Rationale: this is a single-app project, so most of each plan.md's
-  Technical Context (language/version, dependencies, target platform,
-  storage mechanism, repo layout) was identical across every feature;
-  centralizing it in docs/architecture.md removes that duplication
-  while plan.md stays focused on what's actually feature-specific. See
-  ADR-0005 in docs/adr/.
+  - Development Workflow (Spec-Driven): the plan.md bullet now requires
+    one `plan.md` per screen (`specs/<feature>/screens/<screen>/plan.md`)
+    for any feature with screens; a feature with no screens keeps a
+    single feature-root `plan.md`. A screen's plan.md MUST NOT restate
+    what a constitution principle already says — structural principles
+    guaranteed by shared infra (I, II, IV) get one summary line, and only
+    principles with screen-specific substance (III, V) are elaborated.
+  - `.specify/templates/overrides/plan-template.md` rewritten for
+    per-screen scope: Input is the screen's spec.md, and the generic
+    "Documentation (this feature)" file-tree section (identical
+    boilerplate across every plan.md, no per-screen information) is
+    dropped.
+  - `speckit-plan`/`speckit-tasks`/`speckit-implement`/`speckit-analyze`/
+    `speckit-converge`/`speckit-checklist` skill definitions updated to
+    read/write `screens/*/plan.md` instead of assuming a single
+    feature-root `plan.md`.
+- Rationale: this feature's screens (todo-list, todo-new) are moving from
+  a single shared component to one component per screen, which removes
+  ADR-0005's original objection to per-screen plan.md (screens sharing an
+  implementation). Auditing the merged plan.md also showed its
+  Constitution Check section re-deriving what constitution.md principles
+  already state, growing more repetitive as more screens shared one
+  file — splitting by screen lets each file hold only that screen's own
+  design decisions. See ADR-0006 in docs/adr/.
 -->
 
 # Nextjs Sample (BFF) Constitution
@@ -217,14 +225,32 @@ an inventory.
 - App-wide technical facts (language/version, primary dependencies,
   target platform, project type, storage mechanism, repository layout)
   that hold for every feature MUST be documented once in
-  `docs/architecture.md`, not repeated in each feature's `plan.md`. A
-  feature's `plan.md` Technical Context MUST reference
-  `docs/architecture.md` instead of restating it, and state only what is
-  specific to that feature (Performance Goals, Scale/Scope, any
-  feature-specific Constraints); a field with no feature-specific value
-  is omitted rather than left blank. `plan.md`'s Project Structure MUST
-  likewise list only the paths that feature adds or changes, not paths
-  `docs/architecture.md` already documents. See ADR-0005 in `docs/adr/`.
+  `docs/architecture.md`, not repeated in any `plan.md`. A `plan.md`'s
+  Technical Context MUST reference `docs/architecture.md` instead of
+  restating it, and state only what is specific to that plan's own scope
+  (Performance Goals, Scale/Scope, any specific Constraints); a field
+  with no specific value is omitted rather than left blank. `plan.md`'s
+  Project Structure MUST likewise list only the paths that plan's own
+  scope adds or changes, not paths `docs/architecture.md` already
+  documents. See ADR-0005 in `docs/adr/`.
+- A feature with one or more screens MUST have one `plan.md` per screen,
+  at `specs/<feature>/screens/<screen-id>/plan.md`, scoped to that
+  screen's own component(s) and Route Handler(s) — not a single
+  feature-root `plan.md`. A feature with no screens (e.g. a purely
+  internal BFF change) keeps one feature-root `specs/<feature>/plan.md`.
+  When a feature has screens, `specs/<feature>/plan.md` MUST NOT hold
+  design content; it stays a one-line pointer to the screens' plan.md
+  files, present only because spec-kit's own prerequisite scripts
+  hard-require that path to exist. A screen's `plan.md` MUST NOT restate
+  what a constitution principle already says: principles guaranteed for
+  every screen by the shared infra in `docs/architecture.md` (I, II, IV)
+  get one summary line noting they're satisfied by that shared design;
+  only principles with this screen's own substance (III: which endpoints
+  this screen's component calls; V: what this screen's spec explicitly
+  leaves out) are elaborated. `plan.md` MUST NOT include a "Documentation
+  (this feature)" file-tree section — that content is identical
+  boilerplate across every plan.md and carries no screen-specific
+  information. See ADR-0006 in `docs/adr/`.
 - Use `/speckit-clarify` when requirements are ambiguous, before
   `/speckit-plan`.
 - Run `/speckit-analyze` after `/speckit-tasks` and before
@@ -274,4 +300,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 2.5.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
+**Version**: 2.6.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30

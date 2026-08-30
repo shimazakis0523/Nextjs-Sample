@@ -99,12 +99,16 @@ skip constitution checks gracefully rather than failing.
 Run `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks` once from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS. Derive absolute paths:
 
 - SPEC = FEATURE_DIR/spec.md
-- PLAN = FEATURE_DIR/plan.md
+- PLAN = if `FEATURE_DIR/screens/` exists, this feature's plan.md is per-screen
+  (ADR-0006): PLAN is every `FEATURE_DIR/screens/*/plan.md` (`FEATURE_DIR/plan.md`
+  is a one-line stub in that case, not design content — do not assess it as the plan).
+  Otherwise PLAN = the single `FEATURE_DIR/plan.md`.
 - TASKS = FEATURE_DIR/tasks.md
 - CONSTITUTION = `.specify/memory/constitution.md` (if present)
-If `spec.md`, `plan.md`, or `tasks.md` is missing, STOP with a clear, actionable message naming the
-prerequisite command to run (`/speckit-specify` for a missing spec, `/speckit-plan` for a missing plan,
-`/speckit-tasks` for missing tasks). Do not produce partial output.
+If `spec.md`, `tasks.md`, or (for a screens feature) no screen's plan.md is present, STOP
+with a clear, actionable message naming the prerequisite command to run (`/speckit-specify`
+for a missing spec, `/speckit-plan` for a missing plan, `/speckit-tasks` for missing tasks).
+Do not produce partial output.
 For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 ### 2. Load Artifacts (Progressive Disclosure)
@@ -119,7 +123,7 @@ Load only the minimal necessary context from each artifact:
 - User Stories and their Acceptance Scenarios
 - Edge Cases (if present)
 
-**From plan.md:**
+**From plan.md** (all screens' plan.md files when per-screen, per PLAN above):
 
 - Architecture/stack choices and technical decisions
 - Data Model references

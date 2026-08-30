@@ -6,7 +6,7 @@ description: "Task list for feature implementation"
 
 **Input**: Design documents from `/specs/001-todo-dashboard/`
 
-**Prerequisites**: [plan.md](./plan.md), [spec.md](./spec.md), [docs/architecture.md](../../docs/architecture.md), [openapi/](../../openapi/)
+**Prerequisites**: [screens/todo-list/plan.md](./screens/todo-list/plan.md), [screens/todo-new/plan.md](./screens/todo-new/plan.md), [spec.md](./spec.md), [docs/architecture.md](../../docs/architecture.md), [openapi/](../../openapi/)
 
 **Note**: この機能は実装済みのため、以下は「新規実装タスク」ではなく「既存実装が仕様
 (spec.md / openapi/**)と一致しているかを確認するタスク」である。差分が見つかった場合は、
@@ -121,6 +121,25 @@ TC-014をモーダル表示状態で手動実行する
 - [ ] T020 `npm run dev`で起動し`/dashboard`を開いて、[todo-list/e2e-test-spec.md](./screens/todo-list/e2e-test-spec.md)
       と[todo-new/e2e-test-spec.md](./screens/todo-new/e2e-test-spec.md)の全テストケースを手動で確認する
 
+## Phase 6: コンポーネント分割 (ADR-0006)
+
+**Purpose**: [screens/todo-list/plan.md](./screens/todo-list/plan.md)・
+[screens/todo-new/plan.md](./screens/todo-new/plan.md)が前提とするコンポーネント構成
+(画面ごとに担当コンポーネントを分ける)と、現在1つの`TodoDashboard.tsx`にまとまっている
+実装との差分を解消する。
+
+- [ ] T021 `src/app/dashboard/TodoDashboard.tsx`を、一覧表示・削除を担当する
+      `src/app/dashboard/TodoList.tsx`と、新規登録モーダルを担当する
+      `src/app/dashboard/TodoNewModal.tsx`に分割する。`todos`一覧stateとモーダル開閉state
+      は`TodoDashboard.tsx`(親コンテナとして存続)が持ち、`TodoList`には
+      `todos`・`onDelete`・`onAddClick`を、`TodoNewModal`には`onSaved`・`onCancel`を
+      propsで渡す(各screens/plan.mdのStructure Decision参照)。分割後、
+      [todo-list/e2e-test-spec.md](./screens/todo-list/e2e-test-spec.md)と
+      [todo-new/e2e-test-spec.md](./screens/todo-new/e2e-test-spec.md)の全テストケースが
+      引き続き通ることを確認する。
+
+**Checkpoint**: コンポーネント構成がscreens配下の各plan.mdと一致した状態
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -131,6 +150,7 @@ TC-014をモーダル表示状態で手動実行する
 - **Todo新規登録画面 [US2] (Phase 4)**: Foundational完了後。Todo一覧画面への依存なし
   (Addボタンからの遷移確認(T009)はTodo一覧画面側のタスク)
 - **Polish (Phase 5)**: 両画面の確認完了後
+- **コンポーネント分割 (Phase 6)**: 両画面の確認完了後。Polish(Phase 5)との順序制約はない
 
 **着手条件(Issue単位)**: `speckit-implement`は、あるフェーズのタスクに着手する前に、下表の
 「前提Issue」が全てGitHub上でclosedであることを確認する。closedでない前提Issueがある場合、
@@ -143,6 +163,10 @@ TC-014をモーダル表示状態で手動実行する
 | 3 Todo一覧画面 [US1] | #7〜#12 | #4, #5, #6 |
 | 4 Todo新規登録画面 [US2] | #13〜#18 | #4, #5, #6 |
 | 5 Polish | #19, #20, #21 | #7〜#18(すべて) |
+
+Phase 6(コンポーネント分割)はこの表にまだ登録されていない。`speckit-taskstoissues`を
+再実行してT021のIssueを登録するまで、`speckit-implement`のゲートはPhase 6をblocked
+(fail closed)として扱い、実施しない。
 
 ### Parallel Opportunities
 

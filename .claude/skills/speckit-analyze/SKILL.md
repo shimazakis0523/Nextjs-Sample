@@ -72,10 +72,13 @@ Identify inconsistencies, duplications, ambiguities, and underspecified items ac
 Run `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks` once from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS. Derive absolute paths:
 
 - SPEC = FEATURE_DIR/spec.md
-- PLAN = FEATURE_DIR/plan.md
+- PLAN = if `FEATURE_DIR/screens/` exists, this feature's plan.md is per-screen
+  (ADR-0006): PLAN is the set of `FEATURE_DIR/screens/*/plan.md` files (`FEATURE_DIR/plan.md`
+  itself is a one-line stub in that case, not design content, and MUST NOT be analyzed as
+  if it were the plan). Otherwise PLAN = the single `FEATURE_DIR/plan.md`.
 - TASKS = FEATURE_DIR/tasks.md
 
-Abort with an error message if any required file is missing (instruct the user to run missing prerequisite command).
+Abort with an error message if any required file is missing (instruct the user to run missing prerequisite command; for a screens feature, missing means no screen under `screens/*/` has a plan.md yet).
 For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 ### 2. Load Artifacts (Progressive Disclosure)
@@ -90,7 +93,7 @@ Load only the minimal necessary context from each artifact:
 - User Stories
 - Edge Cases (if present)
 
-**From plan.md:**
+**From plan.md** (all screens' plan.md files when per-screen, per PLAN above):
 
 - Architecture/stack choices
 - Data Model references

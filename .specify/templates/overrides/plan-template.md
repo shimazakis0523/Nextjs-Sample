@@ -1,14 +1,16 @@
-# Implementation Plan: [FEATURE]
+# Implementation Plan: [SCREEN NAME]
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Feature**: [###-feature-name](../../spec.md) | **Screen**: `[screen-id]` | **Date**: [DATE]
 
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
+**Input**: Screen specification from `specs/[###-feature-name]/screens/[screen-id]/spec.md`
 
-**Note**: This template is filled in by the `/speckit-plan` command; its definition describes the execution workflow.
+**Note**: This template is filled in by the `/speckit-plan` command, once per screen
+(`specs/<feature>/screens/<screen-id>/plan.md`). A feature with no screens keeps a single
+feature-root `plan.md` instead — see `docs/adr/0006-per-screen-implementation-plans.md`.
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+[この画面固有の実装方針: 担当するコンポーネント、呼び出すBFFエンドポイント、状態管理の要点]
 
 ## Technical Context
 
@@ -16,60 +18,46 @@
   ACTION REQUIRED:
   - アプリ全体に共通する技術スタック・依存関係・デプロイ先・テスト基盤・永続化方式・
     リポジトリレイアウト・共通制約は docs/architecture.md に既に記載されている。
-    ここに重複して書かず、下の行の参照のみを残す。docs/architecture.md自体に
-    変更が必要な技術判断が生じた場合は、この機能のplan.mdではなくdocs/architecture.md
-    を直接更新すること。
-  - このセクションに書くのは、この機能固有の情報のみ。他の機能と共通しない値だけを
-    埋める。該当する固有情報が無いフィールドは行ごと省略する(空欄や「N/A」を残さない)。
+    ここに重複して書かず、下の行の参照のみを残す。
+  - このセクションに書くのは、この画面固有の情報のみ。該当する固有情報が無いフィールドは
+    行ごと省略する(空欄や「N/A」を残さない)。
 -->
 
-**共通のアーキテクチャ**: [docs/architecture.md](../../docs/architecture.md) を参照。
+**共通のアーキテクチャ**: [docs/architecture.md](../../../../docs/architecture.md) を参照。
 
-**Performance Goals**: [この機能固有の性能目標があれば記載。無ければ本行ごと省略]
+**Performance Goals**: [この画面固有の性能目標があれば記載。無ければ本行ごと省略]
 
-**Constraints**: [docs/architecture.mdの制約に加えて、この機能固有の追加制約があれば記載。無ければ本行ごと省略]
+**Constraints**: [docs/architecture.mdの制約に加えて、この画面固有の追加制約があれば記載。無ければ本行ごと省略]
 
-**Scale/Scope**: [この機能固有の規模。例: 画面数、エンティティ数]
+**Scale/Scope**: [この画面固有の規模があれば記載。無ければ本行ごと省略]
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+<!--
+  ACTION REQUIRED:
+  - 共通インフラ(src/lib/backend.tsのswap point、BFF-onlyアクセス、globalThisキャッシュの
+    非永続化)によって画面を問わず自動的に満たされる原則は、原則の説明を再掲せず1行に
+    まとめる。
+  - この画面固有の判断が必要な原則(呼び出すエンドポイント、この画面のスコープ外にした
+    機能など)だけを個別に記載する。
+-->
 
 [Gates determined based on constitution file]
 
-## Project Structure
+## Component Design
 
-### Documentation (this feature)
+**担当コンポーネント**: [この画面を実装する具体的なコンポーネントファイル]
 
-```text
-specs/[###-feature]/
-├── plan.md               # This file (/speckit-plan command output)
-├── screen-flow.md         # 画面遷移図(update-screen-flow-diagramスキルが管理。画面遷移が無い機能では省略)
-├── screens/                # 画面ごとのspec.md/e2e-test-spec.md/checklists/(画面が無い機能では省略)
-└── tasks.md               # Phase 2 output (/speckit-tasks command)
-```
+**呼び出すBFFエンドポイント**: [spec.mdの処理仕様表に挙げたエンドポイント。詳細は
+openapi/bff/openapi.yamlを参照し、ここでは再掲しない]
 
-### Source Code (この機能が追加/変更するパスのみ)
-
-<!--
-  ACTION REQUIRED: docs/architecture.md のリポジトリレイアウトに既に載っている共通パス
-  (src/lib/backend.ts, src/lib/mock-*.ts, openapi/** など)は再掲しない。この機能が
-  新規に追加する、または変更する具体的なファイルパスのみを列挙する。
--->
-
-```text
-[この機能が追加/変更する具体的なファイルパス]
-```
-
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above; for shared/common paths, reference docs/architecture.md
-instead of restating them]
+**Structure Decision**: [このコンポーネントが置かれるパス、他画面のコンポーネントとの関係]
 
 ## Complexity Tracking
 
 > **Fill ONLY if Constitution Check has violations that must be justified**
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
+|-----------|------------|---------------------------------------|
 | [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
 | [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
