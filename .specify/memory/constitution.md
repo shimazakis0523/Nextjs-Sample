@@ -1,5 +1,29 @@
 <!--
 Sync Impact Report
+- Version change: 2.8.2 → 2.8.3 (PATCH — 登場するコンポーネントと関係's
+  scope explicitly includes this feature's own BFF Route Handlers, not
+  React components only; diagram edges MUST be labelled by relationship
+  kind so no separate legend is needed)
+- Modified sections:
+  - Development Workflow (Spec-Driven): the 登場するコンポーネントと関係
+    bullet now says the section's scope is "every file this feature adds
+    or changes with a non-obvious relationship," names Route Handlers
+    explicitly, and requires labelled edges (`"props: ..."`,
+    `"callback: ..."`, `"fetch: METHOD /path"`) instead of a legend.
+  - `.specify/templates/overrides/plan-template.md` and `speckit-plan`
+    updated with the same scope and labelling guidance.
+  - `specs/001-todo-dashboard/plan.md` corrected: added `route.ts` and
+    `[id]/route.ts` as diagram nodes with their own detail subsections
+    (previously only a file path + one-line comment in Project
+    Structure — no actual design for the BFF layer), and replaced the
+    solid/dashed-arrow legend with relationship-labelled edges.
+- Rationale: the component-relationship section had been read as
+  React-components-only, leaving this feature's two Route Handlers with
+  no design of their own — a file path and a one-line comment is not an
+  implementation plan. The diagram already labelled edges with prop/
+  callback names; adding the relationship kind to each label removes
+  the need for a reader to remember what solid vs. dashed means. See
+  ADR-0010 in docs/adr/.
 - Version change: 2.8.1 → 2.8.2 (PATCH — clarifies, does not change, the
   existing "docs/architecture.md documents app-wide facts" rule: it
   documents shared *patterns*, not every specific instance of them. A
@@ -310,20 +334,28 @@ an inventory.
   — always at feature level, never split per screen, even when the
   feature has multiple screens (ADR-0007, superseding ADR-0006's
   per-screen split). `plan.md` holds exactly two sections:
-  **登場するコンポーネントと関係** (a Mermaid diagram of how props/callbacks
-  flow between components, shown first as the whole-picture overview,
-  followed by one subsection per involved file giving its role on the
-  first line — never a bare file name with no explanation — plus
-  whatever detail the diagram itself can't show; required when the
-  feature's screens share a parent component or state, omitted when
-  every screen's component is fully self-contained)
+  **登場するコンポーネントと関係** (scoped to every file this feature adds
+  or changes that has a non-obvious relationship to another — not React
+  components only: this feature's own BFF Route Handlers under
+  `src/app/api/**` MUST get the same treatment, since a file path and a
+  one-line comment in Project Structure is not a design for that layer.
+  A Mermaid diagram of how these files relate — props/callbacks between
+  components, or a Client Component's fetch call to this feature's own
+  Route Handler — comes first as the whole-picture overview, with every
+  edge labelled by what kind of relationship it is (e.g. `"props: ..."`,
+  `"callback: ..."`, `"fetch: METHOD /path"`) so the diagram needs no
+  separate legend. Followed by one subsection per involved file giving
+  its role on the first line — never a bare file name with no
+  explanation — plus whatever detail the diagram itself can't show.
+  Required when any two of this feature's files have such a
+  relationship; omitted only when every file is fully self-contained)
   and **Project Structure** (the Source Code paths this feature adds or
   changes, and a Structure Decision). `plan.md` MUST NOT include a
   Summary, Technical Context, Constitution Check, Complexity Tracking,
   or "Documentation (this feature)" file-tree section — applied to
   `001-todo-dashboard`, each of these either duplicated the
   component-relationship section or restated constitution.md without
-  adding information. See ADR-0008 in `docs/adr/`.
+  adding information. See ADR-0008 and ADR-0010 in `docs/adr/`.
 - Use `/speckit-clarify` when requirements are ambiguous, before
   `/speckit-plan`.
 - Run `/speckit-analyze` after `/speckit-tasks` and before
@@ -373,4 +405,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 2.8.2 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
+**Version**: 2.8.3 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30

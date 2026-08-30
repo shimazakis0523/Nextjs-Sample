@@ -67,23 +67,36 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 3. **Execute plan workflow**: `plan.md` holds exactly two sections (ADR-0008) — do
    not add Summary, Technical Context, Constitution Check, or Complexity Tracking:
-   - Fill "登場するコンポーネントと関係": if the feature's screens share a parent
-     component, shared state, or pass props/callbacks between each other's
-     components, start with a Mermaid `flowchart` (whole-picture overview first)
-     showing solid arrows for props passed down and dashed arrows for callbacks
-     fired back up, then one `###` subsection per involved file giving its role on
-     the first line (never a bare file name with no explanation) followed by
-     whatever detail the diagram can't show (props/state it holds, which API calls
-     it makes, what it does and doesn't own). When a component's detail mentions
-     calling a function that is not itself one of this feature's new components
-     (e.g. `getTodos()` from `src/lib/backend.ts`), name the file it comes from —
-     otherwise it reads as an unexplained component of its own — and check whether
-     that function itself is new or pre-existing (see the Project Structure note
-     below on docs/architecture.md's "pattern vs. instance" distinction: a new
-     entity's swap-point functions and mock file are this feature's own additions,
-     not shared infra, even though they live in the shared `backend.ts` file).
-     Omit this section entirely when
-     every screen's component is fully self-contained (no shared parent or state).
+   - Fill "登場するコンポーネントと関係". Scope is not limited to React
+     components: it includes this feature's own BFF Route Handlers
+     (`src/app/api/**`) too — a Route Handler is not done being planned just
+     because its file path and a one-line comment appear in Project Structure;
+     give it the same node + `###` subsection treatment as everything else,
+     otherwise the BFF layer ends up with no actual design, only code. Include
+     this section whenever any two of this feature's files have a relationship
+     that isn't obvious from the file alone — a shared parent/state,
+     props/callbacks between components, or a Client Component calling this
+     feature's own Route Handler over HTTP. Start with a Mermaid `flowchart`
+     (whole-picture overview first): label every edge with what kind of
+     relationship it is, not just the value/endpoint — `"props: ..."`,
+     `"callback: ..."`, `"fetch: METHOD /path"` — so the diagram is
+     self-explanatory without a separate legend. Follow with one `###`
+     subsection per involved file giving its role on the first line (never a
+     bare file name with no explanation) followed by whatever detail the
+     diagram can't show (props/state it holds, which API calls it makes, what
+     it does and doesn't own — for a Route Handler, which `backend.ts`
+     function(s) it calls and any validation it does or doesn't do). When a
+     file's detail mentions calling a function that is not itself one of this
+     feature's own new files (e.g. `getTodos()` from `src/lib/backend.ts`),
+     name the file it comes from — otherwise it reads as an unexplained
+     component of its own — and state whether that function itself is new or
+     pre-existing (see the Project Structure note below on
+     docs/architecture.md's "pattern vs. instance" distinction: a new entity's
+     swap-point functions and mock file are this feature's own additions, not
+     shared infra, even though they live in the shared `backend.ts` file).
+     Omit this section entirely when every one of this feature's files is
+     fully self-contained (no shared parent, state, or feature-internal
+     HTTP call).
    - Fill Project Structure's Source Code section with only the paths this
      feature adds or changes — not paths already documented in
      `docs/architecture.md`'s repository layout as shared. docs/architecture.md

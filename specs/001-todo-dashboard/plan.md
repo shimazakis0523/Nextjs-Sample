@@ -12,16 +12,20 @@ flowchart TD
     dashboard["TodoDashboard.tsx<br/>(親・todos一覧stateを保持)"]
     list["TodoList.tsx<br/>(todo-list画面)"]
     modal["TodoNewModal.tsx<br/>(todo-new画面)"]
+    postRoute["route.ts<br/>(BFF: GET/POST /api/todos)"]
+    idRoute["[id]/route.ts<br/>(BFF: DELETE /api/todos/{id})"]
 
-    page -- "initialTodos" --> dashboard
-    dashboard -- "todos, onDeleted, onAddClick" --> list
-    dashboard -- "onSaved, onCancel" --> modal
-    list -. "onDeleted(id)" .-> dashboard
-    modal -. "onSaved(todo)" .-> dashboard
+    page -- "props: initialTodos" --> dashboard
+    dashboard -- "props: todos, onDeleted, onAddClick" --> list
+    dashboard -- "props: onSaved, onCancel" --> modal
+    list -. "callback: onDeleted(id)" .-> dashboard
+    modal -. "callback: onSaved(todo)" .-> dashboard
+    list -- "fetch: DELETE /api/todos/{id}" --> idRoute
+    modal -- "fetch: POST /api/todos" --> postRoute
 ```
 
-実線 = 親から子へpropsで渡す。破線 = 子が親のコールバックを呼んで結果を伝える
-(データそのものの書き換えは常に親`TodoDashboard.tsx`側で行う)。
+(データそのものの書き換えは常に親`TodoDashboard.tsx`側で行う。BFFより先
+(`src/lib/backend.ts`・`mock-todos.ts`)は下記Project Structureを参照)
 
 ### `page.tsx`
 
@@ -56,6 +60,22 @@ flowchart TD
 押下時、`POST /api/todos`を呼ぶのも自身。保存成功後、一覧への追加は行わず
 `onSaved(todo)`で親に通知するだけ。表示/非表示は親が持つ`isModalOpen`stateで制御される
 (自身は開閉stateを持たない)。
+
+### `route.ts` (`src/app/api/todos/route.ts`)
+
+役割: BFFのRoute Handler。`GET /api/todos`・`POST /api/todos`を実装。
+
+`GET`は`src/lib/backend.ts`の`getTodos()`をそのまま呼んで結果を返す。`POST`はリクエスト
+ボディをそのまま`createTodo()`に渡し、作成されたTodoを返す。入力の必須項目チェックは
+行わない(クライアント側の`TodoNewModal.tsx`が担う)。リクエスト/レスポンスの詳細は
+[openapi/bff/openapi.yaml](../../openapi/bff/openapi.yaml)を参照。
+
+### `[id]/route.ts` (`src/app/api/todos/[id]/route.ts`)
+
+役割: BFFのRoute Handler。`DELETE /api/todos/{id}`を実装。
+
+`src/lib/backend.ts`の`deleteTodo(id)`を呼ぶだけ。レスポンスコードの詳細は
+[openapi/bff/openapi.yaml](../../openapi/bff/openapi.yaml)を参照。
 
 ## Project Structure
 
