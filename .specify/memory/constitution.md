@@ -69,8 +69,8 @@ those same YAML files, creating maintenance overhead with zero information gain.
 
 ### IV. Serverless-Safe State
 Code MUST assume Route Handlers do not share memory across requests in
-production (Vercel is serverless — see
-`openapi/README.md` / `README.md` caveats). In-memory, `globalThis`-cached
+production (Vercel is serverless — see `docs/architecture.md` caveats).
+In-memory, `globalThis`-cached
 mocks are acceptable for local development and demos only, and MUST NOT be
 presented as durable storage. Real persistence needs are satisfied by
 pointing `BACKEND_API_URL` at a real backend, not by adding a database to
