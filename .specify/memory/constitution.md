@@ -1,17 +1,18 @@
 <!--
 Sync Impact Report
-- Version change: 2.0.2 → 2.1.0 (MINOR — Development Workflow section
-  materially expanded)
+- Version change: 2.1.0 → 2.2.0 (MINOR — Development Workflow section
+  gains a new enforcement rule)
 - Modified sections: Development Workflow (Spec-Driven) gains a bullet
-  requiring the new `update-test-spec` skill to run (regenerating a
-  screen's test-spec.md) whenever its ユースケース定義/画面入出力仕様/
-  処理仕様 changes — mirrors the existing update-screen-flow-diagram
-  rule. test-spec.md is an E2E-test-case document derived from a
-  screen's spec.md (never from source code or used for unit tests —
-  unit tests belong with plan.md's internal design, which spec.md
-  deliberately doesn't define); it has a generated section (仕様から
-  導出したテストケース, owned by the skill) and a preserved section
-  (追加のテスト観点, human-owned, never overwritten).
+  requiring `speckit-implement` to check GitHub Issue state (not
+  tasks.md checkboxes, not conversational memory) before implementing
+  any task, when tasks.md carries the GitHub Issues mapping tables
+  (task↔Issue, phase↔prerequisite-Issue) that `speckit-taskstoissues`
+  produces. A phase whose prerequisite Issues aren't all closed is
+  skipped, with the blocking Issue(s) reported, instead of being
+  implemented out of order. This moves task-ordering enforcement onto
+  GitHub Issue state (see ADR-0001, ADR-0002 in docs/adr/) so it does
+  not depend on a Claude session remembering the Phase Dependencies
+  prose in tasks.md.
 -->
 
 # Nextjs Sample (BFF) Constitution
@@ -177,6 +178,14 @@ reviewable instead of growing into one sprawling document.
   skill to regenerate that screen's `test-spec.md` (its "仕様から導出した
   テストケース" section only — "追加のテスト観点" is preserved) before the
   change is considered complete.
+- When a feature's `tasks.md` carries the GitHub Issues mapping tables
+  produced by `speckit-taskstoissues` (task↔Issue, phase↔prerequisite-
+  Issue), `speckit-implement` MUST check the prerequisite Issues'
+  GitHub state (open/closed) before implementing a phase's tasks, and
+  MUST skip that phase — reporting which Issue(s) are still open —
+  instead of implementing it when a prerequisite Issue isn't closed.
+  Task order is enforced by GitHub Issue state, not by a session
+  remembering the Phase Dependencies described in prose.
 
 ## Governance
 
@@ -193,4 +202,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 2.1.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
+**Version**: 2.2.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30

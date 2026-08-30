@@ -152,6 +152,27 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **Task details**: ID, description, file paths, parallel markers [P]
    - **Execution flow**: Order and dependency requirements
 
+5.5. **着手条件チェック(Issue-based gate)** — **IF** tasks.md contains a "GitHub Issues" task↔Issue
+   mapping table and a "着手条件(Issue単位)" phase↔prerequisite-Issue table (added by
+   `speckit-taskstoissues` workflow): this check is **MANDATORY** and MUST run before implementing
+   any task from that phase. Skip this step entirely only if tasks.md has no such tables (task was
+   never converted to GitHub Issues).
+   - For the phase containing the next task(s) to implement, look up its row in the
+     「着手条件(Issue単位)」table to get the 前提Issue list.
+   - Use the GitHub MCP server (`issue_read` with method `get`, or `list_issues`) to fetch the
+     current state of every 前提Issue.
+   - **If any 前提Issue is not `closed`**: do **NOT** implement any task in this phase. Report which
+     Issue(s) are still open (number + title) and move on to a different phase whose prerequisites
+     ARE met, if one exists. If no phase is currently eligible, halt and report that implementation
+     cannot proceed until the blocking Issue(s) are closed.
+   - **If all 前提Issue are closed**: proceed to implement the phase's tasks normally. After
+     completing a task, in addition to marking it `[X]` in tasks.md, close its corresponding GitHub
+     Issue (`issue_write` method `update`, `state: closed`, `state_reason: completed`) — this keeps
+     the Issue state (the authority this gate checks) in sync with tasks.md instead of drifting from
+     it.
+   - This gate exists so that task ordering is enforced by GitHub Issue state — not by the
+     assumption that whoever is implementing remembers or respects the Phase Dependencies prose.
+
 6. Execute implementation following the task plan:
    - **Phase-by-phase execution**: Complete each phase before moving to the next
    - **Respect dependencies**: Run sequential tasks in order, parallel tasks [P] can run together

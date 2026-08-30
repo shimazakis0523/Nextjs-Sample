@@ -16,6 +16,18 @@ description: "Task list for feature implementation"
 優先順位付け(P1/P2/P3)を持たないため(Principle VI: ユーザーストーリー形式の禁止)、代わりに
 画面をグループ単位として使う。
 
+**GitHub Issues**: 親Issue [#22](https://github.com/shimazakis0523/Nextjs-Sample/issues/22)。
+各タスクのIssue番号は下表の通り(`speckit-implement`の着手条件チェックが参照する、この機能の
+唯一の対応表)。
+
+| Task | Issue | Task | Issue | Task | Issue | Task | Issue |
+|---|---|---|---|---|---|---|---|
+| T001 | #2  | T006 | #7  | T011 | #12 | T016 | #17 |
+| T002 | #3  | T007 | #8  | T012 | #13 | T017 | #18 |
+| T003 | #4  | T008 | #9  | T013 | #14 | T018 | #19 |
+| T004 | #5  | T009 | #10 | T014 | #15 | T019 | #20 |
+| T005 | #6  | T010 | #11 | T015 | #16 | T020 | #21 |
+
 ## Format: `[ID] [P?] [Screen] Description`
 
 - **[P]**: 並行実行可能(異なるファイル、依存関係なし)
@@ -119,6 +131,18 @@ TC-014をモーダル表示状態で手動実行する
 - **Todo新規登録画面 [US2] (Phase 4)**: Foundational完了後。Todo一覧画面への依存なし
   (Addボタンからの遷移確認(T009)はTodo一覧画面側のタスク)
 - **Polish (Phase 5)**: 両画面の確認完了後
+
+**着手条件(Issue単位)**: `speckit-implement`は、あるフェーズのタスクに着手する前に、下表の
+「前提Issue」が全てGitHub上でclosedであることを確認する。closedでない前提Issueがある場合、
+そのフェーズのタスクは実施しない(スキップし、どのIssueが未closeかを報告する)。
+
+| Phase | このフェーズのIssue | 前提Issue(すべてclosed必須) |
+|---|---|---|
+| 1 Setup | #2, #3 | なし |
+| 2 Foundational | #4, #5, #6 | #2, #3 |
+| 3 Todo一覧画面 [US1] | #7〜#12 | #4, #5, #6 |
+| 4 Todo新規登録画面 [US2] | #13〜#18 | #4, #5, #6 |
+| 5 Polish | #19, #20, #21 | #7〜#18(すべて) |
 
 ### Parallel Opportunities
 
