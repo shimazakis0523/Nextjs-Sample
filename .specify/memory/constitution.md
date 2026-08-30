@@ -59,6 +59,14 @@ Rationale: the YAML is the source of truth a future real-backend
 implementer builds against, and drift between contract and code defeats
 the point of having a contract at all.
 
+Feature directories MUST NOT include a `contracts/` or similar directory.
+A feature's endpoint names and methods belong in its `spec.md` 処理仕様 table
+(where each row states the triggering operation and its endpoint), and the
+detailed contract (request/response shape, status codes, error behavior)
+lives exclusively in `openapi/bff/openapi.yaml` and `openapi/backend/openapi.yaml`.
+A separate `contracts/` directory adds nothing except a duplicate pointer to
+those same YAML files, creating maintenance overhead with zero information gain.
+
 ### IV. Serverless-Safe State
 Code MUST assume Route Handlers do not share memory across requests in
 production (Vercel is serverless — see
