@@ -1,5 +1,25 @@
 <!--
 Sync Impact Report
+- Version change: 2.9.0 → 2.10.0 (MINOR — new Core Principle VIII,
+  Governance Change Traceability: a PR changing governance-relevant files
+  (Skills, this constitution, ADRs, CI workflows/scripts) MUST reference a
+  GitHub Issue, mechanically enforced by a new CI job)
+- Modified sections:
+  - New Core Principle VIII (Governance Change Traceability) added after
+    Principle VII.
+  - New `.github/scripts/check-governance-issue-ref.sh` and a new
+    `governance-issue-reference` job in the "Spec consistency" workflow.
+- Rationale: the Jest/Playwright test-tooling introduction and the
+  Component Test Coverage gate itself (Principle VII, ADR-0011) were
+  implemented directly in response to conversational requests, bypassing
+  `speckit-tasks`/`speckit-taskstoissues` entirely — no GitHub Issue was
+  ever created for that work, unlike `001-todo-dashboard`'s T001-T021
+  which went through the full Issue-tracked pipeline (ADR-0002). ADR-0002
+  had already flagged this exact gap: "この仕組みはspeckit-implementを
+  経由しない変更には効かない" (this mechanism has no effect on changes
+  that bypass speckit-implement). This principle closes that gap with a
+  PR-level check that doesn't depend on tasks.md or any particular skill
+  being run. See ADR-0012 in docs/adr/.
 - Version change: 2.8.3 → 2.9.0 (MINOR — new Core Principle VII,
   Component Test Coverage: every src/app/**/*.tsx component MUST have a
   colocated unit test, added in the same change, mechanically enforced
@@ -333,6 +353,30 @@ for E2E re-verification and nothing mechanically checked for missing unit
 coverage. A deterministic CI gate, not reliance on remembering, is what
 guarantees this doesn't recur. See ADR-0011 in `docs/adr/`.
 
+### VIII. Governance Change Traceability
+
+A PR that changes any governance-relevant file — anything under
+`.claude/skills/**`, this constitution (`.specify/memory/constitution.md`),
+any ADR under `docs/adr/**`, or `.github/workflows/**`/
+`.github/scripts/**` — MUST reference a GitHub Issue (`#<number>`) in its
+PR body or in at least one of its commit messages, even when the change
+wasn't produced by `/speckit-tasks` + `/speckit-taskstoissues` (e.g. an
+ad-hoc process/tooling change made directly in conversation). This does
+not require the tasks.md-based Issue-order gate machinery described in the
+Governance section below (ADR-0002) — only that an Issue exists and is
+referenced, so the change is traceable to a documented reason.
+`.github/scripts/check-governance-issue-ref.sh` (the
+`governance-issue-reference` job in the "Spec consistency" GitHub Actions
+workflow) enforces this on every PR against `main`.
+Rationale: the GitHub Issue-based task-order gate (see Governance section
+below, ADR-0002) only fires when `/speckit-implement` runs against a
+`tasks.md` that already carries Issue mapping tables — it has no effect on
+work that never goes through that pipeline at all. That is exactly what
+happened when Jest/Playwright tooling and the Component Test Coverage gate
+itself (Principle VII, ADR-0011) were implemented directly from
+conversational requests, without ever creating a GitHub Issue. See
+ADR-0012 in `docs/adr/`.
+
 ## Technology & Deployment Constraints
 
 See `docs/architecture.md` for the concrete current tech stack, dependency
@@ -451,5 +495,9 @@ Compliance review: before `/speckit-implement` runs tasks touching
 skill to confirm no contract drift was introduced. Before marking a task
 that adds or changes a component under `src/app/**` as complete, confirm
 its `<Component>.test.tsx` exists and `npm test` passes (Principle VII).
+Before opening a PR that changes any Skill, this constitution, an ADR, or
+a CI workflow/script — including one made directly in conversation, not
+through `/speckit-tasks` — create or reuse a GitHub Issue for the change
+and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.9.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
+**Version**: 2.10.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30

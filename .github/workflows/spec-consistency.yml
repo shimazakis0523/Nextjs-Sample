@@ -34,3 +34,14 @@ jobs:
         with:
           fetch-depth: 0
       - run: .github/scripts/check-component-tests.sh "origin/${{ github.base_ref }}"
+
+  governance-issue-reference:
+    name: governance file changes reference a GitHub Issue
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: .github/scripts/check-governance-issue-ref.sh "origin/${{ github.base_ref }}"
