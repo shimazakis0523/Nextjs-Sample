@@ -81,6 +81,13 @@ You **MUST** consider the user input before proceeding (if not empty).
    screen-less feature) and `.specify/memory/constitution.md`.
 
 4. **Execute plan workflow**: Follow the structure in the plan template to:
+   - Fill "登場するコンポーネントと関係" (per-screen plan.md only): if this screen's
+     component shares a parent, state, or props/callbacks with another screen's
+     component, list every involved file with a one-line role (role text first,
+     never a bare file name) in a table, then a Mermaid `flowchart` showing solid
+     arrows for props passed down and dashed arrows for callbacks fired back up.
+     Mark this screen's own component with "★このplan.mdの対象". Omit this section
+     entirely when the screen's component is fully self-contained.
    - Fill Technical Context: reference `docs/architecture.md` for app-wide facts
      (language/version, dependencies, target platform, storage mechanism,
      repository layout) instead of restating them; fill in only this plan's

@@ -4,20 +4,40 @@
 
 **Input**: Screen specification from `specs/001-todo-dashboard/screens/todo-list/spec.md`
 
+## 登場するコンポーネントと関係
+
+| ファイル | 役割 |
+|---|---|
+| `page.tsx` | 画面のエントリ(Server Component)。`getTodos()`で初期データを取得するだけ |
+| `TodoDashboard.tsx` | 親。`todos`一覧stateとモーダル開閉stateを持つ。**todo-listとtodo-newの両方が使う**ため、どちらか一方の画面には属さない |
+| `TodoList.tsx` | ★このplan.mdが実装対象とする画面(todo-list)本体。一覧描画と削除ボタンの処理を担当 |
+| `TodoNewModal.tsx` | [todo-new](../todo-new/spec.md)画面の実装(このplan.mdの対象外。参考として図に含める) |
+
+```mermaid
+flowchart TD
+    page["page.tsx<br/>(Server Component)"]
+    dashboard["TodoDashboard.tsx<br/>(親・todos一覧stateを保持)"]
+    list["TodoList.tsx<br/>★このplan.mdの対象"]
+    modal["TodoNewModal.tsx<br/>(todo-new画面)"]
+
+    page -- "initialTodos" --> dashboard
+    dashboard -- "todos, onDeleted, onAddClick" --> list
+    dashboard -- "onSaved, onCancel" --> modal
+    list -. "onDeleted(id)" .-> dashboard
+    modal -. "onSaved(todo)" .-> dashboard
+```
+
+実線 = 親から子へpropsで渡す。破線 = 子が親のコールバックを呼んで結果を伝える
+(データそのものの書き換えは常に親`TodoDashboard.tsx`側で行う)。
+
 ## Summary
 
 この画面(`todo-list`)が担当するのは一覧表示と削除の2つだけ。
 
-- **一覧表示**: 表示するデータは`page.tsx`(Server Component)が`getTodos()`で取得し、
-  `TodoList`にpropsとして渡す。`TodoList`は受け取ったデータを描画するだけ。
+- **一覧表示**: `page.tsx`から渡された`todos`を描画するだけ(データ取得はこの画面の
+  責務ではない)。
 - **削除**: `TodoList.tsx`自身が`DELETE /api/todos/{id}`を呼ぶ。成功したら
-  `onDeleted(id)`で親に「このTodoが消えた」と伝える(親側の状態更新は下記参照)。
-
-一覧データ(`todos`)そのものは`TodoList.tsx`ではなく、親コンポーネント
-`TodoDashboard.tsx`が保持する。理由: このデータは[todo-new](../todo-new/spec.md)
-(新規登録モーダル)からも変更される(登録されると1件増える)。`todo-list`と`todo-new`
-の両方が同じ一覧データに影響するため、データは片方の画面ではなく両方の親である
-`TodoDashboard.tsx`に置く。
+  `onDeleted(id)`で親に伝える(上図参照)。
 
 ## Technical Context
 
@@ -45,13 +65,8 @@
 `DELETE /api/todos/{id}`(削除ボタン)。詳細は
 [openapi/bff/openapi.yaml](../../../../openapi/bff/openapi.yaml)を参照。
 
-**Structure Decision**: `todos`一覧stateと[todo-new](../todo-new/spec.md)モーダルの
-開閉stateは、`TodoList`と`TodoNewModal`の親である`src/app/dashboard/TodoDashboard.tsx`
-が保持する。`TodoList`がpropsで受け取るのは3つ: `todos`(表示するデータ)、
-`onDeleted(id)`(削除成功後に呼ぶ。親はこれを受けて`todos`からその1件を除く)、
-`onAddClick`(Addボタン押下時に呼ぶ。親はこれを受けてモーダルを開く)。`TodoList`自身が
-持つ責務は一覧描画・削除確認ダイアログの表示・`DELETE`リクエストの送信までで、
-`todos`配列の書き換えは行わない。
+**Structure Decision**: 上記の図の通り。`TodoList`自身は`todos`配列を書き換えない
+(一覧描画・削除確認ダイアログの表示・`DELETE`リクエストの送信までが責務)。
 
 ## Complexity Tracking
 
