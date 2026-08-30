@@ -142,6 +142,19 @@ is exempt from all of the above: it is a quality-detection harness, not a
 requirements document, and may reference tooling, process, or anything
 else needed to reliably catch and correct spec defects.
 
+Feature directories MUST NOT include `research.md`, `quickstart.md`, or
+`data-model.md`. These files create redundancy and confusion:
+- **research.md**: Project-wide architectural decisions belong in
+  `constitution.md` and `docs/adr/`, not repeated per-feature.
+  Feature-specific background (market research, user interviews) is rare
+  enough that contextual notes in spec.md itself suffice.
+- **quickstart.md**: Implementation onboarding is the responsibility of
+  code comments and the implementer's familiarity with constitution.md;
+  repeating per-feature is maintenance overhead.
+- **data-model.md**: The data model is a server-side concern defined in
+  `openapi/common/schemas/**` and referenced from contract YAML; it does
+  not belong in a frontend spec.
+
 A screen's `spec.md` header MAY cite a `**モックアップ**` field naming the
 Artifact URL of the mockup (produced by the `design` skill) that its
 ユースケース定義/画面入出力仕様 were authored from — see Development
