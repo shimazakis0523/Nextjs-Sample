@@ -12,8 +12,29 @@
   (lint/bundle)、`openapi-typescript`(型生成)、`@stoplight/prism-cli`(実バックエンドの
   モックサーバ)。
 - **デプロイ先**: Vercel(サーバーレス)。
-- **プロジェクト種別**: Web application。Next.js App Router単一プロジェクト内に
-  frontendとBFFが同居する構成。
+
+## 全体構成: Frontend + BFF同居
+
+Next.js App Router単一プロジェクト内に、ブラウザ向けのfrontendとBFF(Backend For
+Frontend)が同居する。両者は同一デプロイ単位・同一リポジトリだが、責務は明確に分離
+されている。
+
+```text
+ブラウザ
+  │  fetch("/api/**") のみ (Principle I: BFF-Only Backend Access)
+  ▼
+src/app/api/**  (BFF Route Handler)
+  │  必ず src/lib/backend.ts の関数(getTodos等)経由で呼ぶ
+  ▼
+src/lib/backend.ts  (swap point。BACKEND_API_URLの有無で分岐。Principle II)
+  ├─ 未設定時 → src/lib/mock-*.ts (globalThisキャッシュのインメモリモック)
+  └─ 設定時   → src/lib/backend-client.ts → BACKEND_API_URL (実バックエンド)
+```
+
+- ブラウザは`/api/**`以外のいかなるバックエンドも直接呼び出さない。
+- Route Handler・Server Componentsは`mock-*.ts`や`backend-client.ts`を直接importせず、
+  必ず`backend.ts`の関数を経由する。
+- この構成により、実バックエンド接続への切り替えは`backend.ts`一箇所の変更で完結する。
 
 ## データ永続化
 
