@@ -25,3 +25,12 @@ jobs:
       - run: npm ci
       - run: npm run openapi:lint
       - run: node .github/scripts/check-openapi-bff-routes.mjs
+
+  component-test-coverage:
+    name: src/app/**/*.tsx components have a unit test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: .github/scripts/check-component-tests.sh "origin/${{ github.base_ref }}"
