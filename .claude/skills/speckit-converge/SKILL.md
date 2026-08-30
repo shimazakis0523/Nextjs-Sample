@@ -101,8 +101,8 @@ Run `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --inclu
 - SPEC = FEATURE_DIR/spec.md
 - PLAN = if `FEATURE_DIR/screens/` exists, this feature's plan.md is per-screen
   (ADR-0006): PLAN is every `FEATURE_DIR/screens/*/plan.md` (`FEATURE_DIR/plan.md`
-  is a one-line stub in that case, not design content — do not assess it as the plan).
-  Otherwise PLAN = the single `FEATURE_DIR/plan.md`.
+  does not exist in that case — do not look for it). Otherwise PLAN = the single
+  `FEATURE_DIR/plan.md`.
 - TASKS = FEATURE_DIR/tasks.md
 - CONSTITUTION = `.specify/memory/constitution.md` (if present)
 If `spec.md`, `tasks.md`, or (for a screens feature) no screen's plan.md is present, STOP

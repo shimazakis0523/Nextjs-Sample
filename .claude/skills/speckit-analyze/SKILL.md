@@ -73,9 +73,9 @@ Run `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --inclu
 
 - SPEC = FEATURE_DIR/spec.md
 - PLAN = if `FEATURE_DIR/screens/` exists, this feature's plan.md is per-screen
-  (ADR-0006): PLAN is the set of `FEATURE_DIR/screens/*/plan.md` files (`FEATURE_DIR/plan.md`
-  itself is a one-line stub in that case, not design content, and MUST NOT be analyzed as
-  if it were the plan). Otherwise PLAN = the single `FEATURE_DIR/plan.md`.
+  (ADR-0006): PLAN is the set of `FEATURE_DIR/screens/*/plan.md` files
+  (`FEATURE_DIR/plan.md` does not exist in that case — do not look for it).
+  Otherwise PLAN = the single `FEATURE_DIR/plan.md`.
 - TASKS = FEATURE_DIR/tasks.md
 
 Abort with an error message if any required file is missing (instruct the user to run missing prerequisite command; for a screens feature, missing means no screen under `screens/*/` has a plan.md yet).

@@ -68,15 +68,14 @@ You **MUST** consider the user input before proceeding (if not empty).
      `IMPL_PLAN`. Determine the target screen from `$ARGUMENTS` (a screen id or name);
      if not stated and more than one screen lacks a plan.md, list the screens under
      `SPECS_DIR/screens/*/spec.md` and ask which one. The target file is
-     `SPECS_DIR/screens/<screen-id>/plan.md` — ignore `IMPL_PLAN` for content purposes.
-     If that file doesn't exist yet, create it from the `plan-template` (resolve via
+     `SPECS_DIR/screens/<screen-id>/plan.md` — ignore `IMPL_PLAN` entirely (do not
+     create, read, or write `SPECS_DIR/plan.md`; `setup-plan.sh` already skips it for
+     a feature with `screens/`, and `check-prerequisites.sh`/`setup-tasks.sh` accept
+     `screens/*/plan.md` in its place — see ADR-0006). If the target screen's plan.md
+     doesn't exist yet, create it from the `plan-template` (resolve via
      `resolve_template_content` semantics, i.e. the same override stack `setup-plan.sh`
      uses — read `.specify/templates/overrides/plan-template.md` directly since it
-     always exists as a project override). Additionally, if `IMPL_PLAN`
-     (`SPECS_DIR/plan.md`) does not exist, create it as a one-line stub: a pointer
-     naming each screen's plan.md path, nothing else — this file exists only to satisfy
-     `check-prerequisites.sh`'s hard-coded existence check used by other skills; MUST
-     NOT hold design content once screens exist.
+     always exists as a project override).
 
 3. **Load context**: Read the relevant screen's `spec.md` (or `FEATURE_SPEC` for a
    screen-less feature) and `.specify/memory/constitution.md`.
@@ -156,9 +155,9 @@ Report branch, the actual plan.md path written (the per-screen path when
   `openapi/backend/openapi.yaml`. If Technical Context has unresolved
   NEEDS CLARIFICATION items, resolve them inline (ask the user or make a
   documented assumption) rather than deferring to a research.md file.
-- When `screens/` exists, `IMPL_PLAN` (`SPECS_DIR/plan.md`) is never the
-  plan.md to fill in — it stays a one-line stub. Writing design content there
-  once screens exist is a Development Workflow violation (ADR-0006).
+- When `screens/` exists, `SPECS_DIR/plan.md` MUST NOT exist at all — never
+  create, read, or write it. The plan.md to fill in is always
+  `SPECS_DIR/screens/<screen-id>/plan.md` (ADR-0006).
 
 ## Done When
 

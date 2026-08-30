@@ -35,13 +35,15 @@ ADR-0005は「plan.mdを画面単位に分割するか」を検討し、当時�
 3. **`plan.md`の「Documentation (this feature)」ディレクトリツリー節は削除**する。
    どの機能のplan.mdにも同じ内容(plan.md/screen-flow.md/screens/tasks.mdの説明)が
    並ぶ定型文で、画面固有の情報を持たないため。
-4. **`specs/<feature>/plan.md`(feature直下)は、画面がある機能では中身を持たない
-   スタブとして残す**。`.specify/scripts/bash/check-prerequisites.sh`が
-   `$FEATURE_DIR/plan.md`の存在を無条件にハードコードで要求しており(`speckit-tasks`
-   `speckit-implement`等はすべてこの経由でしか動かない)、このスクリプトは
-   `.specify/templates/overrides/`のようなプロジェクト側の上書き機構を持たない
-   spec-kit本体のコアスクリプトである。中身を持たせず「各画面のplan.mdを参照」という
-   1行だけのポインタにすることで、この既存の前提チェックを壊さずに済ませる。
+4. **`specs/<feature>/plan.md`(feature直下)は、画面がある機能では一切持たない**。
+   当初は「`.specify/scripts/bash/check-prerequisites.sh`が`$FEATURE_DIR/plan.md`の
+   存在を無条件にハードコードで要求している」ことを理由に、中身を持たないスタブとして
+   残す案を採ったが、そのスタブ自体が「何のためにあるか分からないファイル」として
+   同じ種類の混乱を招くと指摘された。そのため方針を変更し、
+   `check-prerequisites.sh`・`setup-tasks.sh`・`setup-plan.sh`の3スクリプトを
+   直接修正し、`$FEATURE_DIR/screens/*/plan.md`が1つ以上存在すれば
+   `$FEATURE_DIR/plan.md`の不在を許容するようにした(スタブ生成自体をやめた)。
+   下記「検討した代替案」も参照。
 5. **`speckit-plan`/`speckit-tasks`/`speckit-implement`/`speckit-analyze`/
    `speckit-converge`/`speckit-checklist`の各Skill定義を、画面単位のplan.mdを読み書き
    するように更新**する。具体的には、`FEATURE_DIR/plan.md`を唯一のplan.mdとして扱う
@@ -50,20 +52,34 @@ ADR-0005は「plan.mdを画面単位に分割するか」を検討し、当時�
 
 ## 検討した代替案
 
-**spec-kit本体のスクリプト(`common.sh`の`get_feature_paths`等)を直接書き換えて
-`IMPL_PLAN`を画面単位に解決させる案**は採らなかった。これらのスクリプトは
-`.specify/scripts/bash/`配下にあり、`.specify/templates/`の`overrides/`層のような
-プロジェクト固有カスタマイズの置き場を持たない。直接書き換えると、spec-kit本体の
-更新(`specify update`等)で上書き・競合するリスクがある。Skill定義
-(`.claude/skills/*/SKILL.md`)側の指示を変更する方を選んだのは、これらが元々この
-プロジェクトの管理下にあり、これまでも(例: research.md/data-model.md/quickstart.md
-を生成しない指示への変更)同じ方法でカスタマイズしてきたため。
+当初は**spec-kit本体のスクリプト(`.specify/scripts/bash/`配下)を直接書き換える案**を
+避け、「feature直下に中身のないスタブplan.mdを置く」方式を採った。理由は、これらの
+スクリプトが`.specify/templates/`の`overrides/`層のようなプロジェクト固有カスタマイズの
+置き場を持たない、spec-kit本体の更新(`specify update`等)で上書き・競合しうるコアスクリプト
+だったため。
+
+しかし実際に運用してみると、このスタブファイル自体が「何のためにあるか分からない
+ファイル」として同種の混乱を招いた。スタブを維持するコスト(そのファイルの役割を
+毎回説明する必要がある)は、スクリプトを直接書き換えるリスク(将来の`specify update`で
+上書きされ得る)より大きいと判断し、方針を変更して
+`check-prerequisites.sh`・`setup-tasks.sh`・`setup-plan.sh`を直接修正した。将来
+spec-kit本体を更新する際は、この3スクリプトのplan.md存在チェック部分がこの変更を
+保持しているか確認すること。
+
+Skill定義(`.claude/skills/*/SKILL.md`)側の指示を変更する方針(決定5)は変更していない
+— これらは元々このプロジェクトの管理下にあり、これまでも(例: research.md/
+data-model.md/quickstart.mdを生成しない指示への変更)同じ方法でカスタマイズしてきた
+ため。
 
 ## 影響
 
-- `specs/001-todo-dashboard/plan.md`はスタブ化し、実体は
+- `specs/001-todo-dashboard/plan.md`は削除し、実体は
   `specs/001-todo-dashboard/screens/todo-list/plan.md`と
   `specs/001-todo-dashboard/screens/todo-new/plan.md`に分かれる。
+- `.specify/scripts/bash/check-prerequisites.sh`・`setup-tasks.sh`・
+  `setup-plan.sh`はこのプロジェクト向けに直接修正済み(`screens/*/plan.md`が
+  1つ以上あれば`$FEATURE_DIR/plan.md`の不在を許容)。spec-kit本体の更新時は
+  この変更が保持されているか確認する。
 - `TodoDashboard.tsx`を`TodoList.tsx`・`TodoNewModal.tsx`に分割するコード変更は、
   この計画変更の対象に含まれるが、plan.mdの執筆自体とは別の実装タスクとして
   `tasks.md`側で扱う。

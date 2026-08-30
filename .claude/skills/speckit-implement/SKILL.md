@@ -98,9 +98,8 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **REQUIRED**: Read plan.md for tech stack, architecture, and file structure —
      if `FEATURE_DIR/screens/` exists, this feature's plan.md is per-screen
      (ADR-0006): read every `FEATURE_DIR/screens/*/plan.md` relevant to the
-     tasks being implemented (`FEATURE_DIR/plan.md` itself is a one-line stub
-     in that case, not design content). Otherwise read the single
-     `FEATURE_DIR/plan.md`.
+     tasks being implemented (`FEATURE_DIR/plan.md` does not exist in that
+     case — do not look for it). Otherwise read the single `FEATURE_DIR/plan.md`.
    - **IF EXISTS**: Read data-model.md for entities and relationships
    - **IF EXISTS**: Read contracts/ for API specifications and test requirements
    - **IF EXISTS**: Read research.md for technical decisions and constraints

@@ -62,9 +62,9 @@ You **MUST** consider the user input before proceeding (if not empty).
 2. **Load design documents**: Read from FEATURE_DIR:
    - **Required**: spec.md (user stories with priorities); plan.md — if
      `FEATURE_DIR/screens/` exists, this feature's plan.md is per-screen
-     (ADR-0006): read every `FEATURE_DIR/screens/*/plan.md` instead of
-     `FEATURE_DIR/plan.md` (which is a one-line stub in that case, not design
-     content). Otherwise read the single `FEATURE_DIR/plan.md`.
+     (ADR-0006): read every `FEATURE_DIR/screens/*/plan.md` instead
+     (`FEATURE_DIR/plan.md` does not exist in that case). Otherwise read the
+     single `FEATURE_DIR/plan.md`.
    - **Optional**: data-model.md (entities), contracts/ (interface contracts), research.md (decisions), quickstart.md (test scenarios)
    - **IF EXISTS**: Load `.specify/memory/constitution.md` for project principles and governance constraints
    - Note: Not all projects have all documents. Generate tasks based on what's available.
@@ -83,7 +83,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Validate task completeness (each user story has all needed tasks, independently testable)
 
 4. **Generate tasks.md**: Use TASKS_TEMPLATE_CONTENT (from the JSON output above) as the structure. For compatibility with older setup scripts that omit TASKS_TEMPLATE_CONTENT, read TASKS_TEMPLATE instead. Fill with:
-   - Correct feature name from spec.md (not plan.md — which is a one-line stub when the feature has screens, per ADR-0006)
+   - Correct feature name from spec.md (not plan.md — which does not exist at the feature root when the feature has screens, per ADR-0006)
    - Phase 1: Setup tasks (project initialization)
    - Phase 2: Foundational tasks (blocking prerequisites for all user stories)
    - Phase 3+: One phase per user story (in priority order from spec.md)

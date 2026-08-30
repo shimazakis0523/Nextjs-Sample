@@ -1,5 +1,13 @@
 <!--
 Sync Impact Report
+- Version change: 2.6.0 → 2.6.1 (PATCH — same per-screen plan.md decision,
+  correcting the compatibility mechanism: a feature-root plan.md stub is
+  no longer required. `.specify/scripts/bash/check-prerequisites.sh`,
+  `setup-tasks.sh`, and `setup-plan.sh` are now patched directly to
+  accept `screens/*/plan.md` in place of a feature-root plan.md, so
+  `specs/<feature>/plan.md` simply does not exist for a feature with
+  screens, instead of existing as a content-free pointer file. See the
+  "検討した代替案" section of ADR-0006 for why the stub was dropped.)
 - Version change: 2.5.0 → 2.6.0 (MINOR — plan.md moves from one file per
   feature to one file per screen, reversing ADR-0005's decision to keep
   plan.md at feature level)
@@ -238,10 +246,12 @@ an inventory.
   screen's own component(s) and Route Handler(s) — not a single
   feature-root `plan.md`. A feature with no screens (e.g. a purely
   internal BFF change) keeps one feature-root `specs/<feature>/plan.md`.
-  When a feature has screens, `specs/<feature>/plan.md` MUST NOT hold
-  design content; it stays a one-line pointer to the screens' plan.md
-  files, present only because spec-kit's own prerequisite scripts
-  hard-require that path to exist. A screen's `plan.md` MUST NOT restate
+  When a feature has screens, `specs/<feature>/plan.md` MUST NOT exist at
+  all — `.specify/scripts/bash/check-prerequisites.sh`, `setup-tasks.sh`,
+  and `setup-plan.sh` are patched (this project's own change, not
+  upstream spec-kit) to accept one or more `screens/*/plan.md` in place
+  of a feature-root `plan.md`; re-verify that patch survives after any
+  spec-kit update. A screen's `plan.md` MUST NOT restate
   what a constitution principle already says: principles guaranteed for
   every screen by the shared infra in `docs/architecture.md` (I, II, IV)
   get one summary line noting they're satisfied by that shared design;
@@ -300,4 +310,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 2.6.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
+**Version**: 2.6.1 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
