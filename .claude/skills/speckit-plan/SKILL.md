@@ -69,11 +69,13 @@ You **MUST** consider the user input before proceeding (if not empty).
    not add Summary, Technical Context, Constitution Check, or Complexity Tracking:
    - Fill "登場するコンポーネントと関係": if the feature's screens share a parent
      component, shared state, or pass props/callbacks between each other's
-     components, list every involved file with a one-line role (role text first,
-     never a bare file name) in a table, then a Mermaid `flowchart` showing solid
-     arrows for props passed down and dashed arrows for callbacks fired back up.
-     Omit this section entirely when every screen's component is fully
-     self-contained (no shared parent or state).
+     components, start with a Mermaid `flowchart` (whole-picture overview first)
+     showing solid arrows for props passed down and dashed arrows for callbacks
+     fired back up, then one `###` subsection per involved file giving its role on
+     the first line (never a bare file name with no explanation) followed by
+     whatever detail the diagram can't show (props/state it holds, which API calls
+     it makes, what it does and doesn't own). Omit this section entirely when
+     every screen's component is fully self-contained (no shared parent or state).
    - Fill Project Structure's Source Code section with only the paths this
      feature adds or changes — not paths already documented in
      `docs/architecture.md`'s repository layout, and do not include a

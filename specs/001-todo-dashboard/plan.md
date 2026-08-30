@@ -6,13 +6,6 @@
 
 ## 登場するコンポーネントと関係
 
-| ファイル | 役割 |
-|---|---|
-| `page.tsx` | 画面のエントリ(Server Component)。`getTodos()`で初期データを取得するだけ |
-| `TodoDashboard.tsx` | 親。`todos`一覧stateとモーダル開閉stateを持つ。[todo-list](./screens/todo-list/spec.md)と[todo-new](./screens/todo-new/spec.md)の両方が使うため、どちらか一方の画面には属さない |
-| `TodoList.tsx` | [todo-list](./screens/todo-list/spec.md)画面の実装。一覧描画と削除ボタンの処理を担当 |
-| `TodoNewModal.tsx` | [todo-new](./screens/todo-new/spec.md)画面の実装。新規登録フォームを担当 |
-
 ```mermaid
 flowchart TD
     page["page.tsx<br/>(Server Component)"]
@@ -29,6 +22,39 @@ flowchart TD
 
 実線 = 親から子へpropsで渡す。破線 = 子が親のコールバックを呼んで結果を伝える
 (データそのものの書き換えは常に親`TodoDashboard.tsx`側で行う)。
+
+### `page.tsx`
+
+役割: 画面のエントリ(Server Component)。
+
+`getTodos()`を呼んで初期データを取得し、`TodoDashboard`に`initialTodos`として渡すだけ。
+自身は状態を持たない。
+
+### `TodoDashboard.tsx`
+
+役割: 親。`todos`一覧stateとモーダル開閉stateを持つ。
+
+[todo-list](./screens/todo-list/spec.md)と[todo-new](./screens/todo-new/spec.md)の
+両方が同じ一覧データに影響する(削除で減り、登録で増える)ため、どちらか一方の画面には
+属させず、この親が保持する。`TodoList`から`onDeleted(id)`を受けたら`todos`からその1件を
+除き、`TodoNewModal`から`onSaved(todo)`を受けたら`todos`に追加する。
+
+### `TodoList.tsx`
+
+役割: [todo-list](./screens/todo-list/spec.md)画面の実装。一覧描画と削除ボタンの処理を担当。
+
+`todos`を描画するだけ(データ取得はこの画面の責務ではない)。削除は自身が
+`DELETE /api/todos/{id}`を呼び、成功したら`onDeleted(id)`で親に伝える。`todos`配列
+そのものの書き換えは行わない。
+
+### `TodoNewModal.tsx`
+
+役割: [todo-new](./screens/todo-new/spec.md)画面の実装。新規登録フォームを担当。
+
+入力内容・バリデーション・保存中の表示・失敗メッセージはすべて自身が持つ。Saveボタン
+押下時、`POST /api/todos`を呼ぶのも自身。保存成功後、一覧への追加は行わず
+`onSaved(todo)`で親に通知するだけ。表示/非表示は親が持つ`isModalOpen`stateで制御される
+(自身は開閉stateを持たない)。
 
 ## Project Structure
 

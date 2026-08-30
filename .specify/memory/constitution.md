@@ -1,5 +1,11 @@
 <!--
 Sync Impact Report
+- Version change: 2.8.0 → 2.8.1 (PATCH — reorders 登場するコンポーネント
+  と関係's content, same two-section scope as 2.8.0: the Mermaid diagram
+  now comes first as a whole-picture overview, followed by a `###`
+  subsection per component giving its role plus detail the diagram
+  can't show, replacing the flat role table that used to precede the
+  diagram)
 - Version change: 2.7.0 → 2.8.0 (MINOR — plan.md trimmed to exactly two
   sections, 登場するコンポーネントと関係 and Project Structure; Summary,
   Technical Context, Constitution Check, and Complexity Tracking are
@@ -269,11 +275,13 @@ an inventory.
   — always at feature level, never split per screen, even when the
   feature has multiple screens (ADR-0007, superseding ADR-0006's
   per-screen split). `plan.md` holds exactly two sections:
-  **登場するコンポーネントと関係** (a component-relationship table with
-  each file's role explained before the file name is used anywhere else,
-  plus a Mermaid diagram of how props/callbacks flow between components
-  — required when the feature's screens share a parent component or
-  state, omitted when every screen's component is fully self-contained)
+  **登場するコンポーネントと関係** (a Mermaid diagram of how props/callbacks
+  flow between components, shown first as the whole-picture overview,
+  followed by one subsection per involved file giving its role on the
+  first line — never a bare file name with no explanation — plus
+  whatever detail the diagram itself can't show; required when the
+  feature's screens share a parent component or state, omitted when
+  every screen's component is fully self-contained)
   and **Project Structure** (the Source Code paths this feature adds or
   changes, and a Structure Decision). `plan.md` MUST NOT include a
   Summary, Technical Context, Constitution Check, Complexity Tracking,
@@ -330,4 +338,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 2.8.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
+**Version**: 2.8.1 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
