@@ -1,14 +1,17 @@
 <!--
 Sync Impact Report
-- Version change: 2.0.1 → 2.0.2 (PATCH — existing rule extended to two
-  more header fields)
-- Modified: VI now additionally bans two spec.md header fields: a
-  cross-reference to the parent feature directory (redundant with the
-  file's own path) and a document status/workflow field like "Draft"
-  (process tracking, not design content — same category as the
-  authoring-process ban already in this principle). Removed 親機能 and
-  ステータス from specs/001-todo-dashboard/**/spec.md and from
-  .specify/templates/overrides/spec-template.md.
+- Version change: 2.0.2 → 2.1.0 (MINOR — Development Workflow section
+  materially expanded)
+- Modified sections: Development Workflow (Spec-Driven) gains a bullet
+  requiring the new `update-test-spec` skill to run (regenerating a
+  screen's test-spec.md) whenever its ユースケース定義/画面入出力仕様/
+  処理仕様 changes — mirrors the existing update-screen-flow-diagram
+  rule. test-spec.md is an E2E-test-case document derived from a
+  screen's spec.md (never from source code or used for unit tests —
+  unit tests belong with plan.md's internal design, which spec.md
+  deliberately doesn't define); it has a generated section (仕様から
+  導出したテストケース, owned by the skill) and a preserved section
+  (追加のテスト観点, human-owned, never overwritten).
 -->
 
 # Nextjs Sample (BFF) Constitution
@@ -169,6 +172,11 @@ reviewable instead of growing into one sprawling document.
   `update-screen-flow-diagram` skill to regenerate the corresponding
   `specs/<feature-directory>/screen-flow.md` before the change is
   considered complete.
+- Adding, changing, or removing a screen's ユースケース定義, 画面入出力
+  仕様, or 処理仕様 MUST be followed by running the `update-test-spec`
+  skill to regenerate that screen's `test-spec.md` (its "仕様から導出した
+  テストケース" section only — "追加のテスト観点" is preserved) before the
+  change is considered complete.
 
 ## Governance
 
@@ -185,4 +193,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 2.0.2 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
+**Version**: 2.1.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-29
