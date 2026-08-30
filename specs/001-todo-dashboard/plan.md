@@ -65,10 +65,12 @@ flowchart TD
 
 役割: BFFのRoute Handler。`GET /api/todos`・`POST /api/todos`を実装。
 
-`GET`は`src/lib/backend.ts`の`getTodos()`をそのまま呼んで結果を返す。`POST`はリクエスト
-ボディをそのまま`createTodo()`に渡し、作成されたTodoを返す。入力の必須項目チェックは
-行わない(クライアント側の`TodoNewModal.tsx`が担う)。リクエスト/レスポンスの詳細は
-[openapi/bff/openapi.yaml](../../openapi/bff/openapi.yaml)を参照。
+`GET`は`src/lib/backend.ts`の`getTodos()`をそのまま呼んで結果を返す。`POST`は
+`title`・`dueDate`・`assignee`・`status`の必須項目チェックを行い(未入力または不正な
+`status`なら400を返す)、通過したら`createTodo()`に渡し、作成されたTodoを返す(201)。
+クライアント側の`TodoNewModal.tsx`も同じ必須項目チェックを行うが、これはUXのための
+先行チェックであり、`route.ts`側の検証を代替するものではない。リクエスト/レスポンスの
+詳細は[openapi/bff/openapi.yaml](../../openapi/bff/openapi.yaml)を参照。
 
 ### `[id]/route.ts` (`src/app/api/todos/[id]/route.ts`)
 
