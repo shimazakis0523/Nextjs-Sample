@@ -130,7 +130,7 @@ TC-014をモーダル表示状態で手動実行する
 コンポーネント構成(画面ごとに担当コンポーネントを分ける)と、現在1つの
 `TodoDashboard.tsx`にまとまっている実装との差分を解消する。
 
-- [ ] T021 `src/app/dashboard/TodoDashboard.tsx`を、一覧表示・削除を担当する
+- [x] T021 `src/app/dashboard/TodoDashboard.tsx`を、一覧表示・削除を担当する
       `src/app/dashboard/TodoList.tsx`と、新規登録モーダルを担当する
       `src/app/dashboard/TodoNewModal.tsx`に分割する。`todos`一覧stateとモーダル開閉state
       は`TodoDashboard.tsx`(親コンテナとして存続)が持ち、`TodoList`には
@@ -139,6 +139,9 @@ TC-014をモーダル表示状態で手動実行する
       [todo-list/e2e-test-spec.md](./screens/todo-list/e2e-test-spec.md)と
       [todo-new/e2e-test-spec.md](./screens/todo-new/e2e-test-spec.md)の全テストケースが
       引き続き通ることを確認する。
+      — 確認OK: `tsc --noEmit`・`eslint`とも警告無し。分割後にブラウザ自動操作で
+      主要ケース(初期表示・追加・保存成功/失敗・Cancel・外側クリック・Esc・削除)を
+      再実行し、全てパス
 
 **Checkpoint**: コンポーネント構成が[plan.md](./plan.md)と一致した状態
 
