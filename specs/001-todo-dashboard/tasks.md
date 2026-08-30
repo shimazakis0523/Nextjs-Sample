@@ -27,6 +27,7 @@ description: "Task list for feature implementation"
 | T003 | #4  | T008 | #9  | T013 | #14 | T018 | #19 |
 | T004 | #5  | T009 | #10 | T014 | #15 | T019 | #20 |
 | T005 | #6  | T010 | #11 | T015 | #16 | T020 | #21 |
+| T021 | #23 |     |     |     |     |     |     |
 
 ## Format: `[ID] [P?] [Screen] Description`
 
@@ -164,10 +165,7 @@ TC-014をモーダル表示状態で手動実行する
 | 3 Todo一覧画面 [US1] | #7〜#12 | #4, #5, #6 |
 | 4 Todo新規登録画面 [US2] | #13〜#18 | #4, #5, #6 |
 | 5 Polish | #19, #20, #21 | #7〜#18(すべて) |
-
-Phase 6(コンポーネント分割)はこの表にまだ登録されていない。`speckit-taskstoissues`を
-再実行してT021のIssueを登録するまで、`speckit-implement`のゲートはPhase 6をblocked
-(fail closed)として扱い、実施しない。
+| 6 コンポーネント分割 | #23 | #2〜#21(すべて) |
 
 ### Parallel Opportunities
 
