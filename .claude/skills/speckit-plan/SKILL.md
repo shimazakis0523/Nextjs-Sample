@@ -65,7 +65,8 @@ You **MUST** consider the user input before proceeding (if not empty).
    `docs/adr/0007-revert-to-feature-level-plan-md.md` for why this project always
    plans at feature level, never per screen.
 
-3. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:
+3. **Execute plan workflow**: `plan.md` holds exactly two sections (ADR-0008) — do
+   not add Summary, Technical Context, Constitution Check, or Complexity Tracking:
    - Fill "登場するコンポーネントと関係": if the feature's screens share a parent
      component, shared state, or pass props/callbacks between each other's
      components, list every involved file with a one-line role (role text first,
@@ -73,23 +74,11 @@ You **MUST** consider the user input before proceeding (if not empty).
      arrows for props passed down and dashed arrows for callbacks fired back up.
      Omit this section entirely when every screen's component is fully
      self-contained (no shared parent or state).
-   - Fill Technical Context: reference `docs/architecture.md` for app-wide facts
-     (language/version, dependencies, target platform, storage mechanism,
-     repository layout) instead of restating them; fill in only this feature's
-     own Performance Goals/Constraints/Scale/Scope (mark unknowns as "NEEDS
-     CLARIFICATION"), omitting any field with no feature-specific value
-   - Fill Constitution Check: collapse principles already guaranteed by the shared
-     infra in `docs/architecture.md` (I, II, IV) into one summary line — do not
-     restate what constitution.md already says about them. Elaborate only
-     principles with this feature's own substance (III: which endpoints each
-     screen's component calls; V: what this feature's spec leaves out)
-   - Evaluate gates (ERROR if violations unjustified)
    - Fill Project Structure's Source Code section with only the paths this
      feature adds or changes — not paths already documented in
      `docs/architecture.md`'s repository layout, and do not include a
-     "Documentation (this feature)" file-tree section (dropped from the
-     template — identical boilerplate across every plan.md)
-   - Re-evaluate Constitution Check post-design
+     "Documentation (this feature)" file-tree section (identical boilerplate
+     across every plan.md)
 
 ## Mandatory Post-Execution Hooks
 
@@ -128,29 +117,29 @@ Check if `.specify/extensions.yml` exists in the project root.
 
 ## Completion Report
 
-Command ends once Technical Context, Constitution Check, and Project Structure are
-filled in and the gate passes. Report branch, IMPL_PLAN path, and Constitution Check
-result.
+Command ends once 登場するコンポーネントと関係 (or its intentional omission) and
+Project Structure are filled in. Report branch and IMPL_PLAN path.
 
 ## Key rules
 
 - Use absolute paths for filesystem operations; use project-relative paths for references in documentation
-- ERROR on gate failures or unresolved clarifications
 - This project's constitution forbids `research.md`, `data-model.md`,
   `quickstart.md`, and `contracts/` in feature directories (Principle III,
   Principle VI) — do not generate them under any phase. App-wide technical
   facts live in `docs/architecture.md` (reference it, don't restate it);
   this feature's data model is `openapi/common/schemas/**`; this feature's
   endpoint contracts are `openapi/bff/openapi.yaml` and
-  `openapi/backend/openapi.yaml`. If Technical Context has unresolved
-  NEEDS CLARIFICATION items, resolve them inline (ask the user or make a
-  documented assumption) rather than deferring to a research.md file.
+  `openapi/backend/openapi.yaml`.
 - One `plan.md` per feature, always — never split it per screen, even when the
   feature has multiple screens (ADR-0007; this reverses an earlier per-screen
   attempt documented in ADR-0006).
+- `plan.md` MUST NOT contain a Summary, Technical Context, Constitution Check,
+  or Complexity Tracking section — only 登場するコンポーネントと関係 and Project
+  Structure (ADR-0008). Do not regenerate these dropped sections even if an
+  older plan.md on disk still has them; replace them, don't append alongside them.
 
 ## Done When
 
-- [ ] plan.md filled in (Technical Context, Constitution Check, Project Structure) and the gate passes
+- [ ] plan.md holds only 登場するコンポーネントと関係 (or is intentionally omitted) and Project Structure
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
-- [ ] Completion reported to user with branch, plan path, and Constitution Check result
+- [ ] Completion reported to user with branch and plan path

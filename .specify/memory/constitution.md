@@ -1,5 +1,31 @@
 <!--
 Sync Impact Report
+- Version change: 2.7.0 → 2.8.0 (MINOR — plan.md trimmed to exactly two
+  sections, 登場するコンポーネントと関係 and Project Structure; Summary,
+  Technical Context, Constitution Check, and Complexity Tracking are
+  dropped entirely, not just trimmed of duplication)
+- Modified sections:
+  - Development Workflow (Spec-Driven): the plan.md bullet now states
+    plan.md holds exactly two sections and enumerates what's excluded.
+    The "App-wide technical facts" bullet no longer mentions Technical
+    Context (that section no longer exists) — the docs/architecture.md
+    reference now lives in Project Structure only.
+  - `.specify/templates/overrides/plan-template.md` and `speckit-plan`
+    updated to fill only the two remaining sections.
+  - `specs/001-todo-dashboard/plan.md` trimmed to match.
+- Rationale: applied in practice, Summary duplicated the
+  component-relationship section's own explanation of what each file
+  does; Technical Context shrank to a single docs/architecture.md
+  reference line plus mostly-empty Performance Goals/Scale/Scope;
+  Constitution Check re-derived what constitution.md's principles
+  already state without adding information; Complexity Tracking has
+  never once held content in this project (no violation has occurred).
+  Dropping them keeps plan.md to what has actually proven useful, at the
+  cost of no longer running a per-feature constitution-compliance gate
+  inside plan.md itself — compliance is still checked by
+  check-openapi-contract and code review, and a principle violation
+  needing justification still gets its own ADR. See ADR-0008 in
+  docs/adr/.
 - Version change: 2.6.1 → 2.7.0 (MINOR — reverts the per-screen plan.md
   split from 2.6.0/2.6.1 back to one plan.md per feature, always. Same
   scale of change as the split itself, in the opposite direction.)
@@ -235,31 +261,26 @@ an inventory.
 - App-wide technical facts (language/version, primary dependencies,
   target platform, project type, storage mechanism, repository layout)
   that hold for every feature MUST be documented once in
-  `docs/architecture.md`, not repeated in any `plan.md`. A `plan.md`'s
-  Technical Context MUST reference `docs/architecture.md` instead of
-  restating it, and state only what is specific to that plan's own scope
-  (Performance Goals, Scale/Scope, any specific Constraints); a field
-  with no specific value is omitted rather than left blank. `plan.md`'s
-  Project Structure MUST likewise list only the paths that plan's own
-  scope adds or changes, not paths `docs/architecture.md` already
-  documents. See ADR-0005 in `docs/adr/`.
+  `docs/architecture.md`, not repeated in any `plan.md`. `plan.md`'s
+  Project Structure MUST list only the paths that plan's own scope adds
+  or changes, not paths `docs/architecture.md` already documents. See
+  ADR-0005 in `docs/adr/`.
 - A feature MUST have exactly one `plan.md`, at `specs/<feature>/plan.md`
   — always at feature level, never split per screen, even when the
-  feature has multiple screens. `plan.md` MUST NOT restate what a
-  constitution principle already says: principles guaranteed for every
-  screen by the shared infra in `docs/architecture.md` (I, II, IV) get
-  one summary line noting they're satisfied by that shared design; only
-  principles with this feature's own substance (III: which endpoints
-  each screen's component calls; V: what this feature's spec explicitly
-  leaves out) are elaborated. `plan.md` MUST NOT include a "Documentation
-  (this feature)" file-tree section — that content is identical
-  boilerplate across every plan.md and carries no feature-specific
-  information. When a feature's screens share a parent component or
-  state, `plan.md` MUST include a component-relationship table (role
-  explained before any file name is used) and a Mermaid diagram showing
-  how props and callbacks flow between them — omit this when every
-  screen's component is fully self-contained. See ADR-0007 in
-  `docs/adr/`, which supersedes ADR-0006's per-screen split.
+  feature has multiple screens (ADR-0007, superseding ADR-0006's
+  per-screen split). `plan.md` holds exactly two sections:
+  **登場するコンポーネントと関係** (a component-relationship table with
+  each file's role explained before the file name is used anywhere else,
+  plus a Mermaid diagram of how props/callbacks flow between components
+  — required when the feature's screens share a parent component or
+  state, omitted when every screen's component is fully self-contained)
+  and **Project Structure** (the Source Code paths this feature adds or
+  changes, and a Structure Decision). `plan.md` MUST NOT include a
+  Summary, Technical Context, Constitution Check, Complexity Tracking,
+  or "Documentation (this feature)" file-tree section — applied to
+  `001-todo-dashboard`, each of these either duplicated the
+  component-relationship section or restated constitution.md without
+  adding information. See ADR-0008 in `docs/adr/`.
 - Use `/speckit-clarify` when requirements are ambiguous, before
   `/speckit-plan`.
 - Run `/speckit-analyze` after `/speckit-tasks` and before
@@ -309,4 +330,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 2.7.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
+**Version**: 2.8.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
