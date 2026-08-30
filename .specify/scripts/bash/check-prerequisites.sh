@@ -136,20 +136,10 @@ if [[ ! -d "$FEATURE_DIR" ]]; then
     exit 1
 fi
 
-# Per-screen plan.md (this project's ADR-0006): a feature with screens/ has no
-# feature-root plan.md at all -- at least one screens/*/plan.md satisfies this gate.
 if [[ ! -f "$IMPL_PLAN" ]]; then
-    _has_screen_plan=false
-    if [[ -d "$FEATURE_DIR/screens" ]]; then
-        for _screen_plan in "$FEATURE_DIR"/screens/*/plan.md; do
-            [[ -f "$_screen_plan" ]] && { _has_screen_plan=true; break; }
-        done
-    fi
-    if [[ "$_has_screen_plan" != true ]]; then
-        echo "ERROR: plan.md not found in $FEATURE_DIR (and no screens/*/plan.md found)" >&2
-        echo "Run /speckit-plan first to create the implementation plan." >&2
-        exit 1
-    fi
+    echo "ERROR: plan.md not found in $FEATURE_DIR" >&2
+    echo "Run /speckit-plan first to create the implementation plan." >&2
+    exit 1
 fi
 
 # Check for tasks.md if required

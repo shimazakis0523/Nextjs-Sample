@@ -1,41 +1,43 @@
 <!--
 Sync Impact Report
-- Version change: 2.6.0 → 2.6.1 (PATCH — same per-screen plan.md decision,
-  correcting the compatibility mechanism: a feature-root plan.md stub is
-  no longer required. `.specify/scripts/bash/check-prerequisites.sh`,
-  `setup-tasks.sh`, and `setup-plan.sh` are now patched directly to
-  accept `screens/*/plan.md` in place of a feature-root plan.md, so
-  `specs/<feature>/plan.md` simply does not exist for a feature with
-  screens, instead of existing as a content-free pointer file. See the
-  "検討した代替案" section of ADR-0006 for why the stub was dropped.)
-- Version change: 2.5.0 → 2.6.0 (MINOR — plan.md moves from one file per
-  feature to one file per screen, reversing ADR-0005's decision to keep
-  plan.md at feature level)
+- Version change: 2.6.1 → 2.7.0 (MINOR — reverts the per-screen plan.md
+  split from 2.6.0/2.6.1 back to one plan.md per feature, always. Same
+  scale of change as the split itself, in the opposite direction.)
 - Modified sections:
-  - Development Workflow (Spec-Driven): the plan.md bullet now requires
-    one `plan.md` per screen (`specs/<feature>/screens/<screen>/plan.md`)
-    for any feature with screens; a feature with no screens keeps a
-    single feature-root `plan.md`. A screen's plan.md MUST NOT restate
-    what a constitution principle already says — structural principles
-    guaranteed by shared infra (I, II, IV) get one summary line, and only
-    principles with screen-specific substance (III, V) are elaborated.
-  - `.specify/templates/overrides/plan-template.md` rewritten for
-    per-screen scope: Input is the screen's spec.md, and the generic
-    "Documentation (this feature)" file-tree section (identical
-    boilerplate across every plan.md, no per-screen information) is
-    dropped.
+  - Development Workflow (Spec-Driven): the plan.md bullet no longer
+    branches on whether a feature has screens. It is always exactly one
+    `plan.md` per feature, at `specs/<feature>/plan.md`. The
+    screen-specific wording (screens/<screen-id>/plan.md, feature-root
+    plan.md not existing) is removed.
+  - `.specify/templates/overrides/plan-template.md` reverted to
+    feature-level Input (the feature's spec.md, not a screen's), but
+    keeps two improvements discovered during the per-screen experiment:
+    a "登場するコンポーネントと関係" component-relationship table +
+    Mermaid diagram section (now naturally one copy per feature, not
+    duplicated per screen), and the dropped "Documentation (this
+    feature)" file-tree section (identical boilerplate regardless of
+    granularity).
   - `speckit-plan`/`speckit-tasks`/`speckit-implement`/`speckit-analyze`/
-    `speckit-converge`/`speckit-checklist` skill definitions updated to
-    read/write `screens/*/plan.md` instead of assuming a single
-    feature-root `plan.md`.
-- Rationale: this feature's screens (todo-list, todo-new) are moving from
-  a single shared component to one component per screen, which removes
-  ADR-0005's original objection to per-screen plan.md (screens sharing an
-  implementation). Auditing the merged plan.md also showed its
-  Constitution Check section re-deriving what constitution.md principles
-  already state, growing more repetitive as more screens shared one
-  file — splitting by screen lets each file hold only that screen's own
-  design decisions. See ADR-0006 in docs/adr/.
+    `speckit-converge`/`speckit-checklist` reverted to assuming a single
+    feature-root `plan.md`; `speckit-plan` keeps the instruction to fill
+    the component-relationship diagram when the feature's screens share
+    state or components.
+  - `.specify/scripts/bash/check-prerequisites.sh`, `setup-tasks.sh`, and
+    `setup-plan.sh` reverted to their unconditional feature-root
+    `plan.md` requirement (the ADR-0006/2.6.1 patch accepting
+    `screens/*/plan.md` is removed along with the feature it supported).
+- Rationale: applied to `001-todo-dashboard`, per-screen plan.md produced
+  two files that both needed the same component-relationship diagram
+  (todo-list and todo-new share a state-holding parent component),
+  duplicating it rather than eliminating redundancy. The one design
+  decision that mattered most (who owns the shared `todos` state) is a
+  feature-level fact, not a screen-level one, and splitting it across
+  files hid the whole picture instead of clarifying it. Reverting to a
+  single, unconditional rule (always plan at feature level) is simpler
+  to follow than a conditional one (screen-level when independent,
+  feature-level when shared) and avoids re-litigating which case applies
+  each time a new feature is planned. See ADR-0007 in `docs/adr/`, which
+  supersedes ADR-0006.
 -->
 
 # Nextjs Sample (BFF) Constitution
@@ -241,26 +243,23 @@ an inventory.
   Project Structure MUST likewise list only the paths that plan's own
   scope adds or changes, not paths `docs/architecture.md` already
   documents. See ADR-0005 in `docs/adr/`.
-- A feature with one or more screens MUST have one `plan.md` per screen,
-  at `specs/<feature>/screens/<screen-id>/plan.md`, scoped to that
-  screen's own component(s) and Route Handler(s) — not a single
-  feature-root `plan.md`. A feature with no screens (e.g. a purely
-  internal BFF change) keeps one feature-root `specs/<feature>/plan.md`.
-  When a feature has screens, `specs/<feature>/plan.md` MUST NOT exist at
-  all — `.specify/scripts/bash/check-prerequisites.sh`, `setup-tasks.sh`,
-  and `setup-plan.sh` are patched (this project's own change, not
-  upstream spec-kit) to accept one or more `screens/*/plan.md` in place
-  of a feature-root `plan.md`; re-verify that patch survives after any
-  spec-kit update. A screen's `plan.md` MUST NOT restate
-  what a constitution principle already says: principles guaranteed for
-  every screen by the shared infra in `docs/architecture.md` (I, II, IV)
-  get one summary line noting they're satisfied by that shared design;
-  only principles with this screen's own substance (III: which endpoints
-  this screen's component calls; V: what this screen's spec explicitly
+- A feature MUST have exactly one `plan.md`, at `specs/<feature>/plan.md`
+  — always at feature level, never split per screen, even when the
+  feature has multiple screens. `plan.md` MUST NOT restate what a
+  constitution principle already says: principles guaranteed for every
+  screen by the shared infra in `docs/architecture.md` (I, II, IV) get
+  one summary line noting they're satisfied by that shared design; only
+  principles with this feature's own substance (III: which endpoints
+  each screen's component calls; V: what this feature's spec explicitly
   leaves out) are elaborated. `plan.md` MUST NOT include a "Documentation
   (this feature)" file-tree section — that content is identical
-  boilerplate across every plan.md and carries no screen-specific
-  information. See ADR-0006 in `docs/adr/`.
+  boilerplate across every plan.md and carries no feature-specific
+  information. When a feature's screens share a parent component or
+  state, `plan.md` MUST include a component-relationship table (role
+  explained before any file name is used) and a Mermaid diagram showing
+  how props and callbacks flow between them — omit this when every
+  screen's component is fully self-contained. See ADR-0007 in
+  `docs/adr/`, which supersedes ADR-0006's per-screen split.
 - Use `/speckit-clarify` when requirements are ambiguous, before
   `/speckit-plan`.
 - Run `/speckit-analyze` after `/speckit-tasks` and before
@@ -310,4 +309,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 2.6.1 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
+**Version**: 2.7.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30

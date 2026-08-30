@@ -35,17 +35,8 @@ unset _paths_output
 # Ensure the feature directory exists
 mkdir -p "$FEATURE_DIR"
 
-# Copy plan template if plan doesn't already exist.
-# Per-screen plan.md (this project's ADR-0006): a feature with screens/ has no
-# feature-root plan.md at all -- the speckit-plan skill creates each
-# screens/<screen>/plan.md itself, so skip auto-creating $IMPL_PLAN here.
-if [[ -d "$FEATURE_DIR/screens" ]]; then
-    if $JSON_MODE; then
-        echo "Feature has screens/ (ADR-0006 per-screen plan.md) - not creating $IMPL_PLAN" >&2
-    else
-        echo "Feature has screens/ (ADR-0006 per-screen plan.md) - not creating $IMPL_PLAN"
-    fi
-elif [[ -f "$IMPL_PLAN" ]]; then
+# Copy plan template if plan doesn't already exist
+if [[ -f "$IMPL_PLAN" ]]; then
     if $JSON_MODE; then
         echo "Plan already exists at $IMPL_PLAN, skipping template copy" >&2
     else

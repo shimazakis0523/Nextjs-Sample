@@ -133,10 +133,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 5. **Load feature context**: Read from FEATURE_DIR:
    - spec.md: Feature requirements and scope
-   - plan.md (if exists): Technical details, dependencies — if `FEATURE_DIR/screens/`
-     exists, this feature's plan.md is per-screen (ADR-0006): check
-     `FEATURE_DIR/screens/*/plan.md` instead (`FEATURE_DIR/plan.md` does not exist
-     in that case)
+   - plan.md (if exists): Technical details, dependencies
    - tasks.md (if exists): Implementation tasks
 
    **Context Loading Strategy**:
