@@ -153,14 +153,21 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **Execution flow**: Order and dependency requirements
 
 5.5. **着手条件チェック(Issue-based gate)** — **IF** tasks.md contains a "GitHub Issues" task↔Issue
-   mapping table and a "着手条件(Issue単位)" phase↔prerequisite-Issue table (added by
-   `speckit-taskstoissues` workflow): this check is **MANDATORY** and MUST run before implementing
-   any task from that phase. Skip this step entirely only if tasks.md has no such tables (task was
-   never converted to GitHub Issues).
+   mapping table AND a "着手条件(Issue単位)" phase↔prerequisite-Issue table (added by
+   `speckit-taskstoissues`): this check is **MANDATORY** and MUST run before implementing any task.
+   Skip this step entirely only if tasks.md has **neither** table (the feature was never converted
+   to GitHub Issues at all).
    - For the phase containing the next task(s) to implement, look up its row in the
      「着手条件(Issue単位)」table to get the 前提Issue list.
-   - Use the GitHub MCP server (`issue_read` with method `get`, or `list_issues`) to fetch the
-     current state of every 前提Issue.
+   - **Fail closed on an unmapped phase or task**: if the tables exist but the phase (or the
+     specific task) has **no row** — e.g. a `/speckit-converge`-appended phase whose Issues were
+     never registered in the table — do **NOT** implement it, even though the task itself has a
+     valid GitHub Issue. Report that the phase/task is missing from the mapping table and that
+     `speckit-taskstoissues` must be re-run to add it (per its mapping-table-maintenance step)
+     before this task can be gated correctly. A missing row is a broken guarantee, not an
+     all-clear — never treat "not in the table" as "no prerequisites."
+   - Otherwise, use the GitHub MCP server (`issue_read` with method `get`, or `list_issues`) to
+     fetch the current state of every 前提Issue.
    - **If any 前提Issue is not `closed`**: do **NOT** implement any task in this phase. Report which
      Issue(s) are still open (number + title) and move on to a different phase whose prerequisites
      ARE met, if one exists. If no phase is currently eligible, halt and report that implementation
@@ -172,6 +179,9 @@ You **MUST** consider the user input before proceeding (if not empty).
      it.
    - This gate exists so that task ordering is enforced by GitHub Issue state — not by the
      assumption that whoever is implementing remembers or respects the Phase Dependencies prose.
+     A feature is never "done growing": `/speckit-converge` can append new phases at any point
+     after the original implementation, for later spec changes or bug fixes, and this gate applies
+     identically to those phases once `speckit-taskstoissues` has registered them.
 
 6. Execute implementation following the task plan:
    - **Phase-by-phase execution**: Complete each phase before moving to the next

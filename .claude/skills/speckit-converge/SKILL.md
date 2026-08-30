@@ -235,6 +235,11 @@ Append to the **end** of `tasks.md`, per the append contract:
 - On `tasks_appended`: state how many tasks were appended under which phase, and recommend
   running `/speckit-implement` to complete them; note that a follow-up converge
   run will find fewer or no remaining items.
+  - **If this feature's `tasks.md` already carries the "GitHub Issues" mapping tables** (this
+    project's convention, see `docs/adr/0002-issue-based-task-order-gate.md`): recommend running
+    `/speckit-taskstoissues` **before** `/speckit-implement`, not after. `/speckit-implement`'s
+    task-order gate treats a phase absent from the mapping tables as blocked (fails closed), and
+    only `/speckit-taskstoissues` populates them for a newly appended phase.
 - On `converged`: recommend proceeding to review / opening a PR. No further implement pass
   is needed for this feature's specified scope.
 

@@ -1,18 +1,19 @@
 <!--
 Sync Impact Report
-- Version change: 2.1.0 → 2.2.0 (MINOR — Development Workflow section
-  gains a new enforcement rule)
+- Version change: 2.2.0 → 2.3.0 (MINOR — Development Workflow section
+  gains a rule covering the post-completion lifecycle)
 - Modified sections: Development Workflow (Spec-Driven) gains a bullet
-  requiring `speckit-implement` to check GitHub Issue state (not
-  tasks.md checkboxes, not conversational memory) before implementing
-  any task, when tasks.md carries the GitHub Issues mapping tables
-  (task↔Issue, phase↔prerequisite-Issue) that `speckit-taskstoissues`
-  produces. A phase whose prerequisite Issues aren't all closed is
-  skipped, with the blocking Issue(s) reported, instead of being
-  implemented out of order. This moves task-ordering enforcement onto
-  GitHub Issue state (see ADR-0001, ADR-0002 in docs/adr/) so it does
-  not depend on a Claude session remembering the Phase Dependencies
-  prose in tasks.md.
+  stating that a feature is never permanently "done": a later spec
+  change or bug fix flows through `/speckit-converge` (appends a new
+  Convergence phase to tasks.md) → `/speckit-taskstoissues` (creates
+  Issues for the new tasks AND registers the new phase in the GitHub
+  Issues mapping tables — a project-specific step added to that skill)
+  → `/speckit-implement` (gated as usual). Without this, the 2.2.0 gate
+  had no defined behavior for a phase appended after the original
+  tasks.md was converted to Issues; `/speckit-implement`'s gate is
+  clarified to fail closed (treat an unmapped phase as blocked, never
+  as unconstrained) rather than silently skip the check. See
+  ADR-0003 in docs/adr/.
 -->
 
 # Nextjs Sample (BFF) Constitution
@@ -186,6 +187,14 @@ reviewable instead of growing into one sprawling document.
   instead of implementing it when a prerequisite Issue isn't closed.
   Task order is enforced by GitHub Issue state, not by a session
   remembering the Phase Dependencies described in prose.
+- A feature is never considered permanently "done": a later spec change
+  or bug fix goes through `/speckit-converge` to append a new
+  `## Phase N: Convergence` section to `tasks.md`, then
+  `/speckit-taskstoissues` (run again — it only creates Issues for the
+  new tasks) MUST register the newly appended phase in the GitHub
+  Issues mapping tables before `/speckit-implement` runs it. A phase
+  absent from those tables is treated by `/speckit-implement`'s gate as
+  blocked (fail closed), never as having no prerequisites.
 
 ## Governance
 
@@ -202,4 +211,4 @@ Compliance review: before `/speckit-implement` runs tasks touching
 `src/app/api/**` or `src/lib/backend.ts`, run the `check-openapi-contract`
 skill to confirm no contract drift was introduced.
 
-**Version**: 2.2.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
+**Version**: 2.3.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
