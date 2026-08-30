@@ -1,0 +1,27 @@
+name: Spec consistency
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  spec-sync:
+    name: spec.md / test-spec.md / screen-flow.md sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: .github/scripts/check-spec-sync.sh "origin/${{ github.base_ref }}"
+
+  openapi-routes:
+    name: openapi/bff/openapi.yaml vs src/app/api/** routes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run openapi:lint
+      - run: node .github/scripts/check-openapi-bff-routes.mjs
