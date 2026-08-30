@@ -64,8 +64,8 @@ describe("mock-todos", () => {
     const { addTodo } = await loadModule();
     addTodo({ title: "A", dueDate: "2026-10-01", assignee: "X", status: "未着手" });
 
-    // Re-import without resetModules, simulating a second Route Handler
-    // invocation reusing the same server process.
+    // resetModulesせずに再importし、同じサーバープロセスを再利用する2回目の
+    // Route Handler呼び出しを模擬する。
     const { listTodos: listTodosAgain } = await import("./mock-todos");
 
     expect(listTodosAgain()).toHaveLength(3);

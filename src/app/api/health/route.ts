@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
-// Sample BFF endpoint. Route Handlers under `src/app/api/**` run only on the
-// server, so this is where calls to backend services / secrets should live —
-// the browser never talks to the backend directly.
+// サンプルのBFFエンドポイント。`src/app/api/**`配下のRoute Handlerはサーバー側でのみ
+// 実行されるため、バックエンドサービスの呼び出しやシークレットの扱いはここに置く —
+// ブラウザが直接バックエンドと通信することはない。
 export async function GET() {
   return NextResponse.json({ status: "ok" });
 }
