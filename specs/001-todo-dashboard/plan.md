@@ -27,8 +27,9 @@ flowchart TD
 
 役割: 画面のエントリ(Server Component)。
 
-`getTodos()`を呼んで初期データを取得し、`TodoDashboard`に`initialTodos`として渡すだけ。
-自身は状態を持たない。
+[docs/architecture.md](../../docs/architecture.md)の共通インフラである`src/lib/backend.ts`
+の`getTodos()`(新規実装ではない、既存の関数)を呼んで初期データを取得し、
+`TodoDashboard`に`initialTodos`として渡すだけ。自身は状態を持たない。
 
 ### `TodoDashboard.tsx`
 

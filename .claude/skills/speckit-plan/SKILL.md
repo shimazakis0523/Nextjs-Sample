@@ -74,7 +74,12 @@ You **MUST** consider the user input before proceeding (if not empty).
      fired back up, then one `###` subsection per involved file giving its role on
      the first line (never a bare file name with no explanation) followed by
      whatever detail the diagram can't show (props/state it holds, which API calls
-     it makes, what it does and doesn't own). Omit this section entirely when
+     it makes, what it does and doesn't own). When a component's detail mentions
+     calling a function that is not itself one of this feature's new components
+     (e.g. `getTodos()` from `src/lib/backend.ts`, shared infra documented in
+     docs/architecture.md), name the file it comes from and note it's an existing
+     function, not a new one — otherwise it reads as an unexplained component of
+     its own. Omit this section entirely when
      every screen's component is fully self-contained (no shared parent or state).
    - Fill Project Structure's Source Code section with only the paths this
      feature adds or changes — not paths already documented in
