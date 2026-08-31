@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-08-31T11:56:17.864Z",
+  "unit": {
+    "overall": {
+      "total": 19,
+      "passed": 19,
+      "failed": 0
+    },
+    "byBusiness": {
+      "業務1_Todoダッシュボード": {
+        "total": 19,
+        "passed": 19,
+        "failed": 0
+      }
+    },
+    "coverage": {
+      "lines": {
+        "total": 148,
+        "covered": 61,
+        "skipped": 0,
+        "pct": 41.21
+      },
+      "statements": {
+        "total": 154,
+        "covered": 65,
+        "skipped": 0,
+        "pct": 42.2
+      },
+      "functions": {
+        "total": 43,
+        "covered": 24,
+        "skipped": 0,
+        "pct": 55.81
+      },
+      "branches": {
+        "total": 53,
+        "covered": 15,
+        "skipped": 0,
+        "pct": 28.3
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  "e2e": {
+    "overall": {
+      "total": 22,
+      "passed": 22,
+      "failed": 0
+    },
+    "byBusiness": {
+      "業務1_Todoダッシュボード": {
+        "total": 22,
+        "passed": 22,
+        "failed": 0
+      }
+    }
+  }
+}

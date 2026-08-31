@@ -1,0 +1,39 @@
+name: Test dashboard data
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "dashboard-data/**"
+      - "public/coverage-report/**"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: test-dashboard-data
+  cancel-in-progress: false
+
+jobs:
+  update-dashboard-data:
+    name: 業務単位のテスト結果・カバレッジ集計を更新
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run dashboard:data
+      - name: dashboard-data/summary.json と public/coverage-report をコミット
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dashboard-data/summary.json public/coverage-report
+          if git diff --staged --quiet; then
+            echo "変更なし。コミットをスキップします。"
+            exit 0
+          fi
+          git commit -m "chore: テスト結果ダッシュボードのデータを更新"
+          git push

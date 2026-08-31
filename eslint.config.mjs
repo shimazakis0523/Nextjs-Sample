@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Jestのカバレッジ生成物(サードパーティ製のHTMLレポート同梱JS)。
+    // public/coverage-report/はcoverage/からコピーされた同一の生成物。
+    "coverage/**",
+    "public/coverage-report/**",
   ]),
 ]);
 

@@ -1,0 +1,6 @@
+{
+  "業務1_Todoダッシュボード": {
+    "unitPathPrefixes": ["src/app/dashboard/", "src/lib/mock-todos"],
+    "e2eFiles": ["todo-list.spec.ts", "todo-new.spec.ts"]
+  }
+}
