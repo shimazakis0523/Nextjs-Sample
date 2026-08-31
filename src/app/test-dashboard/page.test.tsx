@@ -7,13 +7,13 @@ import TestDashboardPage from "./page";
 
 const mockedReadFileSync = readFileSync as jest.Mock;
 
-const testDensityFixture = {
+const densityRow = (unitCount: number, e2eCount: number) => ({
   stepCount: 1000,
   kStep: 1,
-  unit: { count: 19, density: 19 },
-  e2e: { count: 22, density: 22 },
-  total: { count: 41, density: 41 },
-};
+  unit: { count: unitCount, density: unitCount },
+  e2e: { count: e2eCount, density: e2eCount },
+  total: { count: unitCount + e2eCount, density: unitCount + e2eCount },
+});
 
 describe("TestDashboardPage", () => {
   afterEach(() => {
@@ -49,7 +49,10 @@ describe("TestDashboardPage", () => {
           overall: { total: 22, passed: 22, failed: 0 },
           byBusiness: { 業務1_Todoダッシュボード: { total: 22, passed: 22, failed: 0 } },
         },
-        testDensity: testDensityFixture,
+        testDensity: {
+          overall: densityRow(19, 22),
+          byBusiness: { 業務1_Todoダッシュボード: densityRow(19, 22) },
+        },
       })
     );
 
@@ -60,8 +63,9 @@ describe("TestDashboardPage", () => {
     expect(screen.getAllByText("19").length).toBeGreaterThan(0);
     expect(screen.getAllByText("22").length).toBeGreaterThan(0);
     expect(screen.getByText("テスト密度")).toBeInTheDocument();
-    expect(screen.getByText("19.00")).toBeInTheDocument();
-    expect(screen.getByText("41.00")).toBeInTheDocument();
+    expect(screen.getByText("全体")).toBeInTheDocument();
+    expect(screen.getAllByText("19.00").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("41.00").length).toBeGreaterThan(0);
   });
 
   it("shows failed counts distinctly when a suite has failures", () => {
@@ -82,7 +86,10 @@ describe("TestDashboardPage", () => {
           overall: { total: 0, passed: 0, failed: 0 },
           byBusiness: {},
         },
-        testDensity: testDensityFixture,
+        testDensity: {
+          overall: densityRow(5, 0),
+          byBusiness: { 業務1_Todoダッシュボード: densityRow(5, 0) },
+        },
       })
     );
 
@@ -109,13 +116,16 @@ describe("TestDashboardPage", () => {
           overall: { total: 3, passed: 2, failed: 1 },
           byBusiness: { 業務B: { total: 3, passed: 2, failed: 1 } },
         },
-        testDensity: testDensityFixture,
+        testDensity: {
+          overall: densityRow(5, 3),
+          byBusiness: { 業務A: densityRow(5, 0), 業務B: densityRow(0, 3) },
+        },
       })
     );
 
     render(<TestDashboardPage />);
 
-    expect(screen.getByText("業務A")).toBeInTheDocument();
-    expect(screen.getByText("業務B")).toBeInTheDocument();
+    expect(screen.getAllByText("業務A").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("業務B").length).toBeGreaterThan(0);
   });
 });

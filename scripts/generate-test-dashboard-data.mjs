@@ -14,6 +14,10 @@
 // { "<業務ディレクトリ名>": { "unitPathPrefixes": [...], "e2eFiles": [...] } } を
 // 追記する。どちらのマッピングにも一致しないテストファイルは「未分類」として
 // 集計される(取りこぼしが起きても黙って消えず、必ず可視化されるようにするため)。
+// unitPathPrefixesは、テスト結果の集計(テストファイルのパス)と、テスト密度算出用の
+// step数集計(対応する実装ファイルのパス)の両方に使う。実装ファイルとそのテスト
+// ファイルが同じディレクトリ・同じファイル名幹を共有する前提のため、両方にマッチする
+// prefixにすること(例: "src/lib/backend"はbackend.ts/backend.test.ts両方にマッチする)。
 
 import { readFileSync, writeFileSync, mkdirSync, cpSync, existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
@@ -139,31 +143,62 @@ function collectSourceFiles(dir) {
 
 // 「実行可能ステップ数」= 空行・コメント行を除いた行数(NTTDATAのstep数の一般的な定義)。
 // slocはJSX/TSXのコメント判定も含めて数えられるため、素朴な正規表現による除外より正確。
-function computeStepCount() {
-  let stepCount = 0;
+// 業務単位のテスト密度を出すため、ファイル単位でstep数を業務に振り分けて積み上げる。
+function computeStepCountByBusiness(businessMap) {
+  const overall = { total: 0 };
+  const byBusiness = {};
+
   for (const root of STEP_COUNT_ROOTS) {
     for (const file of collectSourceFiles(root)) {
       const ext = file.endsWith(".tsx") ? "tsx" : "ts";
       const code = readFileSync(file, "utf8");
-      stepCount += sloc(code, ext).source;
+      const steps = sloc(code, ext).source;
+      const business = resolveUnitBusiness(businessMap, file);
+
+      overall.total += steps;
+      byBusiness[business] = (byBusiness[business] ?? 0) + steps;
     }
   }
-  return stepCount;
+
+  return { overall: overall.total, byBusiness };
 }
 
-function computeTestDensity(stepCount, unitCount, e2eCount) {
+function densityFor(stepCount, count) {
   const kStep = stepCount / 1000;
-  const density = (count) => (kStep > 0 ? count / kStep : 0);
-  return {
-    stepCount,
-    kStep,
-    unit: { count: unitCount, density: density(unitCount) },
-    e2e: { count: e2eCount, density: density(e2eCount) },
-    total: {
-      count: unitCount + e2eCount,
-      density: density(unitCount + e2eCount),
-    },
+  return { count, density: kStep > 0 ? count / kStep : 0 };
+}
+
+function computeTestDensity(stepCountByBusiness, unit, e2e) {
+  const businesses = new Set([
+    ...Object.keys(stepCountByBusiness.byBusiness),
+    ...Object.keys(unit.byBusiness),
+    ...Object.keys(e2e.byBusiness),
+  ]);
+
+  const byBusiness = {};
+  for (const business of businesses) {
+    const stepCount = stepCountByBusiness.byBusiness[business] ?? 0;
+    const unitCount = unit.byBusiness[business]?.total ?? 0;
+    const e2eCount = e2e.byBusiness[business]?.total ?? 0;
+    byBusiness[business] = {
+      stepCount,
+      kStep: stepCount / 1000,
+      unit: densityFor(stepCount, unitCount),
+      e2e: densityFor(stepCount, e2eCount),
+      total: densityFor(stepCount, unitCount + e2eCount),
+    };
+  }
+
+  const overallStepCount = stepCountByBusiness.overall;
+  const overall = {
+    stepCount: overallStepCount,
+    kStep: overallStepCount / 1000,
+    unit: densityFor(overallStepCount, unit.overall.total),
+    e2e: densityFor(overallStepCount, e2e.overall.total),
+    total: densityFor(overallStepCount, unit.overall.total + e2e.overall.total),
   };
+
+  return { overall, byBusiness };
 }
 
 function copyCoverageHtmlReport() {
@@ -185,8 +220,8 @@ function main() {
 
   const unit = aggregateUnit(businessMap, jestResults);
   const e2e = aggregateE2e(businessMap, playwrightResults);
-  const stepCount = computeStepCount();
-  const testDensity = computeTestDensity(stepCount, unit.overall.total, e2e.overall.total);
+  const stepCountByBusiness = computeStepCountByBusiness(businessMap);
+  const testDensity = computeTestDensity(stepCountByBusiness, unit, e2e);
 
   const summary = {
     generatedAt: new Date().toISOString(),
@@ -208,10 +243,10 @@ function main() {
   console.log(`  unit: ${unit.overall.passed}/${unit.overall.total} passed`);
   console.log(`  e2e:  ${e2e.overall.passed}/${e2e.overall.total} passed`);
   console.log(
-    `  step数: ${stepCount} (${testDensity.kStep.toFixed(3)} KStep) / ` +
-      `テスト密度: unit ${testDensity.unit.density.toFixed(2)}件/KStep, ` +
-      `e2e ${testDensity.e2e.density.toFixed(2)}件/KStep, ` +
-      `合計 ${testDensity.total.density.toFixed(2)}件/KStep`
+    `  step数: ${testDensity.overall.stepCount} (${testDensity.overall.kStep.toFixed(3)} KStep) / ` +
+      `テスト密度: unit ${testDensity.overall.unit.density.toFixed(2)}件/KStep, ` +
+      `e2e ${testDensity.overall.e2e.density.toFixed(2)}件/KStep, ` +
+      `合計 ${testDensity.overall.total.density.toFixed(2)}件/KStep`
   );
   console.log(
     copiedHtmlReport

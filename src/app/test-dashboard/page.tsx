@@ -23,12 +23,17 @@ type Summary = {
     byBusiness: Record<string, Counts>;
   };
   testDensity: {
-    stepCount: number;
-    kStep: number;
-    unit: { count: number; density: number };
-    e2e: { count: number; density: number };
-    total: { count: number; density: number };
+    overall: DensityRow;
+    byBusiness: Record<string, DensityRow>;
   };
+};
+
+type DensityRow = {
+  stepCount: number;
+  kStep: number;
+  unit: { count: number; density: number };
+  e2e: { count: number; density: number };
+  total: { count: number; density: number };
 };
 
 function loadSummary(): Summary | null {
@@ -154,32 +159,52 @@ export default function TestDashboardPage() {
       <section className={styles.section}>
         <h2>テスト密度</h2>
         <p className={styles.generatedAt}>
-          対象ステップ数(実行可能ステップ、src/app・src/lib配下、コメント・空行を除く):{" "}
-          {testDensity.stepCount} step({testDensity.kStep.toFixed(3)} KStep)
+          テスト密度 = テスト件数 ÷ step数(Ks)。stepは実行可能ステップ(src/app・src/lib配下、
+          コメント・空行を除く)。全体: {testDensity.overall.stepCount} step(
+          {testDensity.overall.kStep.toFixed(3)} KStep)
         </p>
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>種別</th>
-              <th>テスト件数</th>
-              <th>テスト密度(件/KStep)</th>
+              <th>業務</th>
+              <th>step数</th>
+              <th colSpan={2}>ユニット</th>
+              <th colSpan={2}>E2E</th>
+              <th colSpan={2}>合計</th>
+            </tr>
+            <tr>
+              <th></th>
+              <th>(KStep)</th>
+              <th>件数</th>
+              <th>密度</th>
+              <th>件数</th>
+              <th>密度</th>
+              <th>件数</th>
+              <th>密度</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>ユニットテスト</td>
-              <td>{testDensity.unit.count}</td>
-              <td>{testDensity.unit.density.toFixed(2)}</td>
-            </tr>
-            <tr>
-              <td>E2Eテスト</td>
-              <td>{testDensity.e2e.count}</td>
-              <td>{testDensity.e2e.density.toFixed(2)}</td>
-            </tr>
-            <tr>
-              <td>合計</td>
-              <td>{testDensity.total.count}</td>
-              <td>{testDensity.total.density.toFixed(2)}</td>
+            {Object.entries(testDensity.byBusiness).map(([business, row]) => (
+              <tr key={business}>
+                <td>{business}</td>
+                <td>{row.kStep.toFixed(3)}</td>
+                <td>{row.unit.count}</td>
+                <td>{row.unit.density.toFixed(2)}</td>
+                <td>{row.e2e.count}</td>
+                <td>{row.e2e.density.toFixed(2)}</td>
+                <td>{row.total.count}</td>
+                <td>{row.total.density.toFixed(2)}</td>
+              </tr>
+            ))}
+            <tr className={styles.densityTotalRow}>
+              <td>全体</td>
+              <td>{testDensity.overall.kStep.toFixed(3)}</td>
+              <td>{testDensity.overall.unit.count}</td>
+              <td>{testDensity.overall.unit.density.toFixed(2)}</td>
+              <td>{testDensity.overall.e2e.count}</td>
+              <td>{testDensity.overall.e2e.density.toFixed(2)}</td>
+              <td>{testDensity.overall.total.count}</td>
+              <td>{testDensity.overall.total.density.toFixed(2)}</td>
             </tr>
           </tbody>
         </table>

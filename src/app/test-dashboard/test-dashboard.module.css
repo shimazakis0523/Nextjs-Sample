@@ -47,6 +47,11 @@
   font-weight: 600;
 }
 
+.densityTotalRow td {
+  font-weight: 600;
+  border-top: 2px solid #ccc;
+}
+
 .coverageGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(220px, 1fr));
@@ -97,6 +102,10 @@
 
   .table thead th {
     background: #111;
+  }
+
+  .densityTotalRow td {
+    border-top-color: #555;
   }
 
   .coverageTrack {

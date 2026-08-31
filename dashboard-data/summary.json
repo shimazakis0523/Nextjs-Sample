@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-31T12:42:35.060Z",
+  "generatedAt": "2026-08-31T12:49:44.495Z",
   "unit": {
     "overall": {
       "total": 54,
@@ -7,14 +7,14 @@
       "failed": 0
     },
     "byBusiness": {
-      "業務1_Todoダッシュボード": {
-        "total": 32,
-        "passed": 32,
-        "failed": 0
-      },
       "共通基盤・開発ツール(業務非依存)": {
         "total": 18,
         "passed": 18,
+        "failed": 0
+      },
+      "業務1_Todoダッシュボード": {
+        "total": 32,
+        "passed": 32,
         "failed": 0
       },
       "未分類": {
@@ -25,20 +25,20 @@
     },
     "coverage": {
       "lines": {
-        "total": 148,
-        "covered": 148,
+        "total": 149,
+        "covered": 149,
         "skipped": 0,
         "pct": 100
       },
       "statements": {
-        "total": 154,
-        "covered": 153,
+        "total": 155,
+        "covered": 154,
         "skipped": 0,
         "pct": 99.35
       },
       "functions": {
-        "total": 43,
-        "covered": 43,
+        "total": 44,
+        "covered": 44,
         "skipped": 0,
         "pct": 100
       },
@@ -71,19 +71,71 @@
     }
   },
   "testDensity": {
-    "stepCount": 582,
-    "kStep": 0.582,
-    "unit": {
-      "count": 54,
-      "density": 92.78350515463919
+    "overall": {
+      "stepCount": 606,
+      "kStep": 0.606,
+      "unit": {
+        "count": 54,
+        "density": 89.10891089108911
+      },
+      "e2e": {
+        "count": 22,
+        "density": 36.303630363036305
+      },
+      "total": {
+        "count": 76,
+        "density": 125.41254125412541
+      }
     },
-    "e2e": {
-      "count": 22,
-      "density": 37.80068728522337
-    },
-    "total": {
-      "count": 76,
-      "density": 130.58419243986256
+    "byBusiness": {
+      "共通基盤・開発ツール(業務非依存)": {
+        "stepCount": 271,
+        "kStep": 0.271,
+        "unit": {
+          "count": 18,
+          "density": 66.42066420664206
+        },
+        "e2e": {
+          "count": 0,
+          "density": 0
+        },
+        "total": {
+          "count": 18,
+          "density": 66.42066420664206
+        }
+      },
+      "業務1_Todoダッシュボード": {
+        "stepCount": 284,
+        "kStep": 0.284,
+        "unit": {
+          "count": 32,
+          "density": 112.67605633802818
+        },
+        "e2e": {
+          "count": 22,
+          "density": 77.46478873239437
+        },
+        "total": {
+          "count": 54,
+          "density": 190.14084507042256
+        }
+      },
+      "未分類": {
+        "stepCount": 51,
+        "kStep": 0.051,
+        "unit": {
+          "count": 4,
+          "density": 78.43137254901961
+        },
+        "e2e": {
+          "count": 0,
+          "density": 0
+        },
+        "total": {
+          "count": 4,
+          "density": 78.43137254901961
+        }
+      }
     }
   }
 }
