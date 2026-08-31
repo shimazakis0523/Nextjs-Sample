@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-08-31T13:48:26.648Z",
+  "generatedAt": "2026-08-31T14:06:47.418Z",
   "unit": {
     "overall": {
-      "total": 56,
-      "passed": 56,
+      "total": 60,
+      "passed": 60,
       "failed": 0
     },
     "byBusiness": {
       "未分類": {
-        "total": 6,
-        "passed": 6,
+        "total": 10,
+        "passed": 10,
         "failed": 0
       },
       "業務1_Todoダッシュボード": {
@@ -25,26 +25,26 @@
     },
     "coverage": {
       "lines": {
-        "total": 155,
-        "covered": 155,
+        "total": 163,
+        "covered": 163,
         "skipped": 0,
         "pct": 100
       },
       "statements": {
-        "total": 162,
-        "covered": 160,
+        "total": 170,
+        "covered": 168,
         "skipped": 0,
-        "pct": 98.76
+        "pct": 98.82
       },
       "functions": {
-        "total": 48,
-        "covered": 48,
+        "total": 52,
+        "covered": 52,
         "skipped": 0,
         "pct": 100
       },
       "branches": {
-        "total": 62,
-        "covered": 62,
+        "total": 66,
+        "covered": 66,
         "skipped": 0,
         "pct": 100
       },
@@ -72,22 +72,38 @@
   },
   "testDensity": {
     "overall": {
-      "stepCount": 783,
-      "kStep": 0.783,
+      "stepCount": 962,
+      "kStep": 0.962,
       "unit": {
-        "count": 56,
-        "density": 71.51979565772669
+        "count": 60,
+        "density": 62.37006237006237
       },
       "e2e": {
         "count": 22,
-        "density": 28.0970625798212
+        "density": 22.86902286902287
       },
       "total": {
-        "count": 78,
-        "density": 99.61685823754789
+        "count": 82,
+        "density": 85.23908523908524
       }
     },
     "byBusiness": {
+      "未分類": {
+        "stepCount": 325,
+        "kStep": 0.325,
+        "unit": {
+          "count": 10,
+          "density": 30.769230769230766
+        },
+        "e2e": {
+          "count": 0,
+          "density": 0
+        },
+        "total": {
+          "count": 10,
+          "density": 30.769230769230766
+        }
+      },
       "共通基盤・開発ツール(業務非依存)": {
         "stepCount": 353,
         "kStep": 0.353,
@@ -118,22 +134,6 @@
         "total": {
           "count": 54,
           "density": 190.14084507042256
-        }
-      },
-      "未分類": {
-        "stepCount": 146,
-        "kStep": 0.146,
-        "unit": {
-          "count": 6,
-          "density": 41.09589041095891
-        },
-        "e2e": {
-          "count": 0,
-          "density": 0
-        },
-        "total": {
-          "count": 6,
-          "density": 41.09589041095891
         }
       }
     }

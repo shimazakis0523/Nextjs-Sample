@@ -1,0 +1,138 @@
+.wrap {
+  width: 100%;
+  max-width: 900px;
+  overflow-x: auto;
+}
+
+.svg {
+  display: block;
+  width: 900px;
+  max-width: none;
+  height: auto;
+}
+
+.box {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  height: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #333;
+  border-radius: 10px;
+  background: #fff;
+  font-family: var(--font-geist-sans);
+}
+
+.boxTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.boxDescription {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #444;
+}
+
+.box_dev {
+  border-style: dashed;
+  background: #fafafa;
+}
+
+.box_claude {
+  border-color: #6a4fdb;
+  background: #f4f1ff;
+}
+
+.box_github {
+  border-color: #24292f;
+  background: #f0f1f2;
+}
+
+.box_vercel {
+  border-color: #000;
+  background: #f2f2f2;
+}
+
+.box_dashboard {
+  border-color: #0b7a45;
+  background: #edf9f2;
+}
+
+.arrow {
+  fill: none;
+  stroke: #888;
+  stroke-width: 2;
+}
+
+.arrowDashed {
+  fill: none;
+  stroke: #888;
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+
+.arrowhead {
+  fill: #888;
+}
+
+.arrowLabel {
+  font-size: 11px;
+  font-family: var(--font-geist-sans);
+  fill: #555;
+  text-anchor: middle;
+}
+
+@media (prefers-color-scheme: dark) {
+  .box {
+    border-color: #999;
+    background: #1a1a1a;
+    color: #ededed;
+  }
+
+  .boxDescription {
+    color: #ccc;
+  }
+
+  .box_dev {
+    background: #151515;
+  }
+
+  .box_claude {
+    border-color: #b6a4f7;
+    background: #241d3d;
+  }
+
+  .box_github {
+    border-color: #ccc;
+    background: #1f1f1f;
+  }
+
+  .box_vercel {
+    border-color: #ededed;
+    background: #1f1f1f;
+  }
+
+  .box_dashboard {
+    border-color: #4fd88a;
+    background: #142a1e;
+  }
+
+  .arrow,
+  .arrowDashed {
+    stroke: #aaa;
+  }
+
+  .arrowhead {
+    fill: #aaa;
+  }
+
+  .arrowLabel {
+    fill: #bbb;
+  }
+}

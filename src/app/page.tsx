@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ArchitectureDiagram from "./ArchitectureDiagram";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -69,11 +70,23 @@ export default function Home() {
         </p>
       </header>
 
+      <section className={styles.section} aria-labelledby="architecture-heading">
+        <h2 id="architecture-heading" className={styles.sectionTitle}>
+          仕組み
+        </h2>
+        <p className={styles.sectionLead}>
+          開発者はClaude Code (Web版)に指示するだけで、GitHubへのcommit・push、CIによる
+          自動検証、Vercelへのデプロイまでが繋がって進み、結果は品質ダッシュボードに可視化
+          される。CIが赤の場合はClaude Codeが自律的に修正して再度pushする。
+        </p>
+        <ArchitectureDiagram />
+      </section>
+
       <section className={styles.section} aria-labelledby="process-heading">
         <h2 id="process-heading" className={styles.sectionTitle}>
           開発プロセスとハーネス
         </h2>
-        <ol className={styles.steps}>
+        <ol className={styles.steps} data-testid="process-steps">
           {PROCESS_STEPS.map((step, index) => (
             <li key={step.phase}>
               {index > 0 && <div className={styles.stepConnector}>↓</div>}

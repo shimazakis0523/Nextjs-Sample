@@ -55,6 +55,15 @@
   font-weight: 700;
 }
 
+.sectionLead {
+  margin: 0;
+  max-width: 720px;
+  font-size: 14px;
+  line-height: 1.7;
+  text-align: center;
+  color: #444;
+}
+
 .steps {
   display: flex;
   flex-direction: column;
@@ -188,7 +197,8 @@
   }
 
   .lead,
-  .stepDescription {
+  .stepDescription,
+  .sectionLead {
     color: #ccc;
   }
 

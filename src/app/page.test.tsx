@@ -1,18 +1,21 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import Home from "./page";
 
 describe("Home (top page)", () => {
   it("renders the demo overview heading and lead copy", () => {
     render(<Home />);
 
-    expect(
-      screen.getByRole("heading", { level: 1, name: "仕様駆動開発 × ハーネスエンジニアリング" })
-    ).toBeInTheDocument();
-    expect(screen.getByText(/Claude Code \(Web版\)/)).toBeInTheDocument();
+    const heading = screen.getByRole("heading", {
+      level: 1,
+      name: "仕様駆動開発 × ハーネスエンジニアリング",
+    });
+    expect(heading).toBeInTheDocument();
+    expect(heading.closest("header")).toHaveTextContent(/Claude Code \(Web版\)/);
   });
 
   it("renders every development process step with its harness", () => {
     render(<Home />);
+    const processSteps = within(screen.getByTestId("process-steps"));
 
     const steps = [
       { phase: "仕様書作成", code: "(BD)", harness: "/speckit-specify" },
@@ -31,12 +34,18 @@ describe("Home (top page)", () => {
     ];
 
     steps.forEach((step) => {
-      expect(screen.getByText(step.phase)).toBeInTheDocument();
-      expect(screen.getByText(step.harness)).toBeInTheDocument();
+      expect(processSteps.getByText(step.phase)).toBeInTheDocument();
+      expect(processSteps.getByText(step.harness)).toBeInTheDocument();
       if (step.code) {
-        expect(screen.getByText(step.code)).toBeInTheDocument();
+        expect(processSteps.getByText(step.code)).toBeInTheDocument();
       }
     });
+  });
+
+  it("renders the architecture diagram describing how the pieces connect", () => {
+    render(<Home />);
+
+    expect(screen.getByRole("img", { name: /Claude Code Web版/ })).toBeInTheDocument();
   });
 
   it("renders links to the demo app and the quality dashboard", () => {
