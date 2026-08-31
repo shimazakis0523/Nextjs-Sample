@@ -65,4 +65,11 @@ describe("POST /api/todos", () => {
     expect(response.status).toBe(400);
     expect(mockedBackend.createTodo).not.toHaveBeenCalled();
   });
+
+  it("returns 400 without calling createTodo when the JSON body is null", async () => {
+    const response = await POST(makeRequest(null));
+
+    expect(response.status).toBe(400);
+    expect(mockedBackend.createTodo).not.toHaveBeenCalled();
+  });
 });

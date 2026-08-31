@@ -77,4 +77,31 @@ describe("TestDashboardPage", () => {
 
     expect(screen.getAllByText("1").length).toBeGreaterThan(0);
   });
+
+  it("falls back to zero counts for a business missing from one side, and flags e2e failures", () => {
+    mockedReadFileSync.mockReturnValue(
+      JSON.stringify({
+        generatedAt: "2026-08-31T00:00:00.000Z",
+        unit: {
+          overall: { total: 5, passed: 5, failed: 0 },
+          byBusiness: { 業務A: { total: 5, passed: 5, failed: 0 } },
+          coverage: {
+            statements: { total: 10, covered: 10, skipped: 0, pct: 100 },
+            branches: { total: 4, covered: 4, skipped: 0, pct: 100 },
+            functions: { total: 4, covered: 4, skipped: 0, pct: 100 },
+            lines: { total: 10, covered: 10, skipped: 0, pct: 100 },
+          },
+        },
+        e2e: {
+          overall: { total: 3, passed: 2, failed: 1 },
+          byBusiness: { 業務B: { total: 3, passed: 2, failed: 1 } },
+        },
+      })
+    );
+
+    render(<TestDashboardPage />);
+
+    expect(screen.getByText("業務A")).toBeInTheDocument();
+    expect(screen.getByText("業務B")).toBeInTheDocument();
+  });
 });

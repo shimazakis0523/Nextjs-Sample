@@ -23,6 +23,31 @@ describe("TodoNewModal", () => {
     expect(screen.getByLabelText("ステータス")).toHaveValue("未着手");
   });
 
+  it("reflects a status selection change and submits it on save", async () => {
+    const createdTodo: Todo = {
+      id: "4",
+      title: "新規タスク",
+      dueDate: "2026-12-01",
+      assignee: "担当太郎",
+      status: "完了",
+    };
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => createdTodo,
+    });
+    render(<TodoNewModal onSaved={jest.fn()} onCancel={jest.fn()} />);
+
+    fillRequiredFields();
+    fireEvent.change(screen.getByLabelText("ステータス"), { target: { value: "完了" } });
+    expect(screen.getByLabelText("ステータス")).toHaveValue("完了");
+
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    const [, requestInit] = (global.fetch as jest.Mock).mock.calls[0];
+    expect(JSON.parse(requestInit.body)).toMatchObject({ status: "完了" });
+  });
+
   it("calls onSaved with the created todo on successful save", async () => {
     const createdTodo: Todo = {
       id: "3",
@@ -46,6 +71,16 @@ describe("TodoNewModal", () => {
       "/api/todos",
       expect.objectContaining({ method: "POST" })
     );
+  });
+
+  it("shows the fallback message when fetch rejects with a non-Error value", async () => {
+    (global.fetch as jest.Mock).mockRejectedValue("network down");
+    render(<TodoNewModal onSaved={jest.fn()} onCancel={jest.fn()} />);
+
+    fillRequiredFields();
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    await screen.findByText("保存に失敗しました");
   });
 
   it("shows a failure message and keeps input when the save request fails", async () => {
