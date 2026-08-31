@@ -1,9 +1,8 @@
 const BACKEND_API_URL = process.env.BACKEND_API_URL;
 
-// Thin wrapper for calls from Route Handlers / Server Components to the
-// upstream backend. Only import this from server-side code (API routes,
-// Server Components, Server Actions) — BACKEND_API_URL is not exposed to
-// the browser.
+// Route Handler / Server Componentから上流バックエンドを呼び出すための薄いラッパー。
+// サーバー側コード(APIルート・Server Component・Server Action)からのみimportすること —
+// BACKEND_API_URLはブラウザには公開されない。
 export async function backendFetch(path: string, init?: RequestInit) {
   if (!BACKEND_API_URL) {
     throw new Error("BACKEND_API_URL is not set");

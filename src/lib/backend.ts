@@ -2,9 +2,9 @@ import { backendFetch } from "./backend-client";
 import { mockUsers, type User } from "./mock-data";
 import { addTodo, listTodos, removeTodo, type Todo, type TodoStatus } from "./mock-todos";
 
-// Swap point between the mock backend and the real one. As long as
-// BACKEND_API_URL is unset, Route Handlers get mock data with no other
-// code changes; set it once the real backend exists to switch over.
+// モックバックエンドと実バックエンドの切り替え地点。BACKEND_API_URLが未設定である限り、
+// Route Handlerは他のコード変更なしにモックデータを取得する。実バックエンドができたら
+// これを設定するだけで切り替わる。
 const USE_MOCK_BACKEND = !process.env.BACKEND_API_URL;
 
 export type { Todo, TodoStatus };

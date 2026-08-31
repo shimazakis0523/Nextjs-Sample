@@ -152,6 +152,51 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **Task details**: ID, description, file paths, parallel markers [P]
    - **Execution flow**: Order and dependency requirements
 
+5.5. **着手条件チェック(Issue-based gate)** — **IF** tasks.md contains a "GitHub Issues" task↔Issue
+   mapping table AND a "着手条件(Issue単位)" phase↔prerequisite-Issue table (added by
+   `speckit-taskstoissues`): this check is **MANDATORY** and MUST run before implementing any task.
+   Skip this step entirely only if tasks.md has **neither** table (the feature was never converted
+   to GitHub Issues at all).
+   - For the phase containing the next task(s) to implement, look up its row in the
+     「着手条件(Issue単位)」table to get the 前提Issue list.
+   - **Fail closed on an unmapped phase or task**: if the tables exist but the phase (or the
+     specific task) has **no row** — e.g. a `/speckit-converge`-appended phase whose Issues were
+     never registered in the table — do **NOT** implement it, even though the task itself has a
+     valid GitHub Issue. Report that the phase/task is missing from the mapping table and that
+     `speckit-taskstoissues` must be re-run to add it (per its mapping-table-maintenance step)
+     before this task can be gated correctly. A missing row is a broken guarantee, not an
+     all-clear — never treat "not in the table" as "no prerequisites."
+   - Otherwise, use the GitHub MCP server (`issue_read` with method `get`, or `list_issues`) to
+     fetch the current state of every 前提Issue.
+   - **If any 前提Issue is not `closed`**: do **NOT** implement any task in this phase. Report which
+     Issue(s) are still open (number + title) and move on to a different phase whose prerequisites
+     ARE met, if one exists. If no phase is currently eligible, halt and report that implementation
+     cannot proceed until the blocking Issue(s) are closed.
+   - **If all 前提Issue are closed**: proceed to implement the phase's tasks normally. After
+     completing a task, in addition to marking it `[X]` in tasks.md, close its corresponding GitHub
+     Issue (`issue_write` method `update`, `state: closed`, `state_reason: completed`) — this keeps
+     the Issue state (the authority this gate checks) in sync with tasks.md instead of drifting from
+     it.
+   - This gate exists so that task ordering is enforced by GitHub Issue state — not by the
+     assumption that whoever is implementing remembers or respects the Phase Dependencies prose.
+     A feature is never "done growing": `/speckit-converge` can append new phases at any point
+     after the original implementation, for later spec changes or bug fixes, and this gate applies
+     identically to those phases once `speckit-taskstoissues` has registered them.
+
+5.6. **コンポーネントテストゲート(constitution.md Core Principle VII, ADR-0011)** — before
+   marking **any** task complete that creates or changes a file under `src/app/**` whose
+   name is not one of Next.js App Router's special filenames (`page`, `layout`, `template`,
+   `loading`, `error`, `global-error`, `not-found`, `default`), confirm both of the following,
+   even if the task's own description text doesn't mention tests:
+   - Its sibling `<Component>.test.tsx` exists (write/update it now if it doesn't — do not
+     defer to a later task or to Polish phase).
+   - `npm test` passes for that test file.
+   This mirrors 5.5's gate-fail-closed posture: `.github/scripts/check-component-tests.sh`
+   (the `component-test-coverage` CI job) will fail the PR mechanically if this is skipped,
+   so treat a missing test as a task that is not actually done, not as a nice-to-have —
+   this is exactly the gap that shipped `TodoList.tsx`/`TodoNewModal.tsx`/`TodoDashboard.tsx`
+   with zero unit tests the first time.
+
 6. Execute implementation following the task plan:
    - **Phase-by-phase execution**: Complete each phase before moving to the next
    - **Respect dependencies**: Run sequential tasks in order, parallel tasks [P] can run together
@@ -173,6 +218,8 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Provide clear error messages with context for debugging
    - Suggest next steps if implementation cannot proceed
    - **IMPORTANT** For completed tasks, make sure to mark the task off as [X] in the tasks file.
+     For a task touching a `src/app/**` component, only mark it [X] once step 5.6's gate
+     (sibling `.test.tsx` exists and `npm test` passes) is satisfied.
 
 9. Completion validation:
    - Verify all required tasks are completed
@@ -224,6 +271,7 @@ Report final status with summary of completed work.
 ## Done When
 
 - [ ] All tasks in tasks.md completed and marked `[X]`
+- [ ] Every completed task touching a `src/app/**` component (excluding Next.js special filenames) has a sibling `<Component>.test.tsx` and `npm test` passes for it (Principle VII gate, step 5.6)
 - [ ] Implementation validated against specification, plan, and test coverage
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with summary of completed work

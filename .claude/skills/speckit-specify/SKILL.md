@@ -59,7 +59,22 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 The text the user typed after `/speckit-specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `$ARGUMENTS` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 
-Given that feature description, do this:
+0. **Mockup precondition (project convention — screen-bearing features only, see
+   `doc/common/adr/0004-mockup-first-requirements.md`)**: if the feature description involves one or
+   more screens (any UI a person looks at or interacts with — a page, a modal, a dialog), this
+   step is **MANDATORY** and MUST run before step 1. It does not apply to features with no UI
+   surface at all (e.g. a pure backend/BFF-internal change with nothing a person looks at).
+   - Check whether an agreed-upon mockup already exists for this feature: either the user's
+     message names/links a mockup Artifact (from the `design` skill), or one was produced and
+     agreed on earlier in this same conversation.
+   - **If no agreed mockup exists**: do **NOT** proceed to step 1. Stop, explain that this
+     project starts screen-bearing features from a mockup (visual design + outward functionality
+     agreed on before spec.md is written, to avoid the ambiguity of describing a screen in prose
+     alone), and invoke the `design` skill to produce one from the feature description. Wait for
+     the user to confirm the mockup is agreed before continuing — do not assume agreement just
+     because a draft was produced.
+   - **If an agreed mockup exists**: record its Artifact URL as `MOCKUP_URL` for use in step 7,
+     and continue to step 1.
 
 1. **Generate a concise short name** (2-4 words) for the feature:
    - Analyze the feature description and extract the most meaningful keywords
@@ -141,7 +156,7 @@ Given that feature description, do this:
     7. Identify Key Entities (if data involved)
     8. Return: SUCCESS (spec ready for planning)
 
-7. Write the specification to SPEC_FILE using the template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings.
+7. Write the specification to SPEC_FILE using the template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings. If step 0 recorded a `MOCKUP_URL`, populate the screen's `**モックアップ**` header field with it (per the resolved `spec-template`'s guidance on that field); omit the field entirely if this feature has no screens.
 
 8. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
 

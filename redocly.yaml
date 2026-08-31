@@ -2,10 +2,10 @@ extends:
   - minimal
 apis:
   bff:
-    root: openapi/bff/openapi.yaml
+    root: doc/API仕様書/BFF/openapi.yaml
     x-openapi-ts:
       output: src/types/api/bff.d.ts
   backend:
-    root: openapi/backend/openapi.yaml
+    root: doc/API仕様書/Backend/openapi.yaml
     x-openapi-ts:
       output: src/types/api/backend.d.ts

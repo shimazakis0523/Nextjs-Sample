@@ -1,7 +1,7 @@
 ---
 name: check-openapi-contract
 description: |
-  openapi/配下のOpenAPI契約(YAML)と、実際のNext.js実装(src/app/api/**のRoute Handler、
+  doc/API仕様書/配下のOpenAPI契約(YAML)と、実際のNext.js実装(src/app/api/**のRoute Handler、
   src/lib/backend.ts、src/lib/backend-client.ts、src/lib/mock-todos.ts、src/lib/mock-data.ts)
   との整合性を検査する。エンドポイントのパス・HTTPメソッド・リクエスト/レスポンスの
   フィールド名・必須項目・型・enum値・ステータスコードが、YAML側と実装側で一致しているかを
@@ -9,7 +9,7 @@ description: |
 
   「OpenAPIと実装がずれてないか確認して」「YAMLの契約と実装の整合性チェックして」
   「契約通りに実装されているか確認して」「スキーマと実装に差分がないか見て」のように
-  言われたら必ずこのSkillを使う。また、openapi/配下のYAML、または src/app/api/**、
+  言われたら必ずこのSkillを使う。また、doc/API仕様書/配下のYAML、または src/app/api/**、
   src/lib/backend.ts、src/lib/mock-todos.ts などを変更した直後に「ちゃんと直せてるか確認して」
   「壊れてないか見て」と言われた場合も、この整合性チェックが関係している可能性が高いので
   積極的にこのSkillを使うこと。
@@ -17,8 +17,8 @@ description: |
 
 ## このSkillの位置づけ
 
-このプロジェクトでは `openapi/bff/openapi.yaml`（フロントエンドが呼ぶBFF API契約）と
-`openapi/backend/openapi.yaml`（実バックエンドとの契約。BACKEND_API_URL未設定時は
+このプロジェクトでは `doc/API仕様書/BFF/openapi.yaml`（フロントエンドが呼ぶBFF API契約）と
+`doc/API仕様書/Backend/openapi.yaml`（実バックエンドとの契約。BACKEND_API_URL未設定時は
 `src/lib/mock-todos.ts` / `src/lib/mock-data.ts` がこの契約と同じ形を返すモックとして
 振る舞う想定）を、実装とは別のYAMLファイルとして手で管理している。
 
@@ -34,8 +34,8 @@ YAMLは実装を自動生成しているわけでも、実装に強制力を持�
 決め打ちのファイルリストを鵜呑みにせず、必ず実際に存在するファイルを確認すること
 (ファイルは増減しうる)。
 
-- YAML側: `openapi/bff/openapi.yaml`, `openapi/backend/openapi.yaml`,
-  `openapi/common/schemas/*.yaml` をGlobで確認して読む。
+- YAML側: `doc/API仕様書/BFF/openapi.yaml`, `doc/API仕様書/Backend/openapi.yaml`,
+  `doc/API仕様書/common/schemas/*.yaml` をGlobで確認して読む。
 - 実装側: `src/app/api/**/route.ts` をGlobで確認して読む。加えて
   `src/lib/backend.ts`, `src/lib/backend-client.ts`, `src/lib/mock-todos.ts`,
   `src/lib/mock-data.ts` を読む。
@@ -45,7 +45,7 @@ YAML内の `$ref`（例: `"../common/schemas/Todo.yaml#/Todo"`）は、参照先
 
 ### 2. BFF契約 ⇔ Route Handler を突き合わせる
 
-`openapi/bff/openapi.yaml` の各 path + method について:
+`doc/API仕様書/BFF/openapi.yaml` の各 path + method について:
 
 - 対応する `src/app/api/**/route.ts` の export（`GET`/`POST`/`DELETE`など）が存在するか。
   逆に、実装側にあってYAMLに書かれていないpublicなエンドポイント/メソッドがないか
@@ -61,7 +61,7 @@ YAML内の `$ref`（例: `"../common/schemas/Todo.yaml#/Todo"`）は、参照先
 
 ### 3. Backend契約 ⇔ backend.ts / モック実装 を突き合わせる
 
-`openapi/backend/openapi.yaml` の各 path + method について:
+`doc/API仕様書/Backend/openapi.yaml` の各 path + method について:
 
 - `backend.ts` が `backendFetch()` に渡している path（例: `"/todos"`,
   `` `/todos/${id}` ``）が、YAMLの path と一致するか。

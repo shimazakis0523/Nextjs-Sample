@@ -13,13 +13,12 @@ const initialTodos: Todo[] = [
   { id: "2", title: "デザインレビュー", dueDate: "2026-09-10", assignee: "鈴木花子", status: "進行中" },
 ];
 
-// Kept on globalThis so the list survives Next.js dev-server module reloads
-// instead of resetting to initialTodos on every request. This is only a
-// stand-in for the real backend's storage: on a serverless deployment
-// (e.g. Vercel) each request can land on a different instance with its own
-// memory, so writes here are not guaranteed to persist or be visible across
-// requests in production. Once BACKEND_API_URL is set, backend.ts stops
-// importing this module and none of that applies.
+// Next.jsの開発サーバーがモジュールをリロードしてもリストが初期化されない(毎リクエスト
+// initialTodosに戻らない)よう、globalThisに保持している。あくまで実バックエンドの
+// ストレージの代わりに過ぎない: サーバーレスデプロイ(Vercel等)では各リクエストが
+// メモリを共有しない別インスタンスに振られることがあるため、本番環境ではここへの
+// 書き込みが永続化・他リクエストへの反映を保証されない。BACKEND_API_URLを設定すると
+// backend.tsはこのモジュールをimportしなくなり、上記の制約は関係なくなる。
 const globalStore = globalThis as unknown as { __mockTodos?: Todo[] };
 globalStore.__mockTodos ??= [...initialTodos];
 

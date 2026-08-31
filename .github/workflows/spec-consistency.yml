@@ -6,7 +6,7 @@ on:
 
 jobs:
   spec-sync:
-    name: spec.md / test-spec.md / screen-flow.md sync
+    name: ユースケース記述・画面定義書 / E2E仕様書 / 画面遷移図 sync
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,7 +15,7 @@ jobs:
       - run: .github/scripts/check-spec-sync.sh "origin/${{ github.base_ref }}"
 
   openapi-routes:
-    name: openapi/bff/openapi.yaml vs src/app/api/** routes
+    name: doc/API仕様書/BFF/openapi.yaml vs src/app/api/** routes
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,3 +25,23 @@ jobs:
       - run: npm ci
       - run: npm run openapi:lint
       - run: node .github/scripts/check-openapi-bff-routes.mjs
+
+  component-test-coverage:
+    name: src/app/**/*.tsx components have a unit test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: .github/scripts/check-component-tests.sh "origin/${{ github.base_ref }}"
+
+  governance-issue-reference:
+    name: governance file changes reference a GitHub Issue
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: .github/scripts/check-governance-issue-ref.sh "origin/${{ github.base_ref }}"

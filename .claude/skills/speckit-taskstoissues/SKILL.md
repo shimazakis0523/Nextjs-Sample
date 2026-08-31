@@ -73,9 +73,16 @@ git config --get remote.origin.url
 1. For each task in the list, use the GitHub MCP server to create a new issue in the repository that is representative of the Git remote. Task lines in `tasks.md` start with a markdown checkbox, so first strip the leading `- [ ]` (and any `[P]` / `[US#]` markers) to recover the task ID and its description. Create the issue with a single canonical title of the form `T001: <description>`, with the ID written once followed by the task description (for example, the line `- [ ] T001 Create project structure` becomes the title `T001: Create project structure`).
    - **Skip** any task whose ID is already present in the set of existing issues from the previous step, and report it (for example, `T001 already has an issue, skipping`).
    - Only create issues for tasks that do not yet have a matching issue.
+   - If the feature has a parent Issue (an Issue whose title matches the feature directory name, or one the user names), add each newly created Issue as a sub-issue of it (`sub_issue_write`, method `add`).
 
 > [!CAUTION]
 > UNDER NO CIRCUMSTANCES EVER CREATE ISSUES IN REPOSITORIES THAT DO NOT MATCH THE REMOTE URL
+
+1. **Maintain this project's GitHub Issues mapping tables (project convention — skip this step if `tasks.md` has no "GitHub Issues" section at all; this is not a generic Spec Kit feature)**: this project's `tasks.md` carries two tables that `speckit-implement`'s task-order gate depends on — a task↔Issue table, and a phase↔prerequisite-Issue table (see `doc/common/adr/0002-issue-based-task-order-gate.md`). Whenever this run created one or more new Issues (including on a re-run after `/speckit-converge` appended a new `## Phase N: Convergence` section), update `tasks.md` by hand (Edit tool, not a script) as follows, in the same change:
+   - Add a row for every newly created Issue to the task↔Issue table, keyed by task ID.
+   - For each **newly appended phase** (a phase with no existing row in the 着手条件 table), add a row: the phase's own Issues in the "このフェーズのIssue" column, and — unless the task description or its `source-ref` (from Convergence) names a narrower, specific dependency — default the 前提Issue to **every Issue number from every phase that already existed before this one**. This default is intentionally conservative (a bug-fix or spec-change phase must wait for the entire previously-built feature, not just the one screen it touches) because the mapping table is the sole thing the gate consults; narrow it only when you can point at the specific earlier task(s) the new one actually depends on.
+   - Never remove or renumber an existing row — only append.
+   - Do not skip this step because it feels redundant with `/speckit-converge`'s append-only contract for the task list itself: Convergence is explicitly forbidden from touching anything but the new Phase N task list, so updating these two tables is this skill's responsibility, not Convergence's.
 
 ## Post-Execution Checks
 
