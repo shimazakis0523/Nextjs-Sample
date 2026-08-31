@@ -11,16 +11,16 @@ const config: Config = {
   testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/e2e/"],
   collectCoverageFrom: ["src/app/**/*.{ts,tsx}", "src/lib/**/*.{ts,tsx}", "!**/*.test.{ts,tsx}"],
   coverageReporters: ["json-summary", "html", "text-summary"],
-  // カバレッジ充足性を機械的に判定するゲート。100%は求めない(page.tsx/layout.tsxなど
-  // 分岐のない宣言的なNext.js特殊ファイルまで含めた全体平均のため、それらが増えるだけで
-  // 自然に下がる)。現在の実測値(statements/lines約90%, branches約92%, functions約91%)
-  // から余裕を持たせつつ、実質的な退行は検知できる水準に設定している。
+  // カバレッジ充足性を機械的に判定するゲート。実測値(statements 99.35%、branches/
+  // functions/lines 100%。layout.tsxのexport const metadataがistanbulの計測上
+  // 未到達扱いになる既知の計測アーティファクト1件のみ残り、実際の分岐・ロジックは
+  // 全て網羅済み)から小さな余裕を持たせている。
   coverageThreshold: {
     global: {
-      statements: 80,
-      branches: 75,
-      functions: 80,
-      lines: 80,
+      statements: 95,
+      branches: 95,
+      functions: 95,
+      lines: 95,
     },
   },
   // tsconfig.jsonの"@/*"パスエイリアスをJestのモジュール解決にも反映する。next/jestは

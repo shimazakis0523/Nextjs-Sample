@@ -1,46 +1,46 @@
 {
-  "generatedAt": "2026-08-31T12:18:34.602Z",
+  "generatedAt": "2026-08-31T12:23:42.101Z",
   "unit": {
     "overall": {
-      "total": 50,
-      "passed": 50,
+      "total": 54,
+      "passed": 54,
       "failed": 0
     },
     "byBusiness": {
+      "業務1_Todoダッシュボード": {
+        "total": 32,
+        "passed": 32,
+        "failed": 0
+      },
       "共通基盤・開発ツール(業務非依存)": {
         "total": 18,
         "passed": 18,
         "failed": 0
       },
-      "業務1_Todoダッシュボード": {
-        "total": 31,
-        "passed": 31,
-        "failed": 0
-      },
       "未分類": {
-        "total": 1,
-        "passed": 1,
+        "total": 4,
+        "passed": 4,
         "failed": 0
       }
     },
     "coverage": {
       "lines": {
         "total": 148,
-        "covered": 136,
+        "covered": 148,
         "skipped": 0,
-        "pct": 91.89
+        "pct": 100
       },
       "statements": {
         "total": 154,
-        "covered": 140,
+        "covered": 153,
         "skipped": 0,
-        "pct": 90.9
+        "pct": 99.35
       },
       "functions": {
         "total": 43,
-        "covered": 40,
+        "covered": 43,
         "skipped": 0,
-        "pct": 93.02
+        "pct": 100
       },
       "branches": {
         "total": 53,
