@@ -11,6 +11,74 @@
   height: auto;
 }
 
+.svgOnly {
+  display: block;
+}
+
+.mobileOnly {
+  display: none;
+}
+
+/*
+ * 900px固定幅のSVG版は640px未満の画面だと文字が読めないほど縮小されるため、
+ * 同じデータから作った縦積みのテキスト版に切り替える。
+ */
+@media (max-width: 640px) {
+  .svgOnly {
+    display: none;
+  }
+
+  .mobileOnly {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    width: 100%;
+  }
+}
+
+.mobileNode {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1.5px solid #333;
+  border-radius: 10px;
+  background: #fff;
+  font-family: var(--font-geist-sans);
+  text-align: left;
+}
+
+.mobileArrow {
+  margin: 6px 0;
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+}
+
+.mobileBranchGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobileBranchItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileFeedback {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f2f2f2;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #555;
+  text-align: center;
+}
+
 .box {
   box-sizing: border-box;
   display: flex;
@@ -101,6 +169,21 @@
 
   .box_dev {
     background: #151515;
+  }
+
+  .mobileNode {
+    border-color: #999;
+    background: #1a1a1a;
+    color: #ededed;
+  }
+
+  .mobileArrow {
+    color: #777;
+  }
+
+  .mobileFeedback {
+    background: #1f1f1f;
+    color: #bbb;
   }
 
   .box_claude {

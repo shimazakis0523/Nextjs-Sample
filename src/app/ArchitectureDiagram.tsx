@@ -115,15 +115,56 @@ const ARROWS: DiagramArrow[] = [
   },
 ];
 
+// idはこのファイル内のMOBILE_MAIN_FLOW/MOBILE_BRANCHESが持つ固定値のみを渡すため、
+// 該当なしは起こり得ない(非nullアサーションで十分)。
+function findNode(id: string): DiagramNode {
+  return NODES.find((n) => n.id === id)!;
+}
+
+function findArrowLabel(id: string): string {
+  return ARROWS.find((a) => a.id === id)!.label;
+}
+
+// スマホ幅ではSVG版(固定900px、横スクロール必須)は文字が小さくなりすぎて
+// 読みにくいため、同じNODES/ARROWSデータから作る縦積みのテキスト版に
+// CSSで出し分ける(ArchitectureDiagram.module.cssのメディアクエリ参照)。
+const MOBILE_MAIN_FLOW = [
+  { nodeId: "dev", arrowIdFromPrev: null },
+  { nodeId: "claude", arrowIdFromPrev: "dev-claude" },
+  { nodeId: "github", arrowIdFromPrev: "claude-github" },
+] as const;
+
+const MOBILE_BRANCHES = [
+  { nodeId: "vercel", arrowId: "github-vercel" },
+  { nodeId: "dashboard", arrowId: "github-dashboard" },
+] as const;
+
+function MobileNodeCard({ node }: { node: DiagramNode }) {
+  return (
+    <div className={`${styles.mobileNode} ${styles[`box_${node.variant}`]}`}>
+      <p className={styles.boxTitle}>{node.title}</p>
+      <p className={styles.boxDescription}>
+        {node.description.split("\n").map((line, i, lines) => (
+          <span key={line}>
+            {line}
+            {i < lines.length - 1 && <br />}
+          </span>
+        ))}
+      </p>
+    </div>
+  );
+}
+
+const DIAGRAM_LABEL =
+  "開発者がClaude Code Web版に指示すると、GitHubへcommit・pushされ、GitHub ActionsがCIを実行し、" +
+  "成功するとVercelにデプロイされ、結果は品質ダッシュボードに可視化される。CIが赤の場合はClaude " +
+  "Codeが自動修正して再度pushする。";
+
 export default function ArchitectureDiagram() {
   return (
-    <div className={styles.wrap} role="img" aria-label="開発者がClaude Code Web版に指示すると、GitHubへcommit・pushされ、GitHub ActionsがCIを実行し、成功するとVercelにデプロイされ、結果は品質ダッシュボードに可視化される。CIが赤の場合はClaude Codeが自動修正して再度pushする。">
-        <svg
-          className={styles.svg}
-          viewBox="0 0 900 360"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
+    <div className={styles.wrap} role="img" aria-label={DIAGRAM_LABEL}>
+      <div className={styles.svgOnly} data-testid="architecture-svg" aria-hidden="true">
+        <svg className={styles.svg} viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <marker
               id="arrowhead"
@@ -172,6 +213,31 @@ export default function ArchitectureDiagram() {
             </foreignObject>
           ))}
         </svg>
+      </div>
+
+      <div className={styles.mobileOnly} data-testid="architecture-mobile" aria-hidden="true">
+        {MOBILE_MAIN_FLOW.map(({ nodeId, arrowIdFromPrev }) => (
+          <div key={nodeId}>
+            {arrowIdFromPrev && (
+              <p className={styles.mobileArrow}>↓ {findArrowLabel(arrowIdFromPrev)}</p>
+            )}
+            <MobileNodeCard node={findNode(nodeId)} />
+          </div>
+        ))}
+
+        <div className={styles.mobileBranchGroup}>
+          {MOBILE_BRANCHES.map(({ nodeId, arrowId }) => (
+            <div key={nodeId} className={styles.mobileBranchItem}>
+              <p className={styles.mobileArrow}>↓ {findArrowLabel(arrowId)}</p>
+              <MobileNodeCard node={findNode(nodeId)} />
+            </div>
+          ))}
+        </div>
+
+        <p className={styles.mobileFeedback}>
+          ⟲ {findArrowLabel("github-claude-feedback")}(Claude Codeへ戻る)
+        </p>
+      </div>
     </div>
   );
 }
