@@ -1,5 +1,29 @@
 <!--
 Sync Impact Report
+- Version change: 2.12.0 → 2.13.0 (MINOR — new MUST requirement: every
+  E2E仕様書 test case derived by `update-e2e-test-spec` must be traceable
+  to one of five named black-box test design techniques, and 境界値分析
+  now covers both bounds, not just the upper one)
+- Modified sections: Development Workflow (Spec-Driven) — the
+  `update-e2e-test-spec` bullet now names the five techniques
+  (ユースケーステスト, 同値分割, 境界値分析, 条件/分岐テスト including
+  デシジョンテーブルテスト, 状態遷移テスト) the derived section MUST use.
+- Rationale: the user asked whether E2E test viewpoints follow general
+  software test-case-design techniques, and whether the rule states the
+  techniques explicitly. Investigation found the skill's rules matched
+  recognized techniques in substance but named only "境界値" once, and
+  only for a character-length upper bound — 同値分割, デシジョンテーブル
+  テスト, and 状態遷移テスト were applied in spirit (e.g. required-field
+  checks, enum-value checks, a save button's disabled-during-save state)
+  without ever being named or defined as techniques, so there was no way
+  to audit coverage against a known technique catalog and no lower-bound
+  or "limit-1" boundary cases were ever generated. Fixed by naming all
+  five techniques in both this constitution and `update-e2e-test-spec`'s
+  SKILL.md, extending 境界値分析 to the lower bound when one is specified,
+  making デシジョンテーブルテスト explicit for multi-condition branches,
+  and adding 状態遷移テスト as its own derivation category instead of
+  relying on it being incidentally caught by an unrelated rule. See
+  ADR-0018 in `doc/common/adr/`.
 - Version change: 2.11.2 → 2.12.0 (MINOR — new MUST requirement: every
   `props`/`callback` edge label in 詳細設計書's 登場するコンポーネントと
   関係 diagram must state the field-level type signature, not just the
@@ -587,7 +611,23 @@ binding constraints, not an inventory.
   content MUST be followed by running the `update-e2e-test-spec` skill to
   regenerate that screen's E2E仕様書 (its "仕様から導出したテストケース"
   section only — "追加のテスト観点" is preserved) before the change is
-  considered complete.
+  considered complete. Test cases in that section MUST each be traceable
+  either to one of five named black-box test design techniques —
+  ユースケーステスト, 同値分割, 境界値分析, 条件/分岐テスト(including
+  デシジョンテーブルテスト for a row whose outcome depends on a
+  combination of independent conditions), and 状態遷移テスト for any
+  element with more than one display state — or, for a 画面入出力仕様 row
+  that fits none of those techniques (a fixed heading, a table column
+  rendering its bound data, a per-row action affecting only its own row),
+  to plain technique-free display verification against that row's stated
+  content; never to unstated ad-hoc judgment. Every generated test case
+  states which of these it came from. `update-e2e-test-spec`'s SKILL.md
+  documents exactly how each technique maps to ユースケース記述/画面定義書
+  content and where its boundaries are (e.g. 境界値分析 covers both the
+  upper and lower bound when both are specified, not only the upper one).
+  Combination/exploratory testing beyond this stays human judgment,
+  recorded only in 追加のテスト観点, never in the derived section. See
+  ADR-0018 in `doc/common/adr/`.
 - When a feature's `tasks.md` carries the GitHub Issues mapping tables
   produced by `speckit-taskstoissues` (task↔Issue, phase↔prerequisite-
   Issue), `speckit-implement` MUST check the prerequisite Issues'
@@ -626,4 +666,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.12.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31
+**Version**: 2.13.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31

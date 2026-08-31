@@ -114,6 +114,25 @@ test("TC-005: 削除確認でキャンセルすると一覧は変更されない
   await expect(rowByTitle(page, "キャンセル対象タスク")).toHaveCount(1);
 });
 
+test("TC-013: 最後の1件を削除すると空状態メッセージが表示される", async ({ page }) => {
+  await addTodoViaUI(page, {
+    title: "最後のタスク",
+    dueDate: "2026-10-01",
+    assignee: "A",
+    status: "未着手",
+  });
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await Promise.all([
+    page.waitForResponse(
+      (r) => r.url().includes("/api/todos/") && r.request().method() === "DELETE"
+    ),
+    rowByTitle(page, "最後のタスク").getByRole("button", { name: "削除" }).click(),
+  ]);
+
+  await expect(page.getByText("Todoがありません")).toBeVisible();
+});
+
 test("TC-006: 削除リクエスト失敗時、一覧は変更されずエラー表示もない", async ({ page }) => {
   await addTodoViaUI(page, {
     title: "削除失敗タスク",

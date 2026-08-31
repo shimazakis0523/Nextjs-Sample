@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByText("Todoを追加")).toBeVisible();
 });
 
-test("TC-006: 初期表示で各項目が既定状態になっている", async ({ page }) => {
+test("TC-010: 初期表示で各項目が既定状態になっている", async ({ page }) => {
   await expect(page.getByText("Todoを追加")).toBeVisible();
   await expect(page.locator('input[type="text"]').first()).toHaveValue("");
   await expect(page.locator('input[type="date"]')).toHaveValue("");
@@ -19,12 +19,12 @@ test("TC-006: 初期表示で各項目が既定状態になっている", async 
   await expect(page.locator("select")).toHaveValue("未着手");
 });
 
-test("TC-011: ステータスの4選択肢がこの順で選択できる", async ({ page }) => {
+test("TC-009: ステータスの4選択肢がこの順で選択できる", async ({ page }) => {
   const options = await page.locator("select option").allTextContents();
   expect(options).toEqual(["未着手", "進行中", "完了", "保留"]);
 });
 
-test("TC-001, TC-013: 必須項目を入力してSaveすると登録され画面が閉じる(失敗メッセージなし)", async ({
+test("TC-001, TC-015: 必須項目を入力してSaveすると登録され画面が閉じる(失敗メッセージなし)", async ({
   page,
 }) => {
   await page.locator('input[type="text"]').first().fill("新規タスク");
@@ -38,7 +38,7 @@ test("TC-001, TC-013: 必須項目を入力してSaveすると登録され画面
   await expect(page.locator("table tbody tr", { hasText: "新規タスク" })).toHaveCount(1);
 });
 
-test("TC-002, TC-007: Todo名が未入力だと送信がブロックされる", async ({ page }) => {
+test("TC-002, TC-006: Todo名が未入力だと送信がブロックされる", async ({ page }) => {
   await page.locator('input[type="date"]').fill("2026-12-01");
   await page.locator('input[type="text"]').nth(1).fill("担当太郎");
 
@@ -48,7 +48,7 @@ test("TC-002, TC-007: Todo名が未入力だと送信がブロックされる", 
   await expect(page.getByText("Todoを追加")).toBeVisible();
 });
 
-test("TC-008: 期限が未入力だと送信がブロックされる", async ({ page }) => {
+test("TC-007: 期限が未入力だと送信がブロックされる", async ({ page }) => {
   await page.locator('input[type="text"]').first().fill("タイトル");
   await page.locator('input[type="text"]').nth(1).fill("担当太郎");
 
@@ -57,7 +57,7 @@ test("TC-008: 期限が未入力だと送信がブロックされる", async ({ 
   await expect(page.getByText("Todoを追加")).toBeVisible();
 });
 
-test("TC-009: 担当者が未入力だと送信がブロックされる", async ({ page }) => {
+test("TC-008: 担当者が未入力だと送信がブロックされる", async ({ page }) => {
   await page.locator('input[type="text"]').first().fill("タイトル");
   await page.locator('input[type="date"]').fill("2026-12-01");
 
@@ -66,7 +66,7 @@ test("TC-009: 担当者が未入力だと送信がブロックされる", async 
   await expect(page.getByText("Todoを追加")).toBeVisible();
 });
 
-test("TC-010: 期限に過去日を指定してもブロックされず登録できる", async ({ page }) => {
+test("TC-011: 期限に過去日を指定してもブロックされず登録できる", async ({ page }) => {
   await page.locator('input[type="text"]').first().fill("過去日タスク");
   await page.locator('input[type="date"]').fill("2020-01-01");
   await page.locator('input[type="text"]').nth(1).fill("担当太郎");
@@ -98,7 +98,7 @@ test("TC-003: 登録失敗時はモーダルが開いたまま失敗メッセー
   await expect(page.locator('input[type="text"]').first()).toHaveValue("失敗するタスク");
 });
 
-test("TC-012: 保存処理中はSaveが「Saving...」になりCancel/Saveとも操作不可になる", async ({
+test("TC-013: 保存処理中はSaveが「Saving...」になりCancel/Saveとも操作不可になる", async ({
   page,
 }) => {
   await page.route("**/api/todos", async (route) => {
@@ -111,6 +111,32 @@ test("TC-012: 保存処理中はSaveが「Saving...」になりCancel/Saveとも
   await page.locator('input[type="text"]').first().fill("保存中確認タスク");
   await page.locator('input[type="date"]').fill("2026-12-01");
   await page.locator('input[type="text"]').nth(1).fill("担当太郎");
+
+  await page.getByRole("button", { name: "Save" }).click();
+
+  await expect(page.getByRole("button", { name: "Saving..." })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Cancel" })).toBeDisabled();
+});
+
+test("TC-014: 失敗表示中に再度Saveをクリックすると保存中状態に遷移する", async ({ page }) => {
+  let postCallCount = 0;
+  await page.route("**/api/todos", async (route) => {
+    if (route.request().method() === "POST") {
+      postCallCount += 1;
+      if (postCallCount === 1) {
+        return route.fulfill({ status: 500, body: "" });
+      }
+      await new Promise((resolve) => setTimeout(resolve, 800));
+    }
+    return route.continue();
+  });
+
+  await page.locator('input[type="text"]').first().fill("再送信タスク");
+  await page.locator('input[type="date"]').fill("2026-12-01");
+  await page.locator('input[type="text"]').nth(1).fill("担当太郎");
+
+  await page.getByRole("button", { name: "Save" }).click();
+  await expect(page.getByText("保存に失敗しました")).toBeVisible();
 
   await page.getByRole("button", { name: "Save" }).click();
 
@@ -144,7 +170,7 @@ test("TC-005: モーダル外側クリックで画面が閉じ登録処理は呼
   expect(postCalled).toBe(false);
 });
 
-test("TC-014: Escキーを押しても画面は閉じない", async ({ page }) => {
+test("TC-012: Escキーを押しても画面は閉じない", async ({ page }) => {
   await page.keyboard.press("Escape");
 
   await expect(page.getByText("Todoを追加")).toBeVisible();
