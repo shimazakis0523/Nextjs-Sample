@@ -1,5 +1,25 @@
 <!--
 Sync Impact Report
+- Version change: 2.14.0 → 2.15.0 (MINOR — new Core Principle X, Unit Test
+  Case Design Technique: unit test cases must be derivable from named
+  techniques documented in a new
+  `doc/common/ユニットテスト作成ガイドライン.md`)
+- Modified sections: New Core Principle X added after Principle IX.
+- Rationale: the user shared their organization's UT guideline for a
+  different (Java/PHP, API/SharedService/Admin/Batch) system and asked for
+  transferable insights, then asked to extract the good essence into this
+  project's own unit-test authoring guidance. The source document's
+  C2-based equivalence partitioning (with a worked branch-coverage
+  recipe), 2-point boundary value analysis, a validation-pattern-to-
+  test-case mapping table, and a rich error-guessing catalog were directly
+  transferable; adapted into `doc/common/ユニットテスト作成ガイドライン.md`
+  with this project's own file-type scope (React components, Route
+  Handlers, `src/lib/**`) and worked examples from its own test suite.
+  Two gaps identified in the source document — no decision-table technique
+  for non-independent conditions, no state-transition testing as a named
+  technique — were the same gaps ADR-0018 had already found and fixed for
+  this project's own E2E test design, so both were folded into the new
+  guideline rather than repeated. See ADR-0020 in `doc/common/adr/`.
 - Version change: 2.13.0 → 2.14.0 (MINOR — new Core Principle IX, Coverage
   Threshold Gate: `jest.config.ts` MUST carry a `coverageThreshold` that
   actually fails the build on a real regression, mechanically enforced by
@@ -562,6 +582,35 @@ module) has no colocated-test requirement at all. A coverage-percentage
 floor, mechanically enforced, catches both. See ADR-0019 in
 `doc/common/adr/`.
 
+### X. Unit Test Case Design Technique
+
+Principles VII and IX are mechanically enforced (a test file exists; the
+suite hits a coverage floor); neither can check whether the cases inside a
+test file were derived systematically or just happen to hit lines by
+accident. Unit test cases MUST be derivable from
+`doc/common/ユニットテスト作成ガイドライン.md`'s named techniques —
+equivalence partitioning (including the compound-condition branch-coverage
+recipe), decision tables for conditions that are not actually independent,
+boundary value analysis, an explicit input-validation-pattern-to-test-case
+mapping, error guessing (including double-submission/repeated-action
+cases, not just bad input values), and state transition testing for any
+component with more than one display state — not unstated ad-hoc
+judgment. Each test case's description MUST read in a way that lets a
+reviewer identify which technique produced it, so review can check
+technique coverage against the guideline's catalog instead of trusting
+prose alone. This does not require retrofitting technique-derivation
+descriptions onto every pre-existing test; it applies going forward.
+Rationale: the user shared their organization's own UT (unit test)
+guideline for a different (Java/PHP) system and asked what was
+transferable. That document's C2-based equivalence partitioning, boundary
+value analysis, and rich error-guessing catalog were directly applicable;
+its lack of an explicit decision-table technique for non-independent
+conditions and its lack of state-transition testing as a named technique
+were the same gaps this project had already found and fixed for E2E test
+design (ADR-0018) — the same blind spots recur across stacks because
+they're about test-design method, not language or framework. See
+ADR-0020 in `doc/common/adr/`.
+
 ## Technology & Deployment Constraints
 
 See `doc/common/AP方式設計書(フロントエンド編).md` and
@@ -716,4 +765,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.14.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31
+**Version**: 2.15.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31
