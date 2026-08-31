@@ -26,6 +26,11 @@ type Summary = {
     overall: DensityRow;
     byBusiness: Record<string, DensityRow>;
   };
+  codeQuality: {
+    overall: QualityCounts;
+    byBusiness: Record<string, QualityCounts>;
+    byRule: Record<string, QualityCounts>;
+  };
 };
 
 type DensityRow = {
@@ -35,6 +40,8 @@ type DensityRow = {
   e2e: { count: number; density: number };
   total: { count: number; density: number };
 };
+
+type QualityCounts = { errorCount: number; warningCount: number };
 
 function loadSummary(): Summary | null {
   try {
@@ -87,7 +94,7 @@ export default function TestDashboardPage() {
     );
   }
 
-  const { unit, e2e, testDensity } = summary;
+  const { unit, e2e, testDensity, codeQuality } = summary;
   const businesses = Array.from(
     new Set([...Object.keys(unit.byBusiness), ...Object.keys(e2e.byBusiness)])
   );
@@ -208,6 +215,85 @@ export default function TestDashboardPage() {
             </tr>
           </tbody>
         </table>
+      </section>
+
+      <section className={styles.section}>
+        <h2>コード品質(静的解析)</h2>
+        <p className={styles.generatedAt}>
+          ESLint(サイクロマティック複雑度・認知的複雑度・重複コード等の品質ルール、
+          constitution.md Core Principle XI)による検出件数。PRではエラー・警告0件が必須。
+        </p>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>種別</th>
+              <th>エラー</th>
+              <th>警告</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className={styles.densityTotalRow}>
+              <td>全体</td>
+              <td className={codeQuality.overall.errorCount > 0 ? styles.failed : undefined}>
+                {codeQuality.overall.errorCount}
+              </td>
+              <td>{codeQuality.overall.warningCount}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>業務単位の内訳</h3>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>業務</th>
+              <th>エラー</th>
+              <th>警告</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(codeQuality.byBusiness).map(([business, counts]) => (
+              <tr key={business}>
+                <td>{business}</td>
+                <td className={counts.errorCount > 0 ? styles.failed : undefined}>
+                  {counts.errorCount}
+                </td>
+                <td>{counts.warningCount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {Object.keys(codeQuality.byRule).length > 0 && (
+          <>
+            <h3>ルール別の内訳</h3>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>ルール</th>
+                  <th>エラー</th>
+                  <th>警告</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(codeQuality.byRule)
+                  .sort(
+                    ([, a], [, b]) =>
+                      b.errorCount + b.warningCount - (a.errorCount + a.warningCount)
+                  )
+                  .map(([ruleId, counts]) => (
+                    <tr key={ruleId}>
+                      <td>{ruleId}</td>
+                      <td className={counts.errorCount > 0 ? styles.failed : undefined}>
+                        {counts.errorCount}
+                      </td>
+                      <td>{counts.warningCount}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </>
+        )}
       </section>
 
       <section className={styles.section}>

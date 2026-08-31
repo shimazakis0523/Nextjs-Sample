@@ -1,5 +1,28 @@
 <!--
 Sync Impact Report
+- Version change: 2.15.0 → 2.16.0 (MINOR — new Core Principle XI, Static
+  Code Quality Gate: eslint.config.mjs must enable complexity/duplication
+  quality rules, enforced at 0 errors/0 warnings by a new `code-quality`
+  CI job, and visualized on /test-dashboard)
+- Modified sections: New Core Principle XI added after Principle X.
+- Rationale: the user asked to introduce static code analysis/linter
+  quality checks with visualization. Added `complexity`/`max-depth`/
+  `max-params` (ESLint core) and `sonarjs/cognitive-complexity`/
+  `sonarjs/no-duplicate-string`/`sonarjs/no-identical-functions`
+  (eslint-plugin-sonarjs) rather than the plugin's full 279-rule
+  recommended set (too noisy for a first introduction), scoped off
+  `no-duplicate-string` for test files where repeated literal test data is
+  normal style. Enabling the rules immediately surfaced two real
+  complexity violations in `.github/scripts/check-openapi-bff-routes.mjs`,
+  fixed by extracting a shared helper (which itself briefly tripped
+  `max-params` until parameterized with an options object instead of
+  positional callbacks) rather than loosening the gate — consistent with
+  this project's standing practice of fixing what a new quality gate
+  finds instead of exempting it. `dashboard-data/business-map.json`'s
+  `unitPathPrefixes` (already reused for the test-density-by-business
+  breakdown on /test-dashboard) doubled as the per-business code-quality
+  breakdown key with no further changes needed. See ADR-0021 in
+  `doc/common/adr/`.
 - Version change: 2.14.0 → 2.15.0 (MINOR — new Core Principle X, Unit Test
   Case Design Technique: unit test cases must be derivable from named
   techniques documented in a new
@@ -611,6 +634,38 @@ design (ADR-0018) — the same blind spots recur across stacks because
 they're about test-design method, not language or framework. See
 ADR-0020 in `doc/common/adr/`.
 
+### XI. Static Code Quality Gate
+
+`eslint.config.mjs` MUST enable, in addition to `eslint-config-next`'s
+correctness rules, a static code-quality rule set targeting cyclomatic
+complexity (`complexity`), nesting depth (`max-depth`), parameter count
+(`max-params`), cognitive complexity (`sonarjs/cognitive-complexity`),
+duplicated string literals (`sonarjs/no-duplicate-string`, scoped off for
+`**/*.test.{ts,tsx}` and `e2e/**/*.spec.ts` where repeated literal test
+data is normal style, not a smell), and duplicated functions
+(`sonarjs/no-identical-functions`). The `code-quality` job in the "Spec
+consistency" GitHub Actions workflow runs `npm run lint:ci`
+(`eslint --max-warnings 0`) on every PR against `main` and MUST pass with
+zero errors and zero warnings — lowering a threshold or disabling a rule
+to make a violation pass MUST NOT be done without fixing the underlying
+code first, or documenting in the PR why the specific instance is a false
+positive (a project convention already established for ESLint's own
+`eslint-disable` pragma comments). Results MUST also be visualized:
+`scripts/generate-test-dashboard-data.mjs` aggregates `npm run lint:json`
+output into `dashboard-data/summary.json`'s `codeQuality` field
+(overall/by-business/by-rule error and warning counts), rendered on
+`/test-dashboard` — a CI gate that only fails silently in logs doesn't let
+anyone see where quality is trending without re-running it locally.
+Rationale: the user asked to introduce static code analysis/linter-based
+quality checks with visualization. Enabling the rule set surfaced two real
+complexity violations in `.github/scripts/check-openapi-bff-routes.mjs`'s
+`main` function (cyclomatic complexity 13, cognitive complexity 23) from
+two near-identical spec-vs-impl / impl-vs-spec comparison loops; fixed by
+extracting a shared `collectMismatches` helper parameterized by a
+`messages` object (not five positional parameters, which would have
+tripped `max-params` itself) — the same duplication the rule was designed
+to catch. See ADR-0021 in `doc/common/adr/`.
+
 ## Technology & Deployment Constraints
 
 See `doc/common/AP方式設計書(フロントエンド編).md` and
@@ -765,4 +820,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.15.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31
+**Version**: 2.16.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31

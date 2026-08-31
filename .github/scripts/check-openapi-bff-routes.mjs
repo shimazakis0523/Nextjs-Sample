@@ -61,42 +61,49 @@ function loadImplementedRoutes() {
   return implemented;
 }
 
+// sourceOps側の各エンドポイントがtargetOps側にも存在するかを突き合わせ、欠落を
+// errorメッセージの配列にする。spec→impl・impl→spec両方向のチェックが完全に対称な
+// ロジックのため、方向ごとのメッセージ文言だけを差し替えて1つの関数にまとめている。
+function collectMismatches(sourceOps, targetOps, skip, messages) {
+  const errors = [];
+  for (const [routePath, methods] of sourceOps) {
+    if (skip.has(routePath)) continue;
+    if (!targetOps.has(routePath)) {
+      errors.push(messages.missingRoute(routePath));
+      continue;
+    }
+    const targetMethods = targetOps.get(routePath);
+    for (const method of methods) {
+      if (!targetMethods.has(method)) {
+        errors.push(messages.missingMethod(method, routePath));
+      }
+    }
+  }
+  return errors;
+}
+
 function main() {
   const specOps = loadOpenApiOperations();
   const implOps = loadImplementedRoutes();
-  const errors = [];
 
   // health はこのチェックの対象外(死活監視用でTodo機能のspecに紐づかないため、
   // ここでは存在確認のみ行い、欠落があってもfailさせない緩いチェックとする)
   const skip = new Set(["health"]);
 
-  for (const [routePath, methods] of specOps) {
-    if (skip.has(routePath)) continue;
-    if (!implOps.has(routePath)) {
-      errors.push(`openapi.yaml に ${routePath} が定義されているが、src/app/api/${routePath}/route.ts が存在しない`);
-      continue;
-    }
-    const implMethods = implOps.get(routePath);
-    for (const method of methods) {
-      if (!implMethods.has(method)) {
-        errors.push(`openapi.yaml は ${method} ${routePath} を定義しているが、route.ts に export async function ${method} が無い`);
-      }
-    }
-  }
-
-  for (const [routePath, methods] of implOps) {
-    if (skip.has(routePath)) continue;
-    if (!specOps.has(routePath)) {
-      errors.push(`src/app/api/${routePath}/route.ts が実装されているが、doc/API仕様書/BFF/openapi.yaml に ${routePath} の定義が無い`);
-      continue;
-    }
-    const specMethods = specOps.get(routePath);
-    for (const method of methods) {
-      if (!specMethods.has(method)) {
-        errors.push(`route.ts は export async function ${method} を実装しているが、openapi.yaml に ${method} ${routePath} の定義が無い`);
-      }
-    }
-  }
+  const errors = [
+    ...collectMismatches(specOps, implOps, skip, {
+      missingRoute: (routePath) =>
+        `openapi.yaml に ${routePath} が定義されているが、src/app/api/${routePath}/route.ts が存在しない`,
+      missingMethod: (method, routePath) =>
+        `openapi.yaml は ${method} ${routePath} を定義しているが、route.ts に export async function ${method} が無い`,
+    }),
+    ...collectMismatches(implOps, specOps, skip, {
+      missingRoute: (routePath) =>
+        `src/app/api/${routePath}/route.ts が実装されているが、doc/API仕様書/BFF/openapi.yaml に ${routePath} の定義が無い`,
+      missingMethod: (method, routePath) =>
+        `route.ts は export async function ${method} を実装しているが、openapi.yaml に ${method} ${routePath} の定義が無い`,
+    }),
+  ];
 
   if (errors.length > 0) {
     console.error("doc/API仕様書/BFF/openapi.yaml と src/app/api/** の不整合を検出しました:\n");

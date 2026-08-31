@@ -46,6 +46,17 @@ jobs:
       - run: npm ci
       - run: npm run test:coverage
 
+  code-quality:
+    name: ESLint (complexity/duplication quality rules) has 0 errors and 0 warnings
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run lint:ci
+
   governance-issue-reference:
     name: governance file changes reference a GitHub Issue
     runs-on: ubuntu-latest

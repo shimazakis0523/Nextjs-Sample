@@ -4,10 +4,11 @@
 // 読む)。あわせて、Jestが生成したHTMLカバレッジレポートを public/coverage-report/ に
 // コピーする(Next.jsが静的配信できる場所はpublic/配下のみのため)。
 //
-// このスクリプト自身はJest/Playwrightを実行しない。事前に
+// このスクリプト自身はJest/Playwright/ESLintを実行しない。事前に
 //   npx jest --coverage --json --outputFile=coverage/jest-results.json
 //   PLAYWRIGHT_JSON_OUTPUT_NAME=playwright-report/results.json npx playwright test --reporter=json
-// を実行しておくこと(`npm run dashboard:data` はこの2つとこのスクリプトをまとめて
+//   npx eslint --format json --output-file coverage/eslint-results.json
+// を実行しておくこと(`npm run dashboard:data` はこの3つとこのスクリプトをまとめて
 // 実行する)。
 //
 // 新しい業務を追加したときは dashboard-data/business-map.json に
@@ -28,6 +29,7 @@ const BUSINESS_MAP_PATH = path.join(ROOT, "dashboard-data", "business-map.json")
 const JEST_RESULTS_PATH = path.join(ROOT, "coverage", "jest-results.json");
 const COVERAGE_SUMMARY_PATH = path.join(ROOT, "coverage", "coverage-summary.json");
 const PLAYWRIGHT_RESULTS_PATH = path.join(ROOT, "playwright-report", "results.json");
+const ESLINT_RESULTS_PATH = path.join(ROOT, "coverage", "eslint-results.json");
 const OUTPUT_PATH = path.join(ROOT, "dashboard-data", "summary.json");
 const COVERAGE_HTML_SRC = path.join(ROOT, "coverage");
 const COVERAGE_HTML_DEST = path.join(ROOT, "public", "coverage-report");
@@ -201,13 +203,48 @@ function computeTestDensity(stepCountByBusiness, unit, e2e) {
   return { overall, byBusiness };
 }
 
+// ESLintのJSON出力(ファイル単位のerrorCount/warningCount/messages)を集計する。
+// ruleId単位の内訳は、どの品質観点が最も引っかかっているかをダッシュボードで
+// 一目で分かるようにするため。業務単位の内訳は、ESLintの対象がsrc/app・src/lib
+// 以外(e2e/・.github/scripts/・設定ファイル)にも及ぶため、該当しないファイルは
+// 素直に「未分類」に落ちる(business-mapの対象範囲を無理に広げない)。
+function aggregateCodeQuality(businessMap, eslintResults) {
+  const overall = { errorCount: 0, warningCount: 0 };
+  const byBusiness = {};
+  const byRule = {};
+
+  for (const fileResult of eslintResults) {
+    const business = resolveUnitBusiness(businessMap, fileResult.filePath);
+
+    overall.errorCount += fileResult.errorCount;
+    overall.warningCount += fileResult.warningCount;
+
+    byBusiness[business] ??= { errorCount: 0, warningCount: 0 };
+    byBusiness[business].errorCount += fileResult.errorCount;
+    byBusiness[business].warningCount += fileResult.warningCount;
+
+    for (const message of fileResult.messages) {
+      const ruleId = message.ruleId ?? "(parsing error)";
+      byRule[ruleId] ??= { errorCount: 0, warningCount: 0 };
+      if (message.severity === 2) {
+        byRule[ruleId].errorCount += 1;
+      } else {
+        byRule[ruleId].warningCount += 1;
+      }
+    }
+  }
+
+  return { overall, byBusiness, byRule };
+}
+
 function copyCoverageHtmlReport() {
   if (!existsSync(COVERAGE_HTML_SRC)) {
     return false;
   }
+  const excludedFiles = ["jest-results.json", "coverage-final.json", "eslint-results.json"];
   cpSync(COVERAGE_HTML_SRC, COVERAGE_HTML_DEST, {
     recursive: true,
-    filter: (src) => !src.endsWith("jest-results.json") && !src.endsWith("coverage-final.json"),
+    filter: (src) => !excludedFiles.some((name) => src.endsWith(name)),
   });
   return true;
 }
@@ -217,11 +254,13 @@ function main() {
   const jestResults = loadJson(JEST_RESULTS_PATH, "Jest結果");
   const coverageSummary = loadJson(COVERAGE_SUMMARY_PATH, "カバレッジ集計");
   const playwrightResults = loadJson(PLAYWRIGHT_RESULTS_PATH, "Playwright結果");
+  const eslintResults = loadJson(ESLINT_RESULTS_PATH, "ESLint結果");
 
   const unit = aggregateUnit(businessMap, jestResults);
   const e2e = aggregateE2e(businessMap, playwrightResults);
   const stepCountByBusiness = computeStepCountByBusiness(businessMap);
   const testDensity = computeTestDensity(stepCountByBusiness, unit, e2e);
+  const codeQuality = aggregateCodeQuality(businessMap, eslintResults);
 
   const summary = {
     generatedAt: new Date().toISOString(),
@@ -232,6 +271,7 @@ function main() {
     },
     e2e,
     testDensity,
+    codeQuality,
   };
 
   mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true });
@@ -252,6 +292,9 @@ function main() {
     copiedHtmlReport
       ? `  HTMLカバレッジレポートを ${path.relative(ROOT, COVERAGE_HTML_DEST)} にコピーしました`
       : "  HTMLカバレッジレポートのコピーをスキップしました(coverage/が見つかりません)"
+  );
+  console.log(
+    `  lint: ${codeQuality.overall.errorCount} errors, ${codeQuality.overall.warningCount} warnings`
   );
 }
 

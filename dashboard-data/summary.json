@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-31T12:49:44.495Z",
+  "generatedAt": "2026-08-31T13:09:44.439Z",
   "unit": {
     "overall": {
       "total": 54,
@@ -25,26 +25,26 @@
     },
     "coverage": {
       "lines": {
-        "total": 149,
-        "covered": 149,
+        "total": 152,
+        "covered": 152,
         "skipped": 0,
         "pct": 100
       },
       "statements": {
-        "total": 155,
-        "covered": 154,
+        "total": 158,
+        "covered": 157,
         "skipped": 0,
-        "pct": 99.35
+        "pct": 99.36
       },
       "functions": {
-        "total": 44,
-        "covered": 44,
+        "total": 47,
+        "covered": 47,
         "skipped": 0,
         "pct": 100
       },
       "branches": {
-        "total": 53,
-        "covered": 53,
+        "total": 60,
+        "covered": 60,
         "skipped": 0,
         "pct": 100
       },
@@ -72,28 +72,28 @@
   },
   "testDensity": {
     "overall": {
-      "stepCount": 606,
-      "kStep": 0.606,
+      "stepCount": 688,
+      "kStep": 0.688,
       "unit": {
         "count": 54,
-        "density": 89.10891089108911
+        "density": 78.48837209302326
       },
       "e2e": {
         "count": 22,
-        "density": 36.303630363036305
+        "density": 31.976744186046513
       },
       "total": {
         "count": 76,
-        "density": 125.41254125412541
+        "density": 110.46511627906978
       }
     },
     "byBusiness": {
       "共通基盤・開発ツール(業務非依存)": {
-        "stepCount": 271,
-        "kStep": 0.271,
+        "stepCount": 353,
+        "kStep": 0.353,
         "unit": {
           "count": 18,
-          "density": 66.42066420664206
+          "density": 50.991501416430594
         },
         "e2e": {
           "count": 0,
@@ -101,7 +101,7 @@
         },
         "total": {
           "count": 18,
-          "density": 66.42066420664206
+          "density": 50.991501416430594
         }
       },
       "業務1_Todoダッシュボード": {
@@ -137,5 +137,26 @@
         }
       }
     }
+  },
+  "codeQuality": {
+    "overall": {
+      "errorCount": 0,
+      "warningCount": 0
+    },
+    "byBusiness": {
+      "未分類": {
+        "errorCount": 0,
+        "warningCount": 0
+      },
+      "共通基盤・開発ツール(業務非依存)": {
+        "errorCount": 0,
+        "warningCount": 0
+      },
+      "業務1_Todoダッシュボード": {
+        "errorCount": 0,
+        "warningCount": 0
+      }
+    },
+    "byRule": {}
   }
 }

@@ -53,6 +53,14 @@ describe("TestDashboardPage", () => {
           overall: densityRow(19, 22),
           byBusiness: { 業務1_Todoダッシュボード: densityRow(19, 22) },
         },
+        codeQuality: {
+          overall: { errorCount: 1, warningCount: 2 },
+          byBusiness: { 業務1_Todoダッシュボード: { errorCount: 1, warningCount: 2 } },
+          byRule: {
+            "sonarjs/no-duplicate-string": { errorCount: 0, warningCount: 2 },
+            complexity: { errorCount: 1, warningCount: 0 },
+          },
+        },
       })
     );
 
@@ -63,9 +71,12 @@ describe("TestDashboardPage", () => {
     expect(screen.getAllByText("19").length).toBeGreaterThan(0);
     expect(screen.getAllByText("22").length).toBeGreaterThan(0);
     expect(screen.getByText("テスト密度")).toBeInTheDocument();
-    expect(screen.getByText("全体")).toBeInTheDocument();
+    expect(screen.getAllByText("全体").length).toBeGreaterThan(0);
     expect(screen.getAllByText("19.00").length).toBeGreaterThan(0);
     expect(screen.getAllByText("41.00").length).toBeGreaterThan(0);
+    expect(screen.getByText("コード品質(静的解析)")).toBeInTheDocument();
+    expect(screen.getByText("ルール別の内訳")).toBeInTheDocument();
+    expect(screen.getByText("sonarjs/no-duplicate-string")).toBeInTheDocument();
   });
 
   it("shows failed counts distinctly when a suite has failures", () => {
@@ -90,12 +101,18 @@ describe("TestDashboardPage", () => {
           overall: densityRow(5, 0),
           byBusiness: { 業務1_Todoダッシュボード: densityRow(5, 0) },
         },
+        codeQuality: {
+          overall: { errorCount: 1, warningCount: 0 },
+          byBusiness: { 業務1_Todoダッシュボード: { errorCount: 1, warningCount: 0 } },
+          byRule: {},
+        },
       })
     );
 
     render(<TestDashboardPage />);
 
     expect(screen.getAllByText("1").length).toBeGreaterThan(0);
+    expect(screen.queryByText("ルール別の内訳")).not.toBeInTheDocument();
   });
 
   it("falls back to zero counts for a business missing from one side, and flags e2e failures", () => {
@@ -119,6 +136,14 @@ describe("TestDashboardPage", () => {
         testDensity: {
           overall: densityRow(5, 3),
           byBusiness: { 業務A: densityRow(5, 0), 業務B: densityRow(0, 3) },
+        },
+        codeQuality: {
+          overall: { errorCount: 0, warningCount: 0 },
+          byBusiness: {
+            業務A: { errorCount: 0, warningCount: 0 },
+            業務B: { errorCount: 0, warningCount: 0 },
+          },
+          byRule: {},
         },
       })
     );
