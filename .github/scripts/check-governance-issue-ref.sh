@@ -30,7 +30,13 @@ fi
 
 COMMIT_MESSAGES="$(git -c core.quotePath=false log --format=%B "${BASE_REF}..HEAD")"
 
-if printf '%s\n%s\n' "$PR_BODY" "$COMMIT_MESSAGES" | grep -qE '#[0-9]+'; then
+# grep -q + pipe はリーダーが早期に一致してパイプを閉じるとライター側がSIGPIPEで
+# 落ち、pipefail下ではその非ゼロ終了がパイプライン全体の失敗として扱われてしまう
+# (このPR本文+ブランチ全コミットメッセージのように、パイプバッファ(通常64KB)を
+# 超える入力で実際に発生した)。サブプロセスへのパイプを使わず、bash組み込みの
+# 正規表現マッチで判定する。
+COMBINED="${PR_BODY}"$'\n'"${COMMIT_MESSAGES}"
+if [[ "$COMBINED" =~ \#[0-9]+ ]]; then
   echo "Issue参照を確認しました。"
   exit 0
 fi
