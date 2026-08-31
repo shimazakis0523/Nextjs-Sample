@@ -138,6 +138,14 @@ export default function Home() {
             </a>
             <a
               className={`${styles.link} ${styles.linkSecondary}`}
+              href="https://claude.ai/code/artifact/392c8ee9-5e33-4bd3-83f6-0bef8f1ada65"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              UIモックアップを見る
+            </a>
+            <a
+              className={`${styles.link} ${styles.linkSecondary}`}
               href="https://github.com/shimazakis0523/Nextjs-Sample"
               target="_blank"
               rel="noopener noreferrer"
