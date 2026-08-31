@@ -59,4 +59,15 @@ describe("Home (top page)", () => {
       "/test-dashboard"
     );
   });
+
+  it("renders a link to the public GitHub repository that opens in a new tab", () => {
+    render(<Home />);
+
+    const repoLink = screen.getByRole("link", {
+      name: "GitHubリポジトリを見る(ソースコード・仕様書・ADRを公開中)",
+    });
+    expect(repoLink).toHaveAttribute("href", "https://github.com/shimazakis0523/Nextjs-Sample");
+    expect(repoLink).toHaveAttribute("target", "_blank");
+    expect(repoLink).toHaveAttribute("rel", "noopener noreferrer");
+  });
 });

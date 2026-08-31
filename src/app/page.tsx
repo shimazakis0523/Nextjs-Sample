@@ -122,6 +122,17 @@ export default function Home() {
           </a>
         </div>
       </section>
+
+      <footer className={styles.footer}>
+        <a
+          className={styles.repoLink}
+          href="https://github.com/shimazakis0523/Nextjs-Sample"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHubリポジトリを見る(ソースコード・仕様書・ADRを公開中)
+        </a>
+      </footer>
     </div>
   );
 }

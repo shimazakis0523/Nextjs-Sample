@@ -191,6 +191,24 @@
   }
 }
 
+.footer {
+  display: flex;
+  justify-content: center;
+}
+
+.repoLink {
+  font-size: 13px;
+  color: #666;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .repoLink:hover {
+    color: #000;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   .eyebrow {
     color: #aaa;
@@ -235,6 +253,10 @@
     border-color: #555;
   }
 
+  .repoLink {
+    color: #aaa;
+  }
+
   @media (hover: hover) and (pointer: fine) {
     .link:hover {
       background: #ccc;
@@ -242,6 +264,10 @@
 
     .linkSecondary:hover {
       background: #1f1f1f;
+    }
+
+    .repoLink:hover {
+      color: #ededed;
     }
   }
 }

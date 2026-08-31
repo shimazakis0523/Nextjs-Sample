@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-08-31T14:06:47.418Z",
+  "generatedAt": "2026-08-31T14:11:53.563Z",
   "unit": {
     "overall": {
-      "total": 60,
-      "passed": 60,
+      "total": 61,
+      "passed": 61,
       "failed": 0
     },
     "byBusiness": {
       "未分類": {
-        "total": 10,
-        "passed": 10,
+        "total": 11,
+        "passed": 11,
         "failed": 0
       },
       "業務1_Todoダッシュボード": {
@@ -72,36 +72,36 @@
   },
   "testDensity": {
     "overall": {
-      "stepCount": 962,
-      "kStep": 0.962,
+      "stepCount": 972,
+      "kStep": 0.972,
       "unit": {
-        "count": 60,
-        "density": 62.37006237006237
+        "count": 61,
+        "density": 62.757201646090536
       },
       "e2e": {
         "count": 22,
-        "density": 22.86902286902287
+        "density": 22.63374485596708
       },
       "total": {
-        "count": 82,
-        "density": 85.23908523908524
+        "count": 83,
+        "density": 85.39094650205762
       }
     },
     "byBusiness": {
       "未分類": {
-        "stepCount": 325,
-        "kStep": 0.325,
+        "stepCount": 335,
+        "kStep": 0.335,
         "unit": {
-          "count": 10,
-          "density": 30.769230769230766
+          "count": 11,
+          "density": 32.83582089552239
         },
         "e2e": {
           "count": 0,
           "density": 0
         },
         "total": {
-          "count": 10,
-          "density": 30.769230769230766
+          "count": 11,
+          "density": 32.83582089552239
         }
       },
       "共通基盤・開発ツール(業務非依存)": {
