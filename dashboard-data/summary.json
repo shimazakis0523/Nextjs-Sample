@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-08-31T13:09:44.439Z",
+  "generatedAt": "2026-08-31T13:48:26.648Z",
   "unit": {
     "overall": {
-      "total": 54,
-      "passed": 54,
+      "total": 56,
+      "passed": 56,
       "failed": 0
     },
     "byBusiness": {
-      "共通基盤・開発ツール(業務非依存)": {
-        "total": 18,
-        "passed": 18,
+      "未分類": {
+        "total": 6,
+        "passed": 6,
         "failed": 0
       },
       "業務1_Todoダッシュボード": {
@@ -17,34 +17,34 @@
         "passed": 32,
         "failed": 0
       },
-      "未分類": {
-        "total": 4,
-        "passed": 4,
+      "共通基盤・開発ツール(業務非依存)": {
+        "total": 18,
+        "passed": 18,
         "failed": 0
       }
     },
     "coverage": {
       "lines": {
-        "total": 152,
-        "covered": 152,
+        "total": 155,
+        "covered": 155,
         "skipped": 0,
         "pct": 100
       },
       "statements": {
-        "total": 158,
-        "covered": 157,
+        "total": 162,
+        "covered": 160,
         "skipped": 0,
-        "pct": 99.36
+        "pct": 98.76
       },
       "functions": {
-        "total": 47,
-        "covered": 47,
+        "total": 48,
+        "covered": 48,
         "skipped": 0,
         "pct": 100
       },
       "branches": {
-        "total": 60,
-        "covered": 60,
+        "total": 62,
+        "covered": 62,
         "skipped": 0,
         "pct": 100
       },
@@ -72,19 +72,19 @@
   },
   "testDensity": {
     "overall": {
-      "stepCount": 688,
-      "kStep": 0.688,
+      "stepCount": 783,
+      "kStep": 0.783,
       "unit": {
-        "count": 54,
-        "density": 78.48837209302326
+        "count": 56,
+        "density": 71.51979565772669
       },
       "e2e": {
         "count": 22,
-        "density": 31.976744186046513
+        "density": 28.0970625798212
       },
       "total": {
-        "count": 76,
-        "density": 110.46511627906978
+        "count": 78,
+        "density": 99.61685823754789
       }
     },
     "byBusiness": {
@@ -121,19 +121,19 @@
         }
       },
       "未分類": {
-        "stepCount": 51,
-        "kStep": 0.051,
+        "stepCount": 146,
+        "kStep": 0.146,
         "unit": {
-          "count": 4,
-          "density": 78.43137254901961
+          "count": 6,
+          "density": 41.09589041095891
         },
         "e2e": {
           "count": 0,
           "density": 0
         },
         "total": {
-          "count": 4,
-          "density": 78.43137254901961
+          "count": 6,
+          "density": 41.09589041095891
         }
       }
     }
