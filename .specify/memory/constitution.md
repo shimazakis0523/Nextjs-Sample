@@ -1,5 +1,20 @@
 <!--
 Sync Impact Report
+- Version change: 2.11.0 → 2.11.1 (PATCH — no Core Principle text changed;
+  `specs/<feature>/tasks.md` and `specs/<feature>/screens/*/checklists/`
+  (the process/tracking artifacts ADR-0013 had left in `specs/`) move to
+  `tracking/<業務>/`, and the now-empty `specs/` directory is removed)
+- Modified sections: none (no live principle or workflow text referenced
+  `specs/` as tasks.md's path; this is a file-location-only follow-up).
+- Rationale: after ADR-0013 moved every actual design document out of
+  `specs/**` into `doc/**`, `specs/` held only two kinds of non-spec
+  process artifacts, which reads as a contradiction of the directory's own
+  name — flagged by the user as confusing. `tracking/<業務>/` is a neutral
+  English name (GitHub Issue numbers and task IDs like T001 are inherently
+  English-facing) that doesn't reuse `specs/`. Moving the checklist files
+  also surfaced and fixed a pre-existing relative-link depth bug (one `../`
+  short) in their references to the design documents. See ADR-0014 in
+  `doc/common/adr/`.
 - Version change: 2.10.0 → 2.11.0 (MINOR — document architecture overhaul:
   Japanese document names throughout, and the `specs/**` + `docs/**` split
   replaced by a single `doc/` tree; `spec.md`/`plan.md` as such are
@@ -556,4 +571,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.11.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31
+**Version**: 2.11.1 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31

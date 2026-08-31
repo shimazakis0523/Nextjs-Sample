@@ -2,12 +2,12 @@
 
 **Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
 
-**Input**: Feature specification from `specs/[###-feature-name]/spec.md`
+**Input**: Design documents from `doc/フロントエンド設計書/[業務]/`
 
-**Note**: This template is filled in by the `/speckit-plan` command, once per feature
-(`specs/<feature>/plan.md`), even when the feature has multiple screens. `plan.md` holds
-exactly the two sections below — no Summary, Technical Context, Constitution Check, or
-Complexity Tracking — see `doc/common/adr/0008-minimal-plan-md-sections.md`.
+**Note**: This template is filled in by the `/speckit-plan` command, once per business/feature
+(`doc/フロントエンド設計書/<業務>/詳細設計書.md`), even when the feature has multiple screens.
+詳細設計書 holds exactly the two sections below — no Summary, Technical Context, Constitution
+Check, or Complexity Tracking — see `doc/common/adr/0008-minimal-plan-md-sections.md`.
 
 ## 登場するコンポーネントと関係
 
