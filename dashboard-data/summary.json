@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-31T14:58:02.666Z",
+  "generatedAt": "2026-08-31T15:12:21.347Z",
   "unit": {
     "overall": {
       "total": 63,
@@ -72,28 +72,28 @@
   },
   "testDensity": {
     "overall": {
-      "stepCount": 1041,
-      "kStep": 1.041,
+      "stepCount": 1061,
+      "kStep": 1.061,
       "unit": {
         "count": 63,
-        "density": 60.518731988472624
+        "density": 59.37794533459001
       },
       "e2e": {
         "count": 22,
-        "density": 21.133525456292027
+        "density": 20.735155513666353
       },
       "total": {
         "count": 85,
-        "density": 81.65225744476466
+        "density": 80.11310084825637
       }
     },
     "byBusiness": {
       "未分類": {
-        "stepCount": 404,
-        "kStep": 0.404,
+        "stepCount": 424,
+        "kStep": 0.424,
         "unit": {
           "count": 13,
-          "density": 32.17821782178218
+          "density": 30.660377358490567
         },
         "e2e": {
           "count": 0,
@@ -101,7 +101,7 @@
         },
         "total": {
           "count": 13,
-          "density": 32.17821782178218
+          "density": 30.660377358490567
         }
       },
       "共通基盤・開発ツール(業務非依存)": {

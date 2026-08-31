@@ -60,12 +60,10 @@ describe("Home (top page)", () => {
     );
   });
 
-  it("renders a link to the public GitHub repository that opens in a new tab", () => {
+  it("renders a button-styled link to the public GitHub repository that opens in a new tab", () => {
     render(<Home />);
 
-    const repoLink = screen.getByRole("link", {
-      name: "GitHubリポジトリを見る(ソースコード・仕様書・ADRを公開中)",
-    });
+    const repoLink = screen.getByRole("link", { name: "GitHubリポジトリ" });
     expect(repoLink).toHaveAttribute("href", "https://github.com/shimazakis0523/Nextjs-Sample");
     expect(repoLink).toHaveAttribute("target", "_blank");
     expect(repoLink).toHaveAttribute("rel", "noopener noreferrer");

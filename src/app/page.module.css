@@ -225,6 +225,10 @@
   border: 1px solid #333;
 }
 
+.githubIcon {
+  margin-right: 8px;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .link:hover {
     background: #383838;
@@ -232,19 +236,6 @@
 
   .linkSecondary:hover {
     background: #f2f2f2;
-  }
-}
-
-.repoLink {
-  font-size: 13px;
-  color: #666;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .repoLink:hover {
-    color: #000;
   }
 }
 
@@ -306,10 +297,6 @@
     border-color: #555;
   }
 
-  .repoLink {
-    color: #aaa;
-  }
-
   @media (hover: hover) and (pointer: fine) {
     .link:hover {
       background: #ccc;
@@ -317,10 +304,6 @@
 
     .linkSecondary:hover {
       background: #1f1f1f;
-    }
-
-    .repoLink:hover {
-      color: #ededed;
     }
   }
 }
