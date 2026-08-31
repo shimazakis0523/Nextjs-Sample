@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-31T14:11:53.563Z",
+  "generatedAt": "2026-08-31T14:38:49.495Z",
   "unit": {
     "overall": {
       "total": 61,
@@ -25,16 +25,16 @@
     },
     "coverage": {
       "lines": {
-        "total": 163,
-        "covered": 163,
+        "total": 164,
+        "covered": 164,
         "skipped": 0,
         "pct": 100
       },
       "statements": {
-        "total": 170,
-        "covered": 168,
+        "total": 171,
+        "covered": 169,
         "skipped": 0,
-        "pct": 98.82
+        "pct": 98.83
       },
       "functions": {
         "total": 52,
@@ -43,8 +43,8 @@
         "pct": 100
       },
       "branches": {
-        "total": 66,
-        "covered": 66,
+        "total": 65,
+        "covered": 65,
         "skipped": 0,
         "pct": 100
       },
@@ -72,28 +72,28 @@
   },
   "testDensity": {
     "overall": {
-      "stepCount": 972,
-      "kStep": 0.972,
+      "stepCount": 989,
+      "kStep": 0.989,
       "unit": {
         "count": 61,
-        "density": 62.757201646090536
+        "density": 61.67846309403438
       },
       "e2e": {
         "count": 22,
-        "density": 22.63374485596708
+        "density": 22.24469160768453
       },
       "total": {
         "count": 83,
-        "density": 85.39094650205762
+        "density": 83.92315470171891
       }
     },
     "byBusiness": {
       "未分類": {
-        "stepCount": 335,
-        "kStep": 0.335,
+        "stepCount": 352,
+        "kStep": 0.352,
         "unit": {
           "count": 11,
-          "density": 32.83582089552239
+          "density": 31.250000000000004
         },
         "e2e": {
           "count": 0,
@@ -101,7 +101,7 @@
         },
         "total": {
           "count": 11,
-          "density": 32.83582089552239
+          "density": 31.250000000000004
         }
       },
       "共通基盤・開発ツール(業務非依存)": {

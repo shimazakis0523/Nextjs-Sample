@@ -1,18 +1,44 @@
-.page {
+.deck {
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  font-family: var(--font-geist-sans);
+}
+
+.slide {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 48px;
+  justify-content: center;
   min-height: 100vh;
-  padding: 64px 24px 96px;
-  font-family: var(--font-geist-sans);
+  min-height: 100dvh;
+  padding: 64px 24px;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.slideNumber {
+  position: absolute;
+  right: 24px;
+  bottom: 20px;
+  font-family: var(--font-geist-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #999;
+}
+
+.slideNumberTotal {
+  font-weight: 400;
+  color: #bbb;
 }
 
 .hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
   max-width: 720px;
   text-align: center;
 }
@@ -28,30 +54,47 @@
 
 .title {
   margin: 0;
-  font-size: 32px;
+  font-size: 40px;
   font-weight: 700;
   line-height: 1.3;
 }
 
 .lead {
   margin: 0;
-  font-size: 16px;
-  line-height: 1.8;
+  font-size: 17px;
+  line-height: 1.9;
   color: #444;
+}
+
+.scrollHint {
+  margin: 24px 0 0;
+  font-size: 13px;
+  color: #999;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
 }
 
 .section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 28px;
   width: 100%;
   max-width: 960px;
 }
 
 .sectionTitle {
   margin: 0;
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 700;
 }
 
@@ -64,89 +107,90 @@
   color: #444;
 }
 
-.steps {
+.stepGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.stepCard {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  width: 100%;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fafafa;
+  text-align: left;
 }
 
-.step {
-  display: grid;
-  grid-template-columns: 40px 1fr;
-  gap: 4px 16px;
-  padding: 16px 0;
-}
-
-.stepConnector {
+.stepCardTop {
   display: flex;
-  justify-content: center;
-  color: #999;
-  font-size: 14px;
+  align-items: center;
+  gap: 10px;
 }
 
 .stepNumber {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: #000;
   color: #fff;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-}
-
-.stepBody {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
 }
 
 .stepHeading {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .stepPhase {
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
 }
 
 .stepCode {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: #666;
 }
 
 .stepDescription {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.55;
   color: #444;
 }
 
 .stepHarness {
-  display: inline-flex;
-  align-self: flex-start;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-self: stretch;
+  align-items: baseline;
+  gap: 4px 6px;
+  min-width: 0;
+  padding: 4px 8px;
   border-radius: 6px;
   background: #f2f2f2;
-  font-size: 12px;
+  font-size: 11px;
   font-family: var(--font-geist-mono);
   color: #333;
+  overflow-wrap: anywhere;
 }
 
 .stepHarnessLabel {
+  flex-shrink: 0;
+  white-space: nowrap;
   font-family: var(--font-geist-sans);
   font-weight: 600;
   color: #666;
@@ -191,11 +235,6 @@
   }
 }
 
-.footer {
-  display: flex;
-  justify-content: center;
-}
-
 .repoLink {
   font-size: 13px;
   color: #666;
@@ -210,18 +249,32 @@
 }
 
 @media (prefers-color-scheme: dark) {
+  .slideNumber {
+    color: #777;
+  }
+
+  .slideNumberTotal {
+    color: #555;
+  }
+
   .eyebrow {
     color: #aaa;
   }
 
   .lead,
   .stepDescription,
-  .sectionLead {
+  .sectionLead,
+  .scrollHint {
     color: #ccc;
   }
 
-  .stepConnector {
+  .scrollHint {
     color: #777;
+  }
+
+  .stepCard {
+    border-color: #333;
+    background: #171717;
   }
 
   .stepNumber {

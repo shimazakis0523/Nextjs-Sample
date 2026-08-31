@@ -56,83 +56,100 @@ const PROCESS_STEPS: ProcessStep[] = [
   },
 ];
 
+const SLIDE_COUNT = 4;
+
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <header className={styles.hero}>
-        <p className={styles.eyebrow}>Demo</p>
-        <h1 className={styles.title}>仕様駆動開発 × ハーネスエンジニアリング</h1>
-        <p className={styles.lead}>
-          Claude Code (Web版)・GitHub・Vercelを連携させることで、「仕様書作成→詳細設計→実装
-          →静的解析→ユニットテスト→E2E→品質分析」のサイクルをほぼ自動で回し、結果を可視化
-          できる仕組みのデモです。工程ごとに機械的なチェック(ハーネス)が組み込まれており、
-          違反があればCIが即座にブロックします。
-        </p>
+    <div className={styles.deck}>
+      <header className={styles.slide}>
+        <div className={styles.hero}>
+          <p className={styles.eyebrow}>Demo</p>
+          <h1 className={styles.title}>仕様駆動開発 × ハーネスエンジニアリング</h1>
+          <p className={styles.lead}>
+            Claude Code (Web版)・GitHub・Vercelを連携させることで、「仕様書作成→詳細設計→
+            実装→静的解析→ユニットテスト→E2E→品質分析」のサイクルをほぼ自動で回し、結果を
+            可視化できる仕組みのデモです。工程ごとに機械的なチェック(ハーネス)が組み込まれて
+            おり、違反があればCIが即座にブロックします。
+          </p>
+          <p className={styles.scrollHint}>スクロールして次へ ↓</p>
+        </div>
+        <span className={styles.slideNumber}>
+          01<span className={styles.slideNumberTotal}> / {SLIDE_COUNT}</span>
+        </span>
       </header>
 
-      <section className={styles.section} aria-labelledby="architecture-heading">
-        <h2 id="architecture-heading" className={styles.sectionTitle}>
-          仕組み
-        </h2>
-        <p className={styles.sectionLead}>
-          開発者はClaude Code (Web版)に指示するだけで、GitHubへのcommit・push、CIによる
-          自動検証、Vercelへのデプロイまでが繋がって進み、結果は品質ダッシュボードに可視化
-          される。CIが赤の場合はClaude Codeが自律的に修正して再度pushする。
-        </p>
-        <ArchitectureDiagram />
+      <section className={styles.slide} aria-labelledby="architecture-heading">
+        <div className={styles.section}>
+          <h2 id="architecture-heading" className={styles.sectionTitle}>
+            仕組み
+          </h2>
+          <p className={styles.sectionLead}>
+            開発者はClaude Code (Web版)に指示するだけで、GitHubへのcommit・push、CIによる
+            自動検証、Vercelへのデプロイまでが繋がって進み、結果は品質ダッシュボードに可視化
+            される。CIが赤の場合はClaude Codeが自律的に修正して再度pushする。
+          </p>
+          <ArchitectureDiagram />
+        </div>
+        <span className={styles.slideNumber}>
+          02<span className={styles.slideNumberTotal}> / {SLIDE_COUNT}</span>
+        </span>
       </section>
 
-      <section className={styles.section} aria-labelledby="process-heading">
-        <h2 id="process-heading" className={styles.sectionTitle}>
-          開発プロセスとハーネス
-        </h2>
-        <ol className={styles.steps} data-testid="process-steps">
-          {PROCESS_STEPS.map((step, index) => (
-            <li key={step.phase}>
-              {index > 0 && <div className={styles.stepConnector}>↓</div>}
-              <div className={styles.step}>
-                <div className={styles.stepNumber}>{index + 1}</div>
-                <div className={styles.stepBody}>
+      <section className={styles.slide} aria-labelledby="process-heading">
+        <div className={styles.section}>
+          <h2 id="process-heading" className={styles.sectionTitle}>
+            開発プロセスとハーネス
+          </h2>
+          <div className={styles.stepGrid} data-testid="process-steps">
+            {PROCESS_STEPS.map((step, index) => (
+              <div className={styles.stepCard} key={step.phase}>
+                <div className={styles.stepCardTop}>
+                  <span className={styles.stepNumber}>{index + 1}</span>
                   <div className={styles.stepHeading}>
                     <p className={styles.stepPhase}>{step.phase}</p>
                     {step.code && <span className={styles.stepCode}>({step.code})</span>}
                   </div>
-                  <p className={styles.stepDescription}>{step.description}</p>
-                  <span className={styles.stepHarness}>
-                    <span className={styles.stepHarnessLabel}>ハーネス:</span>
-                    {step.harness}
-                  </span>
                 </div>
+                <p className={styles.stepDescription}>{step.description}</p>
+                <span className={styles.stepHarness}>
+                  <span className={styles.stepHarnessLabel}>ハーネス:</span>
+                  {step.harness}
+                </span>
               </div>
-            </li>
-          ))}
-        </ol>
+            ))}
+          </div>
+        </div>
+        <span className={styles.slideNumber}>
+          03<span className={styles.slideNumberTotal}> / {SLIDE_COUNT}</span>
+        </span>
       </section>
 
-      <section className={styles.section} aria-labelledby="links-heading">
-        <h2 id="links-heading" className={styles.sectionTitle}>
-          実際に見る
-        </h2>
-        <div className={styles.ctaGroup}>
-          <a className={styles.link} href="/dashboard">
-            デモアプリ(Todoダッシュボード)を開く
-          </a>
-          <a className={`${styles.link} ${styles.linkSecondary}`} href="/test-dashboard">
-            品質ダッシュボードを見る
+      <section className={styles.slide} aria-labelledby="links-heading">
+        <div className={styles.section}>
+          <h2 id="links-heading" className={styles.sectionTitle}>
+            実際に見る
+          </h2>
+          <div className={styles.ctaGroup}>
+            <a className={styles.link} href="/dashboard">
+              デモアプリ(Todoダッシュボード)を開く
+            </a>
+            <a className={`${styles.link} ${styles.linkSecondary}`} href="/test-dashboard">
+              品質ダッシュボードを見る
+            </a>
+          </div>
+          <a
+            className={styles.repoLink}
+            href="https://github.com/shimazakis0523/Nextjs-Sample"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHubリポジトリを見る(ソースコード・仕様書・ADRを公開中)
           </a>
         </div>
+        <span className={styles.slideNumber}>
+          04<span className={styles.slideNumberTotal}> / {SLIDE_COUNT}</span>
+        </span>
       </section>
-
-      <footer className={styles.footer}>
-        <a
-          className={styles.repoLink}
-          href="https://github.com/shimazakis0523/Nextjs-Sample"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          GitHubリポジトリを見る(ソースコード・仕様書・ADRを公開中)
-        </a>
-      </footer>
     </div>
   );
 }
