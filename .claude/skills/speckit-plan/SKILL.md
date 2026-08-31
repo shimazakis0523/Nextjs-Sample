@@ -58,18 +58,20 @@ You **MUST** consider the user input before proceeding (if not empty).
 ## Outline
 
 1. **Setup**: Run `.specify/scripts/bash/setup-plan.sh --json` from repo root and parse
-   JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. **Path note (ADR-0013)**: this
-   script still resolves paths under the legacy `specs/<feature>/` layout — treat its
-   output only as a way to identify which business/feature this run is for (the
-   `<feature-dir-name>` segment), not as the literal output location. This project's
-   design documents live under `doc/フロントエンド設計書/<業務>/`, not `specs/`; map
-   `<feature-dir-name>` (e.g. `001-todo-dashboard`) to its `<業務>` directory (e.g.
-   `業務1_Todoダッシュボード`) by matching existing directories under
-   `doc/フロントエンド設計書/`, asking the user if no clear match exists. Set
-   `詳細設計書_PATH` to `doc/フロントエンド設計書/<業務>/詳細設計書.md` — this is what
-   step 3 actually reads/writes, not `IMPL_PLAN`. For single quotes in args like
-   "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible:
-   "I'm Groot").
+   JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. **Path note (ADR-0013, ADR-0014)**:
+   this script still resolves paths under the legacy `specs/<feature>/` layout, which no
+   longer exists — treat its output only as a way to identify which business this run is
+   for (the `<feature-dir-name>` segment), never as a literal path to read from. Resolve
+   `BUSINESS_DIR` instead:
+   - If `.specify/feature.json` has a `business_directory` field (set by a
+     `/speckit-specify` run under the current architecture), use it directly.
+   - Otherwise (an older feature predating this field), map `<feature-dir-name>` (e.g.
+     `001-todo-dashboard`) to its `<業務>` directory (e.g. `業務1_Todoダッシュボード`) by
+     matching existing directories under `doc/フロントエンド設計書/`, asking the user if
+     no clear match exists.
+   Set `詳細設計書_PATH` to `BUSINESS_DIR/詳細設計書.md` — this is what step 3 actually
+   reads/writes, not `IMPL_PLAN`. For single quotes in args like "I'm Groot", use escape
+   syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 2. **Load context**: Read every `doc/フロントエンド設計書/<業務>/ユースケース記述*.md`
    and `画面定義書*.md` for this business, plus `.specify/memory/constitution.md`. Load

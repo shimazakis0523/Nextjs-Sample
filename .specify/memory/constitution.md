@@ -1,5 +1,29 @@
 <!--
 Sync Impact Report
+- Version change: 2.11.1 → 2.11.2 (PATCH — no Core Principle text changed;
+  the Principle VI template citation now names
+  `usecase-template.md`/`screen-definition-template.md`, which is what it
+  already pointed at conceptually)
+- Modified sections: Principle VI's template-file citation only (the
+  principle's own MUST/MUST NOT requirements for ユースケース記述/画面定義書
+  did not change — the templates already matched them; only the citation's
+  file names were stale).
+- Rationale: after ADR-0013's restructuring, `.specify/templates/overrides/
+  spec-template.md` (the old single-file `spec.md` template) was never
+  replaced, and `speckit-specify`/`speckit-plan`/`speckit-implement` still
+  assumed the pre-ADR-0013 `specs/<feature>/spec.md`/`plan.md` layout for
+  any *new* business/screen — only the existing Todo dashboard docs had
+  been manually migrated. The user asked directly whether the
+  mockup→ユースケース記述/画面定義→詳細設計→実装 generation pipeline
+  actually references prior-stage artifacts under the new structure; it
+  did not. Fixed by splitting spec-template.md into
+  usecase-template.md/screen-definition-template.md, and rewiring the
+  three Skills to resolve `doc/`/`tracking/` paths via
+  `.specify/feature.json`'s `business_directory`/`tracking_directory`/
+  `screen_id`/`screen_name` fields (added as a bridge, since the shared
+  `setup-plan.sh`/`check-prerequisites.sh`/`setup-tasks.sh` scripts remain
+  deliberately unmodified per ADR-0013's documented scope-out). See
+  ADR-0016 in `doc/common/adr/`.
 - Version change: 2.11.0 → 2.11.1 (PATCH — no Core Principle text changed;
   `specs/<feature>/tasks.md` and `specs/<feature>/screens/*/checklists/`
   (the process/tracking artifacts ADR-0013 had left in `specs/`) move to
@@ -332,9 +356,10 @@ specification are different things.
   `doc/API仕様書/BFF/openapi.yaml`, cited by reference. A row states only
   how success/failure branch from the screen's own point of view.
 
-`.specify/templates/overrides/spec-template.md` holds this structure so
-`/speckit-specify` produces both files by default; edit that file, not
-this constitution, to adjust the template itself.
+`.specify/templates/overrides/usecase-template.md` and
+`.specify/templates/overrides/screen-definition-template.md` hold this
+structure so `/speckit-specify` produces both files by default; edit
+those files, not this constitution, to adjust the templates themselves.
 
 A ユースケース記述/画面定義書 MUST state only what its own screen does. It
 MUST NOT reference how or when it was authored (e.g. "written
@@ -571,4 +596,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.11.1 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31
+**Version**: 2.11.2 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31

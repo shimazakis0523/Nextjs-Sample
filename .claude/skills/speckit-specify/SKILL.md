@@ -69,7 +69,7 @@ The text the user typed after `/speckit-specify` in the triggering message **is*
      agreed on earlier in this same conversation.
    - **If no agreed mockup exists**: do **NOT** proceed to step 1. Stop, explain that this
      project starts screen-bearing features from a mockup (visual design + outward functionality
-     agreed on before spec.md is written, to avoid the ambiguity of describing a screen in prose
+     agreed on before the ユースケース記述/画面定義書 are written, to avoid the ambiguity of describing a screen in prose
      alone), and invoke the `design` skill to produce one from the feature description. Wait for
      the user to confirm the mockup is agreed before continuing — do not assume agreement just
      because a draft was produced.
@@ -94,40 +94,60 @@ The text the user typed after `/speckit-specify` in the triggering message **is*
 
    If the user explicitly provided `GIT_BRANCH_NAME`, pass it through to the hook so the branch script uses the exact value as the branch name (bypassing all prefix/suffix generation).
 
-3. **Create the spec feature directory**:
+3. **Resolve the business directory and this screen's two files** (project convention —
+   this project's design documents live under `doc/フロントエンド設計書/<業務>/`, not
+   `specs/`; see `doc/common/adr/0013-japanese-doc-tree-restructure.md` and
+   `doc/common/adr/0014-tracking-dir-for-tasks-and-checklists.md`):
 
-   Specs live under the default `specs/` directory unless the user explicitly provides `SPECIFY_FEATURE_DIRECTORY`.
+   **a. Determine new business vs. existing business**: Glob `doc/フロントエンド設計書/*/`
+   to list existing businesses. If the feature description clearly names or continues an
+   existing business (or one was already established earlier in this conversation), reuse
+   it. Otherwise ask the user: "これは新しい業務ですか、それとも既存の業務(一覧: ...)に
+   画面を追加しますか？" — do not guess silently when it's ambiguous, since picking the
+   wrong business directory scatters a screen's docs from its siblings.
 
-   **Resolution order for `SPECIFY_FEATURE_DIRECTORY`**:
-   1. If the user explicitly provided `SPECIFY_FEATURE_DIRECTORY` (e.g., via environment variable, argument, or configuration), use it as-is
-   2. Otherwise, auto-generate it under `specs/`:
-      - Check `.specify/init-options.json` for `feature_numbering` (preferred) or `branch_numbering` (deprecated, migration only — will be removed in a future release)
-      - If `"timestamp"`: prefix is `YYYYMMDD-HHMMSS` (current timestamp)
-      - If `"sequential"` or absent: prefix is `NNN` (next available 3-digit number after scanning existing directories in `specs/`)
-      - Construct the directory name: `<prefix>-<short-name>` (e.g., `003-user-auth` or `20260319-143022-user-auth`)
-      - Set `SPECIFY_FEATURE_DIRECTORY` to `specs/<directory-name>`
-      - If `branch_numbering` was used (and `feature_numbering` was absent), emit a one-line warning: "⚠️ `branch_numbering` in init-options.json is deprecated. Rename to `feature_numbering`."
+   **b. Resolve BUSINESS_DIR**:
+   - **New business**: `N` = next available integer after scanning existing
+     `doc/フロントエンド設計書/業務<N>_*/` directories. `BUSINESS_DIR` =
+     `doc/フロントエンド設計書/業務<N>_<short-name>` (short-name from step 1, unless the
+     user's description gives a clearer business-level name — a business name should
+     describe the business, not necessarily this first screen).
+   - **Existing business**: `BUSINESS_DIR` = the matched existing directory, as-is.
 
-   **Create the directory and spec file**:
-   - `mkdir -p SPECIFY_FEATURE_DIRECTORY`
-   - Resolve the active `spec-template` through the Spec Kit preset/template resolution stack (equivalent to `specify preset resolve spec-template`)
-   - Copy the resolved `spec-template` file to `SPECIFY_FEATURE_DIRECTORY/spec.md` as the starting point
-   - Set `SPEC_FILE` to `SPECIFY_FEATURE_DIRECTORY/spec.md`
-   - Persist the resolved path to `.specify/feature.json`:
+   **c. Resolve this screen's identity**: `SCREEN_NAME` = the business action this screen
+   performs (e.g. "Todo一覧", "Todo新規登録" — never a generic "画面" suffix, per
+   constitution.md Principle VI). `SCREEN_ID` = a kebab-case slug of it (e.g. `todo-list`).
+
+   **d. Create files and directories**:
+   - `mkdir -p BUSINESS_DIR` and `mkdir -p tracking/<業務>/screens/<SCREEN_ID>/checklists`
+     (create `tracking/<業務>/` alongside `BUSINESS_DIR` the first time a business is
+     created; both share the same `<業務>` directory name).
+   - Resolve `usecase-template` and `screen-definition-template` through the Spec Kit
+     preset/template resolution stack (equivalent to `specify preset resolve
+     usecase-template` / `screen-definition-template`).
+   - Copy `usecase-template` to `BUSINESS_DIR/ユースケース記述_<SCREEN_NAME>.md` as
+     `USECASE_FILE`, and `screen-definition-template` to
+     `BUSINESS_DIR/画面定義書_<SCREEN_NAME>.md` as `SCREEN_DEF_FILE`. No numeric prefix on
+     either filename (ADR-0015) — the screen name alone disambiguates within the business.
+   - Persist to `.specify/feature.json`:
      ```json
      {
-       "feature_directory": "<resolved feature dir>"
+       "business_directory": "<resolved BUSINESS_DIR>",
+       "tracking_directory": "tracking/<業務>",
+       "screen_id": "<SCREEN_ID>",
+       "screen_name": "<SCREEN_NAME>"
      }
      ```
-     Write the actual resolved directory path value (for example, `specs/003-user-auth`), not the literal string `SPECIFY_FEATURE_DIRECTORY`.
-     This allows downstream commands (`/speckit-plan`, `/speckit-tasks`, etc.) to locate the feature directory without relying on git branch name conventions.
+     This lets downstream commands (`/speckit-plan`, `/speckit-tasks`, etc.) locate the
+     business directory directly instead of re-deriving it.
 
    **IMPORTANT**:
-   - You must only create one feature per `/speckit-specify` invocation
-   - The spec directory name and the git branch name are independent — they may be the same but that is the user's choice
-   - The spec directory and file are always created by this command, never by the hook
+   - You must only create one screen (one pair of files) per `/speckit-specify` invocation.
+   - The business directory name and the git branch name are independent.
+   - The files and directories are always created by this command, never by the hook.
 
-4. Load the resolved active `spec-template` file to understand required sections.
+4. Load the resolved `usecase-template` and `screen-definition-template` files to
+   understand required sections.
 
 5. **IF EXISTS**: Load `.specify/memory/constitution.md` for project principles and governance constraints.
 
@@ -135,73 +155,78 @@ The text the user typed after `/speckit-specify` in the triggering message **is*
     1. Parse user description from arguments
        If empty: ERROR "No feature description provided"
     2. Extract key concepts from description
-       Identify: actors, actions, data, constraints
+       Identify: actors, actions, screen elements, constraints
     3. For unclear aspects:
        - Make informed guesses based on context and industry standards
        - Only mark with [NEEDS CLARIFICATION: specific question] if:
-         - The choice significantly impacts feature scope or user experience
+         - The choice significantly impacts screen scope or user experience
          - Multiple reasonable interpretations exist with different implications
          - No reasonable default exists
        - **LIMIT: Maximum 3 [NEEDS CLARIFICATION] markers total**
        - Prioritize clarifications by impact: scope > security/privacy > user experience > technical details
-    4. Fill User Scenarios & Testing section
-       If no clear user flow: ERROR "Cannot determine user scenarios"
-    5. Generate Functional Requirements
-       Each requirement must be testable
-       Use reasonable defaults for unspecified details (document assumptions in Assumptions section)
-    6. Define Success Criteria
-       Create measurable, technology-agnostic outcomes
-       Include both quantitative metrics (time, performance, volume) and qualitative measures (user satisfaction, task completion)
-       Each criterion must be verifiable without implementation details
-    7. Identify Key Entities (if data involved)
-    8. Return: SUCCESS (spec ready for planning)
+    4. Fill ユースケース記述 (one or more UC-NN entries: アクター, 事前条件, 基本フロー,
+       代替/例外フロー, 事後条件)
+       If no clear use case: ERROR "Cannot determine use cases for this screen"
+    5. Fill 画面入出力仕様 (one row per on-screen element — every input, static/conditional
+       text, badge, button, dialog) and 処理仕様 (one row per trigger, 初期表示 first)
+       Every element MUST be testable/verifiable from these two tables alone
+    6. Identify Key Entities (if data involved) — note them for the API contract
+       (`doc/API仕様書/common/schemas/**`), do NOT add a data-model section to either file
+    7. Return: SUCCESS (both files ready for planning)
 
-7. Write the specification to SPEC_FILE using the template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings. If step 0 recorded a `MOCKUP_URL`, populate the screen's `**モックアップ**` header field with it (per the resolved `spec-template`'s guidance on that field); omit the field entirely if this feature has no screens.
+7. Write **both** files:
+   - `USECASE_FILE` using the `usecase-template` structure, filled with this screen's
+     ユースケース記述 content.
+   - `SCREEN_DEF_FILE` using the `screen-definition-template` structure, filled with this
+     screen's 画面入出力仕様 and 処理仕様 content.
+   Replace placeholders with concrete details derived from the feature description while
+   preserving section order and headings in each file. If step 0 recorded a `MOCKUP_URL`,
+   populate `USECASE_FILE`'s `**モックアップ**` header field with it (per
+   `usecase-template`'s guidance on that field); omit the field entirely if this feature
+   has no screens. Each file's `**関連**` header field MUST link to the other.
 
-8. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
+8. **Specification Quality Validation**: After writing both files, validate them against quality criteria:
 
-   a. **Create Spec Quality Checklist**: Generate a checklist file at `SPECIFY_FEATURE_DIRECTORY/checklists/requirements.md` using the checklist template structure with these validation items:
+   a. **Create Spec Quality Checklist**: Generate a checklist file at
+      `tracking/<業務>/screens/<SCREEN_ID>/checklists/requirements.md` using the checklist
+      template structure with these validation items:
 
       ```markdown
-      # Specification Quality Checklist: [FEATURE NAME]
+      # 仕様品質チェックリスト: [SCREEN_NAME]
 
-      **Purpose**: Validate specification completeness and quality before proceeding to planning
-      **Created**: [DATE]
-      **Feature**: [Link to spec.md]
+      **目的**: 設計(`/speckit-plan`)に進む前に、仕様の完全性と品質を検証する
+      **作成日**: [DATE]
+      **対象**: [ユースケース記述(SCREEN_NAME)](../../../../doc/フロントエンド設計書/<業務>/ユースケース記述_<SCREEN_NAME>.md)・[画面定義書(SCREEN_NAME)](../../../../doc/フロントエンド設計書/<業務>/画面定義書_<SCREEN_NAME>.md)
 
-      ## Content Quality
+      ## 内容の品質
 
-      - [ ] No implementation details (languages, frameworks, APIs)
-      - [ ] Focused on user value and business needs
-      - [ ] Written for non-technical stakeholders
-      - [ ] All mandatory sections completed
+      - [ ] 実装詳細(言語・フレームワーク・API仕様等)が含まれていない
+      - [ ] タイトルが業務行為の名前になっている(「〜画面」という画面名になっていない)
+      - [ ] ユーザーストーリー形式(優先度・独立テスト可否等)を使っていない
 
-      ## Requirement Completeness
+      ## ユースケース記述の品質
 
-      - [ ] No [NEEDS CLARIFICATION] markers remain
-      - [ ] Requirements are testable and unambiguous
-      - [ ] Success criteria are measurable
-      - [ ] Success criteria are technology-agnostic (no implementation details)
-      - [ ] All acceptance scenarios are defined
-      - [ ] Edge cases are identified
-      - [ ] Scope is clearly bounded
-      - [ ] Dependencies and assumptions identified
+      - [ ] [要確認]マーカーが残っていない
+      - [ ] 各ユースケースに基本フロー・代替/例外フローが定義されている
+      - [ ] スコープの境界が明確である
 
-      ## Feature Readiness
+      ## 画面定義の品質
 
-      - [ ] All functional requirements have clear acceptance criteria
-      - [ ] User scenarios cover primary flows
-      - [ ] Feature meets measurable outcomes defined in Success Criteria
-      - [ ] No implementation details leak into specification
+      - [ ] 画面入出力仕様に、画面上の全要素(入力・出力・ボタン)が列挙されている
+      - [ ] 入出力区分と種別が別の列になっている
+      - [ ] 項目単位の見た目・制約が、各項目の行の中に記載されている
+      - [ ] 処理仕様の1行目が初期表示になっている
+      - [ ] 処理仕様がフロントエンドの範囲に閉じている(API/DBの内部仕様に踏み込んでいない)
 
-      ## Notes
+      ## 備考
 
-      - Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`
+      - 未完了の項目がある場合は、`/speckit-clarify`または`/speckit-plan`に進む前に
+        ユースケース記述・画面定義書を修正すること
       ```
 
-   b. **Run Validation Check**: Review the spec against each checklist item:
+   b. **Run Validation Check**: Review both files against each checklist item:
       - For each item, determine if it passes or fails
-      - Document specific issues found (quote relevant spec sections)
+      - Document specific issues found (quote relevant sections)
 
    c. **Handle Validation Results**:
 
@@ -209,19 +234,19 @@ The text the user typed after `/speckit-specify` in the triggering message **is*
 
       - **If items fail (excluding [NEEDS CLARIFICATION])**:
         1. List the failing items and specific issues
-        2. Update the spec to address each issue
+        2. Update the relevant file(s) to address each issue
         3. Re-run validation until all items pass (max 3 iterations)
         4. If still failing after 3 iterations, document remaining issues in checklist notes and warn user
 
       - **If [NEEDS CLARIFICATION] markers remain**:
-        1. Extract all [NEEDS CLARIFICATION: ...] markers from the spec
+        1. Extract all [NEEDS CLARIFICATION: ...] markers from either file
         2. **LIMIT CHECK**: If more than 3 markers exist, keep only the 3 most critical (by scope/security/UX impact) and make informed guesses for the rest
         3. For each clarification needed (max 3), present options to user in this format:
 
            ```markdown
            ## Question [N]: [Topic]
 
-           **Context**: [Quote relevant spec section]
+           **Context**: [Quote relevant section]
 
            **What we need to know**: [Specific question from NEEDS CLARIFICATION marker]
 
@@ -229,9 +254,9 @@ The text the user typed after `/speckit-specify` in the triggering message **is*
 
            | Option | Answer | Implications |
            |--------|--------|--------------|
-           | A      | [First suggested answer] | [What this means for the feature] |
-           | B      | [Second suggested answer] | [What this means for the feature] |
-           | C      | [Third suggested answer] | [What this means for the feature] |
+           | A      | [First suggested answer] | [What this means for the screen] |
+           | B      | [Second suggested answer] | [What this means for the screen] |
+           | C      | [Third suggested answer] | [What this means for the screen] |
            | Custom | Provide your own answer | [Explain how to provide custom input] |
 
            **Your choice**: _[Wait for user response]_
@@ -245,7 +270,7 @@ The text the user typed after `/speckit-specify` in the triggering message **is*
         5. Number questions sequentially (Q1, Q2, Q3 - max 3 total)
         6. Present all questions together before waiting for responses
         7. Wait for user to respond with their choices for all questions (e.g., "Q1: A, Q2: Custom - [details], Q3: B")
-        8. Update the spec by replacing each [NEEDS CLARIFICATION] marker with the user's selected or provided answer
+        8. Update the relevant file by replacing each [NEEDS CLARIFICATION] marker with the user's selected or provided answer
         9. Re-run validation after all clarifications are resolved
 
    d. **Update Checklist**: After each validation iteration, update the checklist file with current pass/fail status
@@ -288,12 +313,12 @@ Check if `.specify/extensions.yml` exists in the project root.
 ## Completion Report
 
 Report completion to the user with:
-- `SPECIFY_FEATURE_DIRECTORY` — the feature directory path
-- `SPEC_FILE` — the spec file path
+- `BUSINESS_DIR` — the business directory path
+- `USECASE_FILE` and `SCREEN_DEF_FILE` — the two file paths written
 - Checklist results summary
 - Readiness for the next phase (`/speckit-clarify` or `/speckit-plan`)
 
-**NOTE:** Branch creation is handled by the `before_specify` hook (git extension). Spec directory and file creation are always handled by this core command.
+**NOTE:** Branch creation is handled by the `before_specify` hook (git extension). The business directory and the two screen files are always created by this core command.
 
 ## Quick Guidelines
 
@@ -333,31 +358,8 @@ When creating this spec from a user prompt:
 - Authentication method: Standard session-based or OAuth2 for web apps
 - Integration patterns: Use project-appropriate patterns (REST/GraphQL for web services, function calls for libraries, CLI args for tools, etc.)
 
-### Success Criteria Guidelines
-
-Success criteria must be:
-
-1. **Measurable**: Include specific metrics (time, percentage, count, rate)
-2. **Technology-agnostic**: No mention of frameworks, languages, databases, or tools
-3. **User-focused**: Describe outcomes from user/business perspective, not system internals
-4. **Verifiable**: Can be tested/validated without knowing implementation details
-
-**Good examples**:
-
-- "Users can complete checkout in under 3 minutes"
-- "System supports 10,000 concurrent users"
-- "95% of searches return results in under 1 second"
-- "Task completion rate improves by 40%"
-
-**Bad examples** (implementation-focused):
-
-- "API response time is under 200ms" (too technical, use "Users see results instantly")
-- "Database can handle 1000 TPS" (implementation detail, use user-facing metric)
-- "React components render efficiently" (framework-specific)
-- "Redis cache hit rate above 80%" (technology-specific)
-
 ## Done When
 
-- [ ] Specification written to `SPEC_FILE` and validated against quality checklist
+- [ ] Both `USECASE_FILE` and `SCREEN_DEF_FILE` written and validated against quality checklist
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
-- [ ] Completion reported to user with feature directory, spec file path, and checklist results
+- [ ] Completion reported to user with business directory, both file paths, and checklist results
