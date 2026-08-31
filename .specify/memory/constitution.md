@@ -1,5 +1,24 @@
 <!--
 Sync Impact Report
+- Version change: 2.11.2 → 2.12.0 (MINOR — new MUST requirement: every
+  `props`/`callback` edge label in 詳細設計書's 登場するコンポーネントと
+  関係 diagram must state the field-level type signature, not just the
+  name)
+- Modified sections: Development Workflow (Spec-Driven) — the
+  登場するコンポーネントと関係 bullet now requires edge labels to carry
+  type signatures (e.g. `"props: todos: Todo[]"`), reusing a shared
+  `doc/API仕様書/common/schemas/**` entity name where one exists instead
+  of re-listing its fields.
+- Rationale: the user inspected `詳細設計書_業務1_Todoダッシュボード` and
+  found its diagram labelled edges by name only (`"props: initialTodos"`,
+  `"props: todos, onDeleted, onAddClick"`, `"props: onSaved, onCancel"`)
+  with no type information anywhere in the document — the actual `Todo`
+  shape (id/title/dueDate/assignee/status) and callback signatures
+  (`(id: string) => void`, `(todo: Todo) => void`) were only discoverable
+  by reading `TodoList.tsx`/`TodoDashboard.tsx` directly. This defeats the
+  point of designing before implementing: an implementer had to guess or
+  reverse-engineer the contract from code that may not exist yet for a new
+  feature. See ADR-0017 in `doc/common/adr/`.
 - Version change: 2.11.1 → 2.11.2 (PATCH — no Core Principle text changed;
   the Principle VI template citation now names
   `usecase-template.md`/`screen-definition-template.md`, which is what it
@@ -527,8 +546,19 @@ binding constraints, not an inventory.
   Component's fetch call to this business's own Route Handler — comes
   first as the whole-picture overview, with every edge labelled by what
   kind of relationship it is (e.g. `"props: ..."`, `"callback: ..."`,
-  `"fetch: METHOD /path"`) so the diagram needs no separate legend.
-  Followed by one subsection per involved file giving its role on the
+  `"fetch: METHOD /path"`) so the diagram needs no separate legend. A
+  `props`/`callback` edge label MUST also state the field-level type
+  signature, not just the name(s) — e.g. `"props: todos: Todo[]"`,
+  `"callback: onSaved(todo: Todo) => void"` — never a bare
+  `"props: todos"`. When the type is an entity already defined in
+  `doc/API仕様書/common/schemas/**` (e.g. `Todo`), name that type directly
+  instead of re-enumerating its fields; only spell out a field list inline
+  when the shape has no such shared definition (e.g. a local, UI-only
+  type). Omitting the type leaves the implementer to infer the shape from
+  existing code instead of the design document — the same "read the code
+  to find out" gap Component Test Coverage (Principle VII) closed for
+  tests, now closed here for props/callback contracts. Followed by one
+  subsection per involved file giving its role on the
   first line — never a bare file name with no explanation — plus
   whatever detail the diagram itself can't show. Required when any two of
   this business's files have such a relationship; omitted only when every
@@ -596,4 +626,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.11.2 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31
+**Version**: 2.12.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31

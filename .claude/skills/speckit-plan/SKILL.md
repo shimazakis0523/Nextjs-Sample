@@ -95,7 +95,15 @@ You **MUST** consider the user input before proceeding (if not empty).
      (whole-picture overview first): label every edge with what kind of
      relationship it is, not just the value/endpoint — `"props: ..."`,
      `"callback: ..."`, `"fetch: METHOD /path"` — so the diagram is
-     self-explanatory without a separate legend. Follow with one `###`
+     self-explanatory without a separate legend. A `props`/`callback` edge
+     label MUST also carry the field-level type signature, not just the
+     name — `"props: todos: Todo[]"`, `"callback: onSaved(todo: Todo) =>
+     void"`, never a bare `"props: todos"`. Reuse an entity name already
+     defined in `doc/API仕様書/common/schemas/**` (e.g. `Todo`) instead of
+     re-listing its fields; only spell out fields inline for a type with no
+     shared schema definition (a local, UI-only shape). Omitting the type
+     leaves the implementer to infer the shape from existing code (or
+     guess), which is exactly the gap this rule closes. Follow with one `###`
      subsection per involved file giving its role on the first line (never a
      bare file name with no explanation) followed by whatever detail the
      diagram can't show (props/state it holds, which API calls it makes, what
