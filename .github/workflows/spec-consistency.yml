@@ -35,6 +35,17 @@ jobs:
           fetch-depth: 0
       - run: .github/scripts/check-component-tests.sh "origin/${{ github.base_ref }}"
 
+  unit-test-coverage:
+    name: unit test coverage meets the jest.config.ts threshold
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run test:coverage
+
   governance-issue-reference:
     name: governance file changes reference a GitHub Issue
     runs-on: ubuntu-latest

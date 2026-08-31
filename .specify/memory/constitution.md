@@ -1,5 +1,29 @@
 <!--
 Sync Impact Report
+- Version change: 2.13.0 → 2.14.0 (MINOR — new Core Principle IX, Coverage
+  Threshold Gate: `jest.config.ts` MUST carry a `coverageThreshold` that
+  actually fails the build on a real regression, mechanically enforced by
+  a new `unit-test-coverage` CI job)
+- Modified sections:
+  - New Core Principle IX (Coverage Threshold Gate) added after Principle
+    VIII.
+- Rationale: the user asked for an evaluation of whether test-case
+  implementation was adequate, based on a coverage-report screenshot
+  showing `src/app/api/todos` and `src/lib` (backend.ts/backend-client.ts)
+  at or near 0%. Investigation confirmed this was a real gap, not
+  acceptable boilerplate: `src/app/api/todos/route.ts`'s POST validation is
+  documented in 詳細設計書.md as the authoritative check (the client-side
+  one is UX-only, not a substitute), and `backend.ts`/`backend-client.ts`
+  are the mock/real backend swap point (Principle II) — both shipped with
+  zero unit tests. Principle VII (component existence of a test file)
+  cannot catch this class of gap: it doesn't apply to non-component files
+  at all, and doesn't check what a test actually exercises. Fixed by
+  writing the missing tests (route handlers, backend.ts's two branches,
+  backend-client.ts's error handling, and the new test-dashboard page's
+  fallback branch — raising overall coverage from ~46%/37% statements/
+  branches to ~90%/92%) and adding a mechanically-enforced coverage floor
+  so a future regression of this kind fails CI instead of waiting for a
+  human to notice. See ADR-0019 in `doc/common/adr/`.
 - Version change: 2.12.0 → 2.13.0 (MINOR — new MUST requirement: every
   E2E仕様書 test case derived by `update-e2e-test-spec` must be traceable
   to one of five named black-box test design techniques, and 境界値分析
@@ -512,6 +536,32 @@ itself (Principle VII, ADR-0011) were implemented directly from
 conversational requests, without ever creating a GitHub Issue. See
 ADR-0012 in `doc/common/adr/`.
 
+### IX. Coverage Threshold Gate
+
+Principle VII guarantees every component *has* a test; it says nothing
+about whether that test — or any other file's test — actually exercises
+its logic. `jest.config.ts`'s `coverageThreshold` (global statements/
+branches/functions/lines floors) MUST stay set to a value that fails the
+build on a real regression, not one so low it never fires; the
+`unit-test-coverage` job in the "Spec consistency" GitHub Actions workflow
+runs `npm run test:coverage` on every PR against `main` and fails when
+Jest's own threshold check fails. Lowering the threshold to make a
+low-coverage change pass MUST NOT be done without also documenting why in
+the PR (a change that legitimately can't be unit-tested, e.g. requires a
+live external service) — silently loosening the gate defeats its purpose.
+Rationale: `src/app/api/todos/route.ts`'s POST handler — the BFF's own
+authoritative validation logic, explicitly documented in
+`詳細設計書.md` as not substitutable by the client-side check — and
+`src/lib/backend.ts`/`backend-client.ts` (the mock/real backend swap point,
+Principle II) shipped with zero unit tests and sat undetected until a
+human inspected the coverage report by eye. Principle VII's existence
+check does not catch this class of gap: a component can have a
+`<Component>.test.tsx` that exists and still leave most of its branches
+unexercised, and a non-component file (a Route Handler, a `src/lib/**`
+module) has no colocated-test requirement at all. A coverage-percentage
+floor, mechanically enforced, catches both. See ADR-0019 in
+`doc/common/adr/`.
+
 ## Technology & Deployment Constraints
 
 See `doc/common/AP方式設計書(フロントエンド編).md` and
@@ -666,4 +716,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.13.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31
+**Version**: 2.14.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31

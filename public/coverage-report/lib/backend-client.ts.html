@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -85,49 +85,49 @@
 <a name='L20'></a><a href='#L20'>20</a>
 <a name='L21'></a><a href='#L21'>21</a>
 <a name='L22'></a><a href='#L22'>22</a>
-<a name='L23'></a><a href='#L23'>23</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L23'></a><a href='#L23'>23</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const BACKEND_API_URL = <span class="cstat-no" title="statement not covered" >process.env.BACKEND_API_URL;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const BACKEND_API_URL = process.env.BACKEND_API_URL;
 &nbsp;
 // Route Handler / Server Componentから上流バックエンドを呼び出すための薄いラッパー。
 // サーバー側コード(APIルート・Server Component・Server Action)からのみimportすること —
 // BACKEND_API_URLはブラウザには公開されない。
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >backendFetch(p</span></span>ath: string, init?: RequestInit) {
-<span class="cstat-no" title="statement not covered" >  if (!BACKEND_API_URL) {</span>
-<span class="cstat-no" title="statement not covered" >    throw new Error("BACKEND_API_URL is not set");</span>
+export async function backendFetch(path: string, init?: RequestInit) {
+  if (!BACKEND_API_URL) {
+    throw new Error("BACKEND_API_URL is not set");
   }
 &nbsp;
-  const response = <span class="cstat-no" title="statement not covered" >await fetch(`${BACKEND_API_URL}${path}`, init);</span>
+  const response = await fetch(`${BACKEND_API_URL}${path}`, init);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!response.ok) {</span>
-<span class="cstat-no" title="statement not covered" >    throw new Error(`Backend request failed: ${response.status} ${response.statusText}`);</span>
+  if (!response.ok) {
+    throw new Error(`Backend request failed: ${response.status} ${response.statusText}`);
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (response.status === 204) {</span>
-<span class="cstat-no" title="statement not covered" >    return undefined;</span>
+  if (response.status === 204) {
+    return undefined;
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return response.json();</span>
+  return response.json();
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -136,7 +136,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-08-31T11:55:59.120Z
+                at 2026-08-31T12:11:03.632Z
             </div>
         <script src="../prettify.js"></script>
         <script>

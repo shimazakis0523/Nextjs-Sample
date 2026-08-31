@@ -1,6 +1,15 @@
 {
   "業務1_Todoダッシュボード": {
-    "unitPathPrefixes": ["src/app/dashboard/", "src/lib/mock-todos"],
+    "unitPathPrefixes": ["src/app/dashboard/", "src/lib/mock-todos", "src/app/api/todos/"],
     "e2eFiles": ["todo-list.spec.ts", "todo-new.spec.ts"]
+  },
+  "共通基盤・開発ツール(業務非依存)": {
+    "unitPathPrefixes": [
+      "src/lib/backend.test.ts",
+      "src/lib/backend-client.test.ts",
+      "src/app/api/health/",
+      "src/app/test-dashboard/"
+    ],
+    "e2eFiles": []
   }
 }
