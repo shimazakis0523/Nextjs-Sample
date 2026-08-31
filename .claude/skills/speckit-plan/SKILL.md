@@ -57,15 +57,28 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. **Setup**: Run `.specify/scripts/bash/setup-plan.sh --json` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+1. **Setup**: Run `.specify/scripts/bash/setup-plan.sh --json` from repo root and parse
+   JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. **Path note (ADR-0013)**: this
+   script still resolves paths under the legacy `specs/<feature>/` layout — treat its
+   output only as a way to identify which business/feature this run is for (the
+   `<feature-dir-name>` segment), not as the literal output location. This project's
+   design documents live under `doc/フロントエンド設計書/<業務>/`, not `specs/`; map
+   `<feature-dir-name>` (e.g. `001-todo-dashboard`) to its `<業務>` directory (e.g.
+   `業務1_Todoダッシュボード`) by matching existing directories under
+   `doc/フロントエンド設計書/`, asking the user if no clear match exists. Set
+   `詳細設計書_PATH` to `doc/フロントエンド設計書/<業務>/詳細設計書.md` — this is what
+   step 3 actually reads/writes, not `IMPL_PLAN`. For single quotes in args like
+   "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible:
+   "I'm Groot").
 
-2. **Load context**: Read FEATURE_SPEC (and every `SPECS_DIR/screens/*/spec.md` when
-   the feature has screens) and `.specify/memory/constitution.md`. Load IMPL_PLAN
-   template (already copied). One `plan.md` covers the whole feature — see
-   `docs/adr/0007-revert-to-feature-level-plan-md.md` for why this project always
-   plans at feature level, never per screen.
+2. **Load context**: Read every `doc/フロントエンド設計書/<業務>/ユースケース記述*.md`
+   and `画面定義書*.md` for this business, plus `.specify/memory/constitution.md`. Load
+   the IMPL_PLAN template (already copied) as the section structure to fill into
+   `詳細設計書_PATH`. One 詳細設計書 covers the whole business — see
+   `doc/common/adr/0007-revert-to-feature-level-plan-md.md` for why this project always
+   plans at business/feature level, never per screen.
 
-3. **Execute plan workflow**: `plan.md` holds exactly two sections (ADR-0008) — do
+3. **Execute plan workflow**: 詳細設計書 holds exactly two sections (ADR-0008) — do
    not add Summary, Technical Context, Constitution Check, or Complexity Tracking:
    - Fill "登場するコンポーネントと関係". Scope is not limited to React
      components: it includes this feature's own BFF Route Handlers
@@ -90,24 +103,25 @@ You **MUST** consider the user input before proceeding (if not empty).
      feature's own new files (e.g. `getTodos()` from `src/lib/backend.ts`),
      name the file it comes from — otherwise it reads as an unexplained
      component of its own — and state whether that function itself is new or
-     pre-existing (see the Project Structure note below on
-     docs/architecture.md's "pattern vs. instance" distinction: a new entity's
-     swap-point functions and mock file are this feature's own additions, not
-     shared infra, even though they live in the shared `backend.ts` file).
-     Omit this section entirely when every one of this feature's files is
-     fully self-contained (no shared parent, state, or feature-internal
-     HTTP call).
+     pre-existing (see the Project Structure note below on the AP方式設計書's
+     "pattern vs. instance" distinction: a new entity's swap-point functions
+     and mock file are this feature's own additions, not shared infra, even
+     though they live in the shared `backend.ts` file). Omit this section
+     entirely when every one of this feature's files is fully self-contained
+     (no shared parent, state, or feature-internal HTTP call).
    - Fill Project Structure's Source Code section with only the paths this
      feature adds or changes — not paths already documented in
-     `docs/architecture.md`'s repository layout as shared. docs/architecture.md
-     documents *patterns* (backend.ts hosting every entity's swap-point
-     functions in one file; the `mock-<entity>.ts` naming convention), not
-     specific instances of them: if this feature introduces a new entity, list
-     the specific functions it adds to `backend.ts` (as a change to that
-     existing file) and its specific `mock-<entity>.ts` file (as a new file) —
-     do not wave them away as "common infra" just because the file name
-     matches the pattern. Do not include a "Documentation (this feature)"
-     file-tree section (identical boilerplate across every plan.md)
+     `doc/common/AP方式設計書(フロントエンド編).md` /
+     `doc/common/AP方式設計書(バックエンド編).md`'s repository layout as
+     shared. The AP方式設計書 documents *patterns* (backend.ts hosting every
+     entity's swap-point functions in one file; the `mock-<entity>.ts` naming
+     convention), not specific instances of them: if this feature introduces
+     a new entity, list the specific functions it adds to `backend.ts` (as a
+     change to that existing file) and its specific `mock-<entity>.ts` file
+     (as a new file) — do not wave them away as "common infra" just because
+     the file name matches the pattern. Do not include a "Documentation
+     (this feature)" file-tree section (identical boilerplate across every
+     詳細設計書)
    - For every `src/app/**` component this feature adds or changes (any
      `.tsx` file whose name is not one of Next.js App Router's own special
      filenames — `page`, `layout`, `template`, `loading`, `error`,
@@ -117,8 +131,8 @@ You **MUST** consider the user input before proceeding (if not empty).
      discussion. This is not optional detail: constitution.md Core Principle
      VII requires the test to exist, and `check-component-tests.sh` (the
      `component-test-coverage` CI job) fails the PR if a listed component
-     ships without one. A plan.md that lists the component but not its test
-     is an incomplete plan.
+     ships without one. A 詳細設計書 that lists the component but not its
+     test is incomplete.
 
 ## Mandatory Post-Execution Hooks
 
@@ -158,25 +172,28 @@ Check if `.specify/extensions.yml` exists in the project root.
 ## Completion Report
 
 Command ends once 登場するコンポーネントと関係 (or its intentional omission) and
-Project Structure are filled in. Report branch and IMPL_PLAN path.
+Project Structure are filled in. Report branch and 詳細設計書_PATH.
 
 ## Key rules
 
 - Use absolute paths for filesystem operations; use project-relative paths for references in documentation
 - This project's constitution forbids `research.md`, `data-model.md`,
-  `quickstart.md`, and `contracts/` in feature directories (Principle III,
-  Principle VI) — do not generate them under any phase. App-wide technical
-  facts live in `docs/architecture.md` (reference it, don't restate it);
-  this feature's data model is `openapi/common/schemas/**`; this feature's
-  endpoint contracts are `openapi/bff/openapi.yaml` and
-  `openapi/backend/openapi.yaml`.
-- One `plan.md` per feature, always — never split it per screen, even when the
-  feature has multiple screens (ADR-0007; this reverses an earlier per-screen
-  attempt documented in ADR-0006).
-- `plan.md` MUST NOT contain a Summary, Technical Context, Constitution Check,
-  or Complexity Tracking section — only 登場するコンポーネントと関係 and Project
-  Structure (ADR-0008). Do not regenerate these dropped sections even if an
-  older plan.md on disk still has them; replace them, don't append alongside them.
+  `quickstart.md`, and `contracts/` in business/feature directories under
+  `doc/フロントエンド設計書/` (Principle III, Principle VI) — do not
+  generate them under any phase. App-wide technical facts live in
+  `doc/common/AP方式設計書(フロントエンド編).md` /
+  `doc/common/AP方式設計書(バックエンド編).md` (reference them, don't
+  restate them); this feature's data model is
+  `doc/API仕様書/common/schemas/**`; this feature's endpoint contracts are
+  `doc/API仕様書/BFF/openapi.yaml` and `doc/API仕様書/Backend/openapi.yaml`.
+- One 詳細設計書 per business/feature, always — never split it per screen,
+  even when the feature has multiple screens (ADR-0007; this reverses an
+  earlier per-screen attempt documented in ADR-0006).
+- 詳細設計書 MUST NOT contain a Summary, Technical Context, Constitution
+  Check, or Complexity Tracking section — only 登場するコンポーネントと関係
+  and Project Structure (ADR-0008). Do not regenerate these dropped
+  sections even if an older 詳細設計書 on disk still has them; replace
+  them, don't append alongside them.
 - Every planned `src/app/**` component (excluding Next.js special filenames)
   MUST appear in Project Structure together with its `<Component>.test.tsx`
   sibling (constitution.md Core Principle VII, ADR-0011). Do not list a
@@ -184,7 +201,7 @@ Project Structure are filled in. Report branch and IMPL_PLAN path.
 
 ## Done When
 
-- [ ] plan.md holds only 登場するコンポーネントと関係 (or is intentionally omitted) and Project Structure
+- [ ] 詳細設計書 holds only 登場するコンポーネントと関係 (or is intentionally omitted) and Project Structure
 - [ ] Every `src/app/**` component in Project Structure (excluding Next.js special filenames) has its sibling `<Component>.test.tsx` listed alongside it
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
-- [ ] Completion reported to user with branch and plan path
+- [ ] Completion reported to user with branch and 詳細設計書 path

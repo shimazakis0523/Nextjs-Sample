@@ -10,9 +10,9 @@
     "test": "jest",
     "test:e2e": "playwright test",
     "openapi:lint": "redocly lint",
-    "openapi:bundle:backend": "redocly bundle openapi/backend/openapi.yaml -o openapi/dist/backend.yaml",
+    "openapi:bundle:backend": "redocly bundle doc/API仕様書/Backend/openapi.yaml -o doc/API仕様書/dist/backend.yaml",
     "openapi:types": "openapi-typescript",
-    "openapi:mock:backend": "npm run openapi:bundle:backend && prism mock openapi/dist/backend.yaml"
+    "openapi:mock:backend": "npm run openapi:bundle:backend && prism mock doc/API仕様書/dist/backend.yaml"
   },
   "dependencies": {
     "next": "16.3.3",

@@ -15,7 +15,7 @@ jobs:
       - run: .github/scripts/check-spec-sync.sh "origin/${{ github.base_ref }}"
 
   openapi-routes:
-    name: openapi/bff/openapi.yaml vs src/app/api/** routes
+    name: doc/API仕様書/BFF/openapi.yaml vs src/app/api/** routes
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

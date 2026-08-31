@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// openapi/bff/openapi.yaml と src/app/api/** の Route Handler を突き合わせ、
+// doc/API仕様書/BFF/openapi.yaml と src/app/api/** の Route Handler を突き合わせ、
 // パス・HTTPメソッドの過不足を検出する。Principle III (Contract-First APIs) の
-// 「エンドポイントのパス・メソッドの変更は同じ変更でopenapi/**/*.yamlを更新する」
+// 「エンドポイントのパス・メソッドの変更は同じ変更でdoc/API仕様書/**/*.yamlを更新する」
 // を機械的に検査するCIチェック。
 //
 // スコープ: パス・メソッドの存在一致のみ。リクエスト/レスポンスのフィールド単位の
@@ -12,7 +12,7 @@ import { load } from "js-yaml";
 import path from "node:path";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
-const OPENAPI_PATH = path.join(ROOT, "openapi/bff/openapi.yaml");
+const OPENAPI_PATH = path.join(ROOT, "doc", "API仕様書", "BFF", "openapi.yaml");
 const API_ROOT = path.join(ROOT, "src/app/api");
 const HTTP_METHODS = ["get", "post", "put", "patch", "delete", "head", "options"];
 
@@ -87,7 +87,7 @@ function main() {
   for (const [routePath, methods] of implOps) {
     if (skip.has(routePath)) continue;
     if (!specOps.has(routePath)) {
-      errors.push(`src/app/api/${routePath}/route.ts が実装されているが、openapi/bff/openapi.yaml に ${routePath} の定義が無い`);
+      errors.push(`src/app/api/${routePath}/route.ts が実装されているが、doc/API仕様書/BFF/openapi.yaml に ${routePath} の定義が無い`);
       continue;
     }
     const specMethods = specOps.get(routePath);
@@ -99,13 +99,13 @@ function main() {
   }
 
   if (errors.length > 0) {
-    console.error("openapi/bff/openapi.yaml と src/app/api/** の不整合を検出しました:\n");
+    console.error("doc/API仕様書/BFF/openapi.yaml と src/app/api/** の不整合を検出しました:\n");
     for (const e of errors) console.error(`  - ${e}`);
-    console.error("\nPrinciple III: エンドポイントの変更は同じ変更でopenapi/**/*.yamlを更新してください。");
+    console.error("\nPrinciple III: エンドポイントの変更は同じ変更でdoc/API仕様書/**/*.yamlを更新してください。");
     process.exit(1);
   }
 
-  console.log("openapi/bff/openapi.yaml と src/app/api/** のパス・メソッドは一致しています。");
+  console.log("doc/API仕様書/BFF/openapi.yaml と src/app/api/** のパス・メソッドは一致しています。");
 }
 
 main();

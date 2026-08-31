@@ -43,7 +43,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# openapi-generated (source of truth is the YAML under openapi/**;
+# openapi-generated (source of truth is the YAML under doc/API仕様書/**;
 # regenerate with `npm run openapi:bundle:backend` / `npm run openapi:types`)
-/openapi/dist/
+/doc/API仕様書/dist/
 /src/types/api/

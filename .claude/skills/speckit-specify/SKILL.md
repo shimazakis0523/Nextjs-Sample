@@ -60,7 +60,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 The text the user typed after `/speckit-specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `$ARGUMENTS` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 
 0. **Mockup precondition (project convention — screen-bearing features only, see
-   `docs/adr/0004-mockup-first-requirements.md`)**: if the feature description involves one or
+   `doc/common/adr/0004-mockup-first-requirements.md`)**: if the feature description involves one or
    more screens (any UI a person looks at or interacts with — a page, a modal, a dialog), this
    step is **MANDATORY** and MUST run before step 1. It does not apply to features with no UI
    surface at all (e.g. a pure backend/BFF-internal change with nothing a person looks at).

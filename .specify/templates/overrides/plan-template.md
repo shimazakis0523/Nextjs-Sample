@@ -7,7 +7,7 @@
 **Note**: This template is filled in by the `/speckit-plan` command, once per feature
 (`specs/<feature>/plan.md`), even when the feature has multiple screens. `plan.md` holds
 exactly the two sections below — no Summary, Technical Context, Constitution Check, or
-Complexity Tracking — see `docs/adr/0008-minimal-plan-md-sections.md`.
+Complexity Tracking — see `doc/common/adr/0008-minimal-plan-md-sections.md`.
 
 ## 登場するコンポーネントと関係
 
@@ -58,7 +58,7 @@ flowchart TD
 ### Source Code (この機能が追加/変更するパスのみ)
 
 <!--
-  ACTION REQUIRED: docs/architecture.md が「共通」として記載しているのはパターン
+  ACTION REQUIRED: doc/common/AP方式設計書(フロントエンド編).md / doc/common/AP方式設計書(バックエンド編).md が「共通」として記載しているのはパターン
   (backend.tsに全エンティティのswap point関数が集約される構成、mock-<entity>.tsという
   命名規則)であり、個別の中身ではない。「backend.ts」「mock-*.ts」というファイル名の
   形だけを見て省略しない — この機能が新しいエンティティを導入するなら、backend.ts内に
@@ -73,5 +73,5 @@ flowchart TD
 ```
 
 **Structure Decision**: [Document the selected structure and reference the real
-directories captured above; for shared/common paths, reference docs/architecture.md
+directories captured above; for shared/common paths, reference doc/common/AP方式設計書(フロントエンド編).md / doc/common/AP方式設計書(バックエンド編).md
 instead of restating them]

@@ -18,9 +18,9 @@ set -euo pipefail
 BASE_REF="${1:?usage: check-governance-issue-ref.sh <base_ref>}"
 PR_BODY="${PR_BODY:-}"
 
-GOVERNANCE_PATH_PATTERN='^(\.claude/skills/|\.specify/memory/constitution\.md$|docs/adr/|\.github/workflows/|\.github/scripts/)'
+GOVERNANCE_PATH_PATTERN='^(\.claude/skills/|\.specify/memory/constitution\.md$|doc/common/adr/|\.github/workflows/|\.github/scripts/)'
 
-CHANGED_FILES="$(git diff --name-only "${BASE_REF}...HEAD")"
+CHANGED_FILES="$(git -c core.quotePath=false diff --name-only "${BASE_REF}...HEAD")"
 GOVERNANCE_CHANGED="$(echo "$CHANGED_FILES" | grep -E "$GOVERNANCE_PATH_PATTERN" || true)"
 
 if [ -z "$GOVERNANCE_CHANGED" ]; then
@@ -28,7 +28,7 @@ if [ -z "$GOVERNANCE_CHANGED" ]; then
   exit 0
 fi
 
-COMMIT_MESSAGES="$(git log --format=%B "${BASE_REF}..HEAD")"
+COMMIT_MESSAGES="$(git -c core.quotePath=false log --format=%B "${BASE_REF}..HEAD")"
 
 if printf '%s\n%s\n' "$PR_BODY" "$COMMIT_MESSAGES" | grep -qE '#[0-9]+'; then
   echo "Issue参照を確認しました。"

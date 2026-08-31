@@ -27,7 +27,7 @@ ADR-0002は決定当時からこの抜け道を認識していた:
 ## 決定
 
 1. **Core Principle VIII (Governance Change Traceability) を新設**。
-   `.claude/skills/**`・`.specify/memory/constitution.md`・`docs/adr/**`・
+   `.claude/skills/**`・`.specify/memory/constitution.md`・`doc/common/adr/**`・
    `.github/workflows/**`・`.github/scripts/**` のいずれかを変更するPRは、
    PR本文またはコミットメッセージに`#<Issue番号>`形式の参照を最低1件持たなければ
    ならない。`tasks.md`のIssue対応表や`speckit-tasks`/`speckit-taskstoissues`の

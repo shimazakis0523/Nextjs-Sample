@@ -1,5 +1,46 @@
 <!--
 Sync Impact Report
+- Version change: 2.10.0 → 2.11.0 (MINOR — document architecture overhaul:
+  Japanese document names throughout, and the `specs/**` + `docs/**` split
+  replaced by a single `doc/` tree; `spec.md`/`plan.md` as such are
+  retired)
+- Modified sections:
+  - Principle II, III: `openapi/**` paths → `doc/API仕様書/**`.
+  - Principle IV: `docs/architecture.md` → `doc/common/AP方式設計書(バック
+    エンド編).md`.
+  - Principle VI (redefined): a screen's ユースケース定義 and 画面定義 are
+    now two separate files (「ユースケース記述」・「画面定義書」), not two
+    sections of one `spec.md`. `spec.md` as a filename/concept is retired.
+  - Principle VIII: governance-relevant paths updated
+    (`docs/adr/**` → `doc/common/adr/**`).
+  - Technology & Deployment Constraints, Development Workflow, Governance:
+    all `docs/architecture.md`/`docs/adr/`/`specs/<feature>/plan.md`/
+    `specs/<feature>/screen-flow.md`/`e2e-test-spec.md` references updated
+    to the new `doc/` tree paths and Japanese document names.
+  - New: `doc/common/`, `doc/フロントエンド設計書/<業務>/`,
+    `doc/API仕様書/` tree. `openapi/**` moved to `doc/API仕様書/**`;
+    `docs/architecture.md` split into `doc/common/AP方式設計書(フロント
+    エンド編).md` and `doc/common/AP方式設計書(バックエンド編).md`;
+    `docs/adr/**` moved to `doc/common/adr/**`; a screen's `spec.md` split
+    into `ユースケース記述*.md` + `画面定義書*.md`; `plan.md` renamed
+    `詳細設計書.md`; `screen-flow.md` renamed `画面遷移図.md`;
+    `e2e-test-spec.md` renamed `E2E仕様書*.md`.
+  - `specs/<feature>/tasks.md` and `specs/<feature>/screens/*/checklists/`
+    stay at their current location (process/tracking artifacts, not design
+    documents) — only their internal cross-references were updated to the
+    new `doc/` paths.
+  - `.github/scripts/check-spec-sync.sh`, `check-openapi-bff-routes.mjs`,
+    `check-governance-issue-ref.sh` and the `speckit-*`/`update-e2e-test-
+    spec`/`update-screen-flow-diagram`/`check-openapi-contract` skills
+    updated for the new paths and file names.
+- Rationale: this is a Japanese company; English document names and an
+  artifact split across `specs/` (spec.md/plan.md/tasks.md) and `docs/`
+  (architecture.md/adr/) reads as foreign convention rather than this
+  org's own document set. Consolidating into one `doc/` tree with
+  Japanese names the org already uses for this kind of artifact (AP方式
+  設計書, 画面定義書, 詳細設計書, ユースケース記述, E2E仕様書, API仕様書)
+  removes both frictions in one change, explicitly requested by the user.
+  See ADR-0013 in `doc/common/adr/`.
 - Version change: 2.9.0 → 2.10.0 (MINOR — new Core Principle VIII,
   Governance Change Traceability: a PR changing governance-relevant files
   (Skills, this constitution, ADRs, CI workflows/scripts) MUST reference a
@@ -185,34 +226,38 @@ keeps upstream URLs/credentials out of client-reachable code.
 `BACKEND_API_URL` is set. Every function it exports follows the same
 shape: a mock branch backed by `src/lib/mock-*.ts`, and a real branch that
 calls `backendFetch()` from `backend-client.ts`. Mock data MUST match the
-shape documented in `openapi/backend/openapi.yaml`.
+shape documented in `doc/API仕様書/Backend/openapi.yaml`.
 Rationale: callers (Route Handlers, Server Components) never know or care
 which branch is live; pointing `BACKEND_API_URL` at a real backend must
 require zero changes to any caller.
 
 ### III. Contract-First APIs (OpenAPI)
-Every public BFF endpoint MUST be documented in `openapi/bff/openapi.yaml`;
-every call `backend.ts` makes to `BACKEND_API_URL` MUST be documented in
-`openapi/backend/openapi.yaml`. Shared shapes (Todo, User, Error, ...) live
-in `openapi/common/schemas/**` and are `$ref`'d from both, not duplicated.
-A change to an endpoint's path, method, request/response fields, or status
-codes MUST update the corresponding YAML in the same change. Run the
-`check-openapi-contract` skill before treating an API change as complete.
+Every public BFF endpoint MUST be documented in
+`doc/API仕様書/BFF/openapi.yaml`; every call `backend.ts` makes to
+`BACKEND_API_URL` MUST be documented in `doc/API仕様書/Backend/openapi.yaml`.
+Shared shapes (Todo, User, Error, ...) live in
+`doc/API仕様書/common/schemas/**` and are `$ref`'d from both, not
+duplicated. A change to an endpoint's path, method, request/response
+fields, or status codes MUST update the corresponding YAML in the same
+change. Run the `check-openapi-contract` skill before treating an API
+change as complete.
 Rationale: the YAML is the source of truth a future real-backend
 implementer builds against, and drift between contract and code defeats
 the point of having a contract at all.
 
 Feature directories MUST NOT include a `contracts/` or similar directory.
-A feature's endpoint names and methods belong in its `spec.md` 処理仕様 table
-(where each row states the triggering operation and its endpoint), and the
-detailed contract (request/response shape, status codes, error behavior)
-lives exclusively in `openapi/bff/openapi.yaml` and `openapi/backend/openapi.yaml`.
-A separate `contracts/` directory adds nothing except a duplicate pointer to
-those same YAML files, creating maintenance overhead with zero information gain.
+A feature's endpoint names and methods belong in its 画面定義書's 処理仕様
+table (where each row states the triggering operation and its endpoint),
+and the detailed contract (request/response shape, status codes, error
+behavior) lives exclusively in `doc/API仕様書/BFF/openapi.yaml` and
+`doc/API仕様書/Backend/openapi.yaml`. A separate `contracts/` directory
+adds nothing except a duplicate pointer to those same YAML files, creating
+maintenance overhead with zero information gain.
 
 ### IV. Serverless-Safe State
 Code MUST assume Route Handlers do not share memory across requests in
-production (Vercel is serverless — see `docs/architecture.md` caveats).
+production (Vercel is serverless — see
+`doc/common/AP方式設計書(バックエンド編).md` caveats).
 In-memory, `globalThis`-cached
 mocks are acceptable for local development and demos only, and MUST NOT be
 presented as durable storage. Real persistence needs are satisfied by
@@ -231,104 +276,111 @@ Rationale: this is a small sample/learning project; every added layer of
 indirection has to earn its place by making something easier to change,
 not harder to read.
 
-### VI. Spec Documents State Requirements, Not Process
-`spec.md` files under `specs/**` MUST be written in Japanese, and MUST
-include a table of contents. One screen — including a modal or any other
-UI with its own layout and flow, even without an independent URL — gets
-exactly one `screens/<screen-id>/spec.md`, titled after the business
-action it performs (e.g. "Todo新規登録"), not after "screen" (not
-"Todoダッシュボード画面"). A feature directory's top-level `spec.md` is
-limited to the screen list; it MUST NOT duplicate per-screen detail and
-MUST NOT define an entity/data model — the data model is a server-side
-concern already captured in `openapi/common/schemas/**`, and a screen's
-own field-level constraints belong in that screen's own 画面入出力仕様
-table instead.
+### VI. Design Documents State Requirements, Not Process
+This project's screen-level design documents live under
+`doc/フロントエンド設計書/<業務>/` and MUST be written in Japanese. One
+screen — including a modal or any other UI with its own layout and flow,
+even without an independent URL — gets exactly one **ユースケース記述**
+document and exactly one **画面定義書** document (two separate files, not
+sections of one file), each titled after the business action the screen
+performs (e.g. "Todo新規登録"), not after "screen" (not "Todoダッシュ
+ボード画面"). A business (業務)'s **詳細設計書** (one per business,
+`doc/フロントエンド設計書/<業務>/詳細設計書.md`) is limited to the
+component-relationship design and an overview/screen list; it MUST NOT
+duplicate per-screen detail and MUST NOT define an entity/data model — the
+data model is a server-side concern already captured in
+`doc/API仕様書/common/schemas/**`, and a screen's own field-level
+constraints belong in that screen's own 画面定義書's 画面入出力仕様 table
+instead.
 
-A screen's `spec.md` MUST be organized as exactly two parts:
+**ユースケース記述** MUST contain one or more ユースケース記述 entries,
+each with アクター, 事前条件, 基本フロー, 代替/例外フロー, and 事後条件.
+It MUST NOT use agile user-story framing (prioritization, independent-test
+notes) or Given/When/Then acceptance scenarios — a user story and a screen
+specification are different things.
 
-- **ユースケース定義** (use-case definitions): one or more ユースケース
-  記述, each with アクター, 事前条件, 基本フロー, 代替/例外フロー, and
-  事後条件. A screen's `spec.md` MUST NOT use agile user-story framing
-  (prioritization, independent-test notes) or Given/When/Then acceptance
-  scenarios — a user story and a screen specification are different
-  things.
-- **画面定義** (screen definition), split into:
-  - **画面入出力仕様**: every element rendered on the screen — inputs,
-    static or conditionally-shown text, badges, buttons, dialogs, all of
-    it, not just input fields. One row per element. An element's
-    look-and-feel and constraints MUST live entirely inside that
-    element's own row; MUST NOT be described in prose outside the table.
-  - **処理仕様**: one row per trigger (initial display, or a screen
-    operation). The 初期表示 (initial display) row MUST be first; other
-    rows SHOULD follow the on-screen order of the controls they respond
-    to. This table MUST stay scoped to frontend-observable behavior: when
-    a row calls a BFF endpoint, it MUST name that endpoint (method + path,
-    e.g. `POST /api/todos`) — that's a contract fact both sides need, not
-    an internal detail — but MUST NOT restate that endpoint's own request/
-    response shape, status codes, or backend-internal behavior (database
-    writes, persistence); those stay solely in `openapi/bff/openapi.yaml`,
-    cited by reference. A row states only how success/failure branch from
-    the screen's own point of view.
+**画面定義書** MUST be split into:
+- **画面入出力仕様**: every element rendered on the screen — inputs,
+  static or conditionally-shown text, badges, buttons, dialogs, all of
+  it, not just input fields. One row per element. An element's
+  look-and-feel and constraints MUST live entirely inside that element's
+  own row; MUST NOT be described in prose outside the table.
+- **処理仕様**: one row per trigger (initial display, or a screen
+  operation). The 初期表示 (initial display) row MUST be first; other
+  rows SHOULD follow the on-screen order of the controls they respond to.
+  This table MUST stay scoped to frontend-observable behavior: when a row
+  calls a BFF endpoint, it MUST name that endpoint (method + path, e.g.
+  `POST /api/todos`) — that's a contract fact both sides need, not an
+  internal detail — but MUST NOT restate that endpoint's own request/
+  response shape, status codes, or backend-internal behavior (database
+  writes, persistence); those stay solely in
+  `doc/API仕様書/BFF/openapi.yaml`, cited by reference. A row states only
+  how success/failure branch from the screen's own point of view.
 
 `.specify/templates/overrides/spec-template.md` holds this structure so
-`/speckit-specify` produces it by default; edit that file, not this
-constitution, to adjust the template itself.
+`/speckit-specify` produces both files by default; edit that file, not
+this constitution, to adjust the template itself.
 
-A `spec.md` MUST state only what its own screen or feature does. It MUST
-NOT reference how or when it was authored (e.g. "written retroactively"),
-project-management facts (branch names, when a tool was adopted), or the
-current state of unrelated, not-yet-built features or infrastructure
-(e.g. that login doesn't exist yet, that no real backend is connected).
-A `spec.md`'s own header MUST NOT include a cross-reference to its parent
-feature directory (its file path already shows that) or a document
-status/workflow field (e.g. "Draft") — document lifecycle is tracked by
-the PR/review process, not written into the design content itself.
-A screen's `spec.md` MUST NOT state which screen(s) launch it (its entry
-point) — any screen can be launched from any screen, now or in a future
-change, so recording an entry point bakes in a dependency that doesn't
-reflect reality. A screen's `spec.md` MUST state its own outbound
+A ユースケース記述/画面定義書 MUST state only what its own screen does. It
+MUST NOT reference how or when it was authored (e.g. "written
+retroactively"), project-management facts (branch names, when a tool was
+adopted), or the current state of unrelated, not-yet-built features or
+infrastructure (e.g. that login doesn't exist yet, that no real backend
+is connected). Its own header MUST NOT include a cross-reference to its
+parent business directory (its file path already shows that) or a
+document status/workflow field (e.g. "Draft") — document lifecycle is
+tracked by the PR/review process, not written into the design content
+itself. A screen's design documents MUST NOT state which screen(s) launch
+it (its entry point) — any screen can be launched from any screen, now or
+in a future change, so recording an entry point bakes in a dependency
+that doesn't reflect reality. A screen MUST state its own outbound
 navigation instead: each of its own buttons/links, as a row in 画面入出力
 仕様, and where it leads, as a row in 処理仕様. `checklists/requirements.md`
 is exempt from all of the above: it is a quality-detection harness, not a
 requirements document, and may reference tooling, process, or anything
-else needed to reliably catch and correct spec defects.
+else needed to reliably catch and correct defects in these documents.
 
-Feature directories MUST NOT include `research.md`, `quickstart.md`, or
-`data-model.md`. These files create redundancy and confusion:
+Business (業務) directories under `doc/フロントエンド設計書/` MUST NOT
+include `research.md`, `quickstart.md`, or `data-model.md`. These files
+create redundancy and confusion:
 - **research.md**: Project-wide architectural decisions belong in
-  `constitution.md` and `docs/adr/`, not repeated per-feature.
-  Feature-specific background (market research, user interviews) is rare
-  enough that contextual notes in spec.md itself suffice.
+  `constitution.md` and `doc/common/adr/`, not repeated per-business.
+  Business-specific background (market research, user interviews) is rare
+  enough that contextual notes in the design documents themselves
+  suffice.
 - **quickstart.md**: Implementation onboarding is the responsibility of
   code comments and the implementer's familiarity with constitution.md;
-  repeating per-feature is maintenance overhead.
+  repeating per-business is maintenance overhead.
 - **data-model.md**: The data model is a server-side concern defined in
-  `openapi/common/schemas/**` and referenced from contract YAML; it does
-  not belong in a frontend spec.
+  `doc/API仕様書/common/schemas/**` and referenced from contract YAML; it
+  does not belong in a frontend design document.
 
-A screen's `spec.md` header MAY cite a `**モックアップ**` field naming the
-Artifact URL of the mockup (produced by the `design` skill) that its
-ユースケース定義/画面入出力仕様 were authored from — see Development
-Workflow below for when a mockup is required. This is the one exception
-to the no-header-cross-reference rule above, and it works differently
-from the `openapi/bff/openapi.yaml` citation in 処理仕様: that citation
-defers to a contract that MUST stay in sync with the spec, so the spec
-never restates it, whereas the mockup is a snapshot of the visual
+A screen's ユースケース記述 header MAY cite a `**モックアップ**` field
+naming the Artifact URL of the mockup (produced by the `design` skill)
+that its content was authored from — see Development Workflow below for
+when a mockup is required. This is the one exception to the
+no-header-cross-reference rule above, and it works differently from the
+`doc/API仕様書/BFF/openapi.yaml` citation in 処理仕様: that citation
+defers to a contract that MUST stay in sync with the design documents, so
+they never restate it, whereas the mockup is a snapshot of the visual
 agreement at authoring time — 画面入出力仕様/処理仕様 MUST still be fully
-self-contained (never "see mockup for details"), spec.md is authoritative
-over the mockup once they diverge, and the mockup is not required to be
-kept current after spec.md changes.
-Rationale: a spec is handed to an implementer expecting it to describe
-exactly what to build, in the shape a screen designer actually needs —
-item-level detail and event-by-event behavior — not a backlog artifact
-(user stories exist to sequence incremental delivery, not to state what a
-screen does) and not process commentary or another feature's status
-(noise at best, and as happened when "no login yet" read as this feature
-requiring no login, mistaken for actual requirements). A data model
-belongs with the API contract that defines it, not repeated into every
-screen that happens to display it. Splitting large features into one file
-per screen, each with its own table of contents, keeps every file
-reviewable instead of growing into one sprawling document.
+self-contained (never "see mockup for details"), the design documents are
+authoritative over the mockup once they diverge, and the mockup is not
+required to be kept current after they change.
+Rationale: a screen's design documents are handed to an implementer
+expecting them to describe exactly what to build, in the shape a screen
+designer actually needs — item-level detail and event-by-event behavior —
+not a backlog artifact (user stories exist to sequence incremental
+delivery, not to state what a screen does) and not process commentary or
+another feature's status (noise at best, and as happened when "no login
+yet" read as this feature requiring no login, mistaken for actual
+requirements). A data model belongs with the API contract that defines
+it, not repeated into every screen that happens to display it. Splitting
+a screen's use cases from its screen definition — and splitting a large
+business into one such pair of files per screen — keeps every file
+reviewable instead of growing into one sprawling document, and matches
+this organization's own naming for this kind of artifact
+(ユースケース記述, 画面定義書).
 
 ### VII. Component Test Coverage
 
@@ -351,13 +403,13 @@ from Principle-driven `plan.md` design) shipped with zero unit tests,
 found only after the fact, because the task that created them asked only
 for E2E re-verification and nothing mechanically checked for missing unit
 coverage. A deterministic CI gate, not reliance on remembering, is what
-guarantees this doesn't recur. See ADR-0011 in `docs/adr/`.
+guarantees this doesn't recur. See ADR-0011 in `doc/common/adr/`.
 
 ### VIII. Governance Change Traceability
 
 A PR that changes any governance-relevant file — anything under
 `.claude/skills/**`, this constitution (`.specify/memory/constitution.md`),
-any ADR under `docs/adr/**`, or `.github/workflows/**`/
+any ADR under `doc/common/adr/**`, or `.github/workflows/**`/
 `.github/scripts/**` — MUST reference a GitHub Issue (`#<number>`) in its
 PR body or in at least one of its commit messages, even when the change
 wasn't produced by `/speckit-tasks` + `/speckit-taskstoissues` (e.g. an
@@ -375,13 +427,14 @@ work that never goes through that pipeline at all. That is exactly what
 happened when Jest/Playwright tooling and the Component Test Coverage gate
 itself (Principle VII, ADR-0011) were implemented directly from
 conversational requests, without ever creating a GitHub Issue. See
-ADR-0012 in `docs/adr/`.
+ADR-0012 in `doc/common/adr/`.
 
 ## Technology & Deployment Constraints
 
-See `docs/architecture.md` for the concrete current tech stack, dependency
-list, and repository layout; this section states binding constraints, not
-an inventory.
+See `doc/common/AP方式設計書(フロントエンド編).md` and
+`doc/common/AP方式設計書(バックエンド編).md` for the concrete current tech
+stack, dependency list, and repository layout; this section states
+binding constraints, not an inventory.
 
 - Frontend + BFF: Next.js App Router, deployed to Vercel (serverless).
 - No database in this app. Data is either mocked in-app (Principle II) or
@@ -403,65 +456,68 @@ an inventory.
   alone. `/speckit-specify` MUST check for an agreed mockup and halt,
   directing to the `design` skill, if none exists. This does not apply
   to features with no screen (e.g. a purely internal BFF change). See
-  ADR-0004 in `docs/adr/`.
+  ADR-0004 in `doc/common/adr/`.
 - App-wide technical facts (language/version, primary dependencies,
   target platform, project type, storage mechanism, repository layout)
   that hold for every feature MUST be documented once in
-  `docs/architecture.md`, not repeated in any `plan.md`. `plan.md`'s
-  Project Structure MUST list only the paths that plan's own scope adds
-  or changes, not paths `docs/architecture.md` documents as shared
-  across every feature. `docs/architecture.md` documenting a *pattern*
-  (e.g. `backend.ts` hosting every entity's swap-point functions in one
-  file, or the `mock-<entity>.ts` naming convention) does NOT make a
-  specific instance of that pattern shared: a feature introducing a new
-  entity MUST list the specific functions it adds to `backend.ts` (as a
-  change) and its specific `mock-<entity>.ts` file (as an addition) in
-  its own Project Structure, not omit them as "common infra" merely
-  because they live in or resemble an already-documented shared file.
-  See ADR-0005 and ADR-0009 in `docs/adr/`.
-- A feature MUST have exactly one `plan.md`, at `specs/<feature>/plan.md`
-  — always at feature level, never split per screen, even when the
-  feature has multiple screens (ADR-0007, superseding ADR-0006's
-  per-screen split). `plan.md` holds exactly two sections:
-  **登場するコンポーネントと関係** (scoped to every file this feature adds
-  or changes that has a non-obvious relationship to another — not React
-  components only: this feature's own BFF Route Handlers under
-  `src/app/api/**` MUST get the same treatment, since a file path and a
-  one-line comment in Project Structure is not a design for that layer.
-  A Mermaid diagram of how these files relate — props/callbacks between
-  components, or a Client Component's fetch call to this feature's own
-  Route Handler — comes first as the whole-picture overview, with every
-  edge labelled by what kind of relationship it is (e.g. `"props: ..."`,
-  `"callback: ..."`, `"fetch: METHOD /path"`) so the diagram needs no
-  separate legend. Followed by one subsection per involved file giving
-  its role on the first line — never a bare file name with no
-  explanation — plus whatever detail the diagram itself can't show.
-  Required when any two of this feature's files have such a
-  relationship; omitted only when every file is fully self-contained)
-  and **Project Structure** (the Source Code paths this feature adds or
-  changes, and a Structure Decision). `plan.md` MUST NOT include a
-  Summary, Technical Context, Constitution Check, Complexity Tracking,
-  or "Documentation (this feature)" file-tree section — applied to
-  `001-todo-dashboard`, each of these either duplicated the
-  component-relationship section or restated constitution.md without
-  adding information. See ADR-0008 and ADR-0010 in `docs/adr/`.
+  `doc/common/AP方式設計書(フロントエンド編).md` /
+  `doc/common/AP方式設計書(バックエンド編).md`, not repeated in any
+  詳細設計書. A 詳細設計書's Project Structure MUST list only the paths
+  that business's own scope adds or changes, not paths the AP方式設計書
+  documents as shared across every feature. The AP方式設計書 documenting
+  a *pattern* (e.g. `backend.ts` hosting every entity's swap-point
+  functions in one file, or the `mock-<entity>.ts` naming convention)
+  does NOT make a specific instance of that pattern shared: a feature
+  introducing a new entity MUST list the specific functions it adds to
+  `backend.ts` (as a change) and its specific `mock-<entity>.ts` file (as
+  an addition) in its own Project Structure, not omit them as "common
+  infra" merely because they live in or resemble an already-documented
+  shared file. See ADR-0005 and ADR-0009 in `doc/common/adr/`.
+- A business MUST have exactly one 詳細設計書, at
+  `doc/フロントエンド設計書/<業務>/詳細設計書.md` — always at
+  business/feature level, never split per screen, even when the business
+  has multiple screens (ADR-0007, superseding ADR-0006's per-screen
+  split). 詳細設計書 holds exactly two sections: **登場するコンポーネント
+  と関係** (scoped to every file this business adds or changes that has a
+  non-obvious relationship to another — not React components only: this
+  business's own BFF Route Handlers under `src/app/api/**` MUST get the
+  same treatment, since a file path and a one-line comment in Project
+  Structure is not a design for that layer. A Mermaid diagram of how
+  these files relate — props/callbacks between components, or a Client
+  Component's fetch call to this business's own Route Handler — comes
+  first as the whole-picture overview, with every edge labelled by what
+  kind of relationship it is (e.g. `"props: ..."`, `"callback: ..."`,
+  `"fetch: METHOD /path"`) so the diagram needs no separate legend.
+  Followed by one subsection per involved file giving its role on the
+  first line — never a bare file name with no explanation — plus
+  whatever detail the diagram itself can't show. Required when any two of
+  this business's files have such a relationship; omitted only when every
+  file is fully self-contained) and **Project Structure** (the Source
+  Code paths this business adds or changes, and a Structure Decision).
+  詳細設計書 MUST NOT include a Summary, Technical Context, Constitution
+  Check, Complexity Tracking, or "Documentation (this feature)" file-tree
+  section — applied to Todoダッシュボード, each of these either
+  duplicated the component-relationship section or restated
+  constitution.md without adding information. See ADR-0008 and ADR-0010
+  in `doc/common/adr/`.
 - Use `/speckit-clarify` when requirements are ambiguous, before
   `/speckit-plan`.
 - Run `/speckit-analyze` after `/speckit-tasks` and before
-  `/speckit-implement` to catch drift between spec, plan, and tasks.
+  `/speckit-implement` to catch drift between the design documents,
+  詳細設計書, and tasks.
 - Any task that touches `src/app/api/**` or `src/lib/backend.ts` MUST
-  include updating the relevant `openapi/**/*.yaml` as part of the task
-  itself, not as a follow-up.
+  include updating the relevant `doc/API仕様書/**/*.yaml` as part of the
+  task itself, not as a follow-up.
 - Adding, changing, or removing a 処理仕様 row that states a screen's own
   outbound navigation (Principle VI) MUST be followed by running the
   `update-screen-flow-diagram` skill to regenerate the corresponding
-  `specs/<feature-directory>/screen-flow.md` before the change is
+  `doc/フロントエンド設計書/<業務>/画面遷移図.md` before the change is
   considered complete.
-- Adding, changing, or removing a screen's ユースケース定義, 画面入出力
-  仕様, or 処理仕様 MUST be followed by running the `update-e2e-test-spec`
-  skill to regenerate that screen's `e2e-test-spec.md` (its "仕様から導出した
-  テストケース" section only — "追加のテスト観点" is preserved) before the
-  change is considered complete.
+- Adding, changing, or removing a screen's ユースケース記述 or 画面定義書
+  content MUST be followed by running the `update-e2e-test-spec` skill to
+  regenerate that screen's E2E仕様書 (its "仕様から導出したテストケース"
+  section only — "追加のテスト観点" is preserved) before the change is
+  considered complete.
 - When a feature's `tasks.md` carries the GitHub Issues mapping tables
   produced by `speckit-taskstoissues` (task↔Issue, phase↔prerequisite-
   Issue), `speckit-implement` MUST check the prerequisite Issues'
@@ -500,4 +556,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.10.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-30
+**Version**: 2.11.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31

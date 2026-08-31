@@ -10,7 +10,7 @@ set -euo pipefail
 
 BASE_REF="${1:?usage: check-component-tests.sh <base_ref>}"
 
-CHANGED_FILES="$(git diff --name-only "${BASE_REF}...HEAD")"
+CHANGED_FILES="$(git -c core.quotePath=false diff --name-only "${BASE_REF}...HEAD")"
 
 # Next.js App Routerがファイル名で意味を持たせる特殊ファイル。フレームワークの
 # エントリポイントであり、このプロジェクト固有のコンポーネントではないため対象外とする。
