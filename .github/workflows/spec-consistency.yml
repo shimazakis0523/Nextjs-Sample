@@ -26,6 +26,17 @@ jobs:
       - run: npm run openapi:lint
       - run: node .github/scripts/check-openapi-bff-routes.mjs
 
+  openapi-style-guide:
+    name: doc/API仕様書/**/openapi.yaml conforms to the OpenAPI style guide (Spectral)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run openapi:lint:spectral
+
   component-test-coverage:
     name: src/app/**/*.tsx components have a unit test
     runs-on: ubuntu-latest

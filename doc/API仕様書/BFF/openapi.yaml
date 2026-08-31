@@ -8,10 +8,20 @@ info:
     呼び出すエンドポイントを定義する。実装は `src/app/api/**` の Route Handlers。
 servers:
   - url: /api
+    description: このNext.jsアプリ自身が提供するBFFのエンドポイント
+tags:
+  - name: health
+    description: 稼働確認
+  - name: user
+    description: ユーザー
+  - name: todo
+    description: Todoの管理
 paths:
   /health:
     get:
+      tags: [health]
       summary: ヘルスチェック
+      description: サービスの稼働確認用エンドポイント。認証不要で常に200を返す。
       operationId: getHealth
       responses:
         "200":
@@ -28,7 +38,9 @@ paths:
 
   /users:
     get:
+      tags: [user]
       summary: ユーザー一覧取得
+      description: 登録されている全ユーザーを返す。ページングは行わない。
       operationId: listUsers
       responses:
         "200":
@@ -42,7 +54,9 @@ paths:
 
   /todos:
     get:
+      tags: [todo]
       summary: Todo一覧取得
+      description: 登録されている全Todoを追加順(古い順)で返す。
       operationId: listTodos
       responses:
         "200":
@@ -54,7 +68,9 @@ paths:
                 items:
                   $ref: "../common/schemas/Todo.yaml#/Todo"
     post:
+      tags: [todo]
       summary: Todo作成
+      description: 新しいTodoを登録する。title・dueDate・assignee・statusが必須。
       operationId: createTodo
       requestBody:
         required: true
@@ -70,15 +86,13 @@ paths:
               schema:
                 $ref: "../common/schemas/Todo.yaml#/Todo"
         "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "../common/schemas/Error.yaml#/Error"
+          $ref: "#/components/responses/BadRequest"
 
   /todos/{id}:
     delete:
+      tags: [todo]
       summary: Todo削除
+      description: 指定したidのTodoを削除する。対象が存在しない場合も204を返す(冪等)。
       operationId: deleteTodo
       parameters:
         - name: id
@@ -89,3 +103,12 @@ paths:
       responses:
         "204":
           description: No Content
+
+components:
+  responses:
+    BadRequest:
+      description: 400 Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../common/schemas/Error.yaml#/Error"

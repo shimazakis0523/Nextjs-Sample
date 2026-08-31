@@ -10,14 +10,22 @@ info:
     データをアプリ内でモックしている。
 servers:
   - url: "{backendApiUrl}"
+    description: BACKEND_API_URL環境変数が指す実バックエンドサーバー
     variables:
       backendApiUrl:
         default: https://example.com/api
         description: BACKEND_API_URL 環境変数の値
+tags:
+  - name: user
+    description: ユーザー
+  - name: todo
+    description: Todoの管理
 paths:
   /users:
     get:
+      tags: [user]
       summary: ユーザー一覧取得
+      description: 登録されている全ユーザーを返す。ページングは行わない。
       operationId: listUsers
       responses:
         "200":
@@ -31,7 +39,9 @@ paths:
 
   /todos:
     get:
+      tags: [todo]
       summary: Todo一覧取得
+      description: 登録されている全Todoを追加順(古い順)で返す。
       operationId: listTodos
       responses:
         "200":
@@ -43,7 +53,9 @@ paths:
                 items:
                   $ref: "../common/schemas/Todo.yaml#/Todo"
     post:
+      tags: [todo]
       summary: Todo作成
+      description: 新しいTodoを登録する。title・dueDate・assignee・statusが必須。
       operationId: createTodo
       requestBody:
         required: true
@@ -61,7 +73,9 @@ paths:
 
   /todos/{id}:
     delete:
+      tags: [todo]
       summary: Todo削除
+      description: 指定したidのTodoを削除する。
       operationId: deleteTodo
       parameters:
         - name: id

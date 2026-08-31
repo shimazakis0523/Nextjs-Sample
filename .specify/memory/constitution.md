@@ -1,5 +1,34 @@
 <!--
 Sync Impact Report
+- Version change: 2.16.0 → 2.17.0 (MINOR — new Core Principle XII, OpenAPI
+  Style Guide Conformance: doc/API仕様書/{BFF,Backend}/openapi.yaml must
+  conform to a Spectral ruleset implementing the version-agnostic subset
+  of Future Architect's "OpenAPI Specification 3.0.3規約", enforced at 0
+  errors by a new `openapi-style-guide` CI job)
+- Modified sections: New Core Principle XII added after Principle XI.
+- Rationale: the user shared the full Japanese-language standard document
+  and asked to add a harness checking OpenAPI spec conformance to it.
+  Three decisions were made via clarifying questions: keep OpenAPI 3.1
+  and apply only version-agnostic rules (not downgrade to 3.0.3); use
+  Spectral (the standard document itself names it as the verification
+  tool, over extending the existing Redocly lint); fix the current
+  openapi.yaml files' real non-conformances first, then add an
+  immediately-blocking CI gate (not visualize-only). Implementing the
+  17-rule Spectral ruleset (`.spectral.yaml`) surfaced genuine violations
+  in both `doc/API仕様書/{BFF,Backend}/openapi.yaml` — missing tags,
+  missing per-operation descriptions, missing server descriptions, and
+  an inlined (not componentized) 4xx response in the BFF contract — all
+  fixed with content checked against actual behavior (e.g. `deleteTodo`'s
+  idempotent-204 claim verified against `mock-todos.ts`) rather than
+  loosening the ruleset. Four standard-document rules were deliberately
+  excluded (route-level `security`, since the project has no
+  authentication; pure YAML formatting; default-value/`maxLength`
+  backward-compatibility, which needs historical diffing a single-snapshot
+  lint can't do; `components.parameters` naming prefixes, since no shared
+  parameters exist yet) — consistent with this project's practice of
+  fixing what a new gate finds rather than exempting it, while not faking
+  enforcement of what can't genuinely be checked. See ADR-0022 in
+  `doc/common/adr/`.
 - Version change: 2.15.0 → 2.16.0 (MINOR — new Core Principle XI, Static
   Code Quality Gate: eslint.config.mjs must enable complexity/duplication
   quality rules, enforced at 0 errors/0 warnings by a new `code-quality`
@@ -666,6 +695,44 @@ extracting a shared `collectMismatches` helper parameterized by a
 tripped `max-params` itself) — the same duplication the rule was designed
 to catch. See ADR-0021 in `doc/common/adr/`.
 
+### XII. OpenAPI Style Guide Conformance
+
+`doc/API仕様書/BFF/openapi.yaml` and `doc/API仕様書/Backend/openapi.yaml`
+MUST conform to the version-agnostic subset of Future Architect's
+"OpenAPI Specification 3.0.3規約" implemented as a `.spectral.yaml`
+ruleset: `info`/`servers[]` descriptions present; a non-empty root
+`tags[]` with lowercase space-separated names and descriptions; every
+operation carries exactly one tag, a `description` distinct from its
+`summary`, and a camelCase `operationId`; no `options` method; no
+`requestBody` on GET/DELETE and no query parameters on POST/PUT/PATCH;
+snake_case query parameter names and PascalCase-hyphenated header names;
+no `traceparent` header; 2xx responses defined inline and 4xx/5xx
+responses componentized via `$ref` to `components.responses` (never the
+reverse); UpperCamelCase names for `components.responses` and
+`components.schemas`; no multi-type or `null`-type schemas; no
+`allOf`/`anyOf`/`oneOf`. The `openapi-style-guide` job in the "Spec
+consistency" GitHub Actions workflow runs `npm run openapi:lint:spectral`
+on every PR against `main` and MUST pass with zero errors. Rules that
+cannot be mechanically or meaningfully enforced given this project's
+actual state — route-level `security` (the project has no authentication
+to describe), pure YAML formatting conventions, default-value/`maxLength`
+backward-compatibility (requires historical diffing, not a single-snapshot
+lint), and `components.parameters` naming prefixes (no shared parameters
+exist yet) — are intentionally excluded rather than faked or
+half-enforced; see ADR-0022 for the full list and reasoning.
+Rationale: the user shared the standard document and asked for a harness
+checking conformance to it. The project runs OpenAPI 3.1 while the
+standard targets 3.0.3, so version-specific constructs were left out
+rather than downgrading the spec; Spectral was chosen over extending the
+existing Redocly lint because the standard document itself names Spectral
+as its verification tool. Implementing the ruleset immediately surfaced
+real non-conformances in both existing `openapi.yaml` files (missing
+tags, missing operation descriptions, missing server descriptions, and an
+inlined 4xx response in the BFF contract) — all fixed with content
+verified against actual mock behavior (e.g. `deleteTodo`'s idempotent
+204 claim was checked against `mock-todos.ts`'s `removeTodo`) rather than
+loosening the ruleset to pass. See ADR-0022 in `doc/common/adr/`.
+
 ## Technology & Deployment Constraints
 
 See `doc/common/AP方式設計書(フロントエンド編).md` and
@@ -820,4 +887,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.16.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31
+**Version**: 2.17.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31

@@ -1,0 +1,218 @@
+# フューチャー株式会社「OpenAPI Specification 3.0.3規約」から、機械的に検証可能な
+# 観点を抜粋してSpectralルールとして実装したもの(constitution.md Core Principle XII)。
+# このプロジェクトはOpenAPI 3.1を使用しているため、3.0固有の構文(nullable等)に
+# 依存しないルールのみを対象とする。
+#
+# 意図的に対象外とした観点(doc/common/adr/0022-openapi-style-guide-conformance.md参照):
+# - security(ルートレベルの認証定義必須): このプロジェクトのAPIには認証機構が
+#   無いため、強制すると実態にないセキュリティを捏造することになる
+# - YAML記法(フロースタイル配列・クォート省略・改行末尾等): 既存ファイルが規約に
+#   自然に沿っており、テキストレベルのルールをSpectralに実装するより優先度が低い
+# - デフォルト値/maxLengthの後方互換性(API公開後に変更してはならない): 単一時点の
+#   スナップショットに対するlintでは検証できない(履歴比較が必要)
+# - components > parameters の Query/Header/Cookie プレフィックス命名: 現状
+#   共通パラメータが1つも定義されておらず、対象が存在しない
+extends: [[spectral:oas, off]]
+rules:
+  # info
+  info-contains-title:
+    description: info.titleは必須
+    given: $.info
+    severity: error
+    then:
+      field: title
+      function: truthy
+  info-contains-description:
+    description: info.descriptionは必須
+    given: $.info
+    severity: error
+    then:
+      field: description
+      function: truthy
+  info-contains-version:
+    description: info.versionは必須
+    given: $.info
+    severity: error
+    then:
+      field: version
+      function: truthy
+
+  # servers
+  server-requires-description:
+    description: servers[].descriptionは必須
+    given: $.servers[*]
+    severity: error
+    then:
+      field: description
+      function: truthy
+
+  # tags(ルート)
+  root-tags-required:
+    description: ルートのtagsは1つ以上定義する
+    given: $
+    severity: error
+    then:
+      field: tags
+      function: schema
+      functionOptions:
+        schema:
+          type: array
+          minItems: 1
+  tag-requires-description:
+    description: tags[].descriptionは必須
+    given: $.tags[*]
+    severity: error
+    then:
+      field: description
+      function: truthy
+  tag-name-lowercase-singular-style:
+    description: tags[].nameは小文字・半角スペース区切り(例: "user account")
+    given: $.tags[*].name
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[a-z]+( [a-z]+)*$"
+
+  # 各operation
+  operation-tags-required-and-single:
+    description: 各operationはtagsを1つだけ持つ
+    given: $.paths[*][get,post,put,patch,delete]
+    severity: error
+    then:
+      field: tags
+      function: schema
+      functionOptions:
+        schema:
+          type: array
+          minItems: 1
+          maxItems: 1
+  operation-description-required:
+    description: 各operationはdescriptionを持つ(summaryとは別に、振る舞いの詳細を書く)
+    given: $.paths[*][get,post,put,patch,delete]
+    severity: error
+    then:
+      field: description
+      function: truthy
+  operation-operationid-camelcase:
+    description: operationIdはキャメルケース(例: getUsers, putProductsProductId)
+    given: $.paths[*][get,post,put,patch,delete].operationId
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[a-z][a-zA-Z0-9]*$"
+
+  # HTTPメソッド制約
+  no-options-method:
+    description: CORSのためのoptionsメソッド追記は原則不要
+    given: $.paths[*]
+    severity: error
+    then:
+      field: options
+      function: falsy
+  no-get-delete-requestbody:
+    description: requestBodyはPOST/PUT/PATCHのみに指定する
+    given: $.paths[*][get,delete]
+    severity: error
+    then:
+      field: requestBody
+      function: falsy
+  no-post-put-patch-query-params:
+    description: クエリパラメータはGET/DELETEのみに指定する
+    given: $.paths[*][post,put,patch].parameters[?(@.in=='query')]
+    severity: error
+    then:
+      function: falsy
+
+  # パラメータ命名
+  query-param-snake-case:
+    description: クエリパラメータ名はスネークケース
+    given: $.paths[*][get,delete].parameters[?(@.in=='query')].name
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[a-z][a-z0-9_]*$"
+  header-param-pascal-hyphen-case:
+    description: ヘッダ名はハイフン区切りのパスカルケース(例: Content-Type)
+    given: $.paths[*][get,post,put,patch,delete].parameters[?(@.in=='header')].name
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[A-Z][a-zA-Z0-9]*(-[A-Z][a-zA-Z0-9]*)*$"
+  no-traceparent-header:
+    description: OpenTelemetryのtraceparentヘッダは原則不要
+    given: $.paths[*][get,post,put,patch,delete].parameters[?(@.in=='header')].name
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: "^traceparent$"
+
+  # レスポンス
+  error-response-must-be-componentized:
+    description: 4xx/5xxのレスポンスはcomponents.responsesに定義し$refで参照する(個別定義しない)
+    given: $.paths[*][get,post,put,patch,delete].responses[?(@property.match(/^[45]/))]
+    severity: error
+    resolved: false
+    then:
+      field: $ref
+      function: truthy
+  success-response-must-not-be-componentized:
+    description: 2xxのレスポンスはAPI個別に定義する(componentsを参照しない)
+    given: $.paths[*][get,post,put,patch,delete].responses[?(@property.match(/^2/))]
+    severity: error
+    resolved: false
+    then:
+      field: $ref
+      function: falsy
+
+  # components.responses
+  component-response-name-upper-camel-case:
+    description: components.responsesの名称はアッパーキャメルケース
+    given: $.components.responses.*~
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[A-Z][a-zA-Z0-9]*$"
+
+  # components.schemas
+  schema-name-upper-camel-case:
+    description: components.schemasの名称はアッパーキャメルケース
+    given: $.components.schemas.*~
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[A-Z][a-zA-Z0-9]*$"
+  schema-no-multiple-types:
+    description: typeに複数の型を定義しない
+    given: $..[?(@.type)].type
+    severity: error
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: string
+  schema-no-null-type:
+    description: typeにnullは指定しない(値が無いことはキー自体を含めないことで表現する)
+    given: $..[?(@.type)].type
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: "^null$"
+  no-oneof-anyof-allof:
+    description: allOf/anyOf/oneOfは利用しない
+    given: $..[?(@.type=='object' || @.properties)]
+    severity: error
+    then:
+      - field: allOf
+        function: falsy
+      - field: anyOf
+        function: falsy
+      - field: oneOf
+        function: falsy
