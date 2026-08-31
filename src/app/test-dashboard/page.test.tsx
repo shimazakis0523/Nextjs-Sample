@@ -7,6 +7,14 @@ import TestDashboardPage from "./page";
 
 const mockedReadFileSync = readFileSync as jest.Mock;
 
+const testDensityFixture = {
+  stepCount: 1000,
+  kStep: 1,
+  unit: { count: 19, density: 19 },
+  e2e: { count: 22, density: 22 },
+  total: { count: 41, density: 41 },
+};
+
 describe("TestDashboardPage", () => {
   afterEach(() => {
     jest.clearAllMocks();
@@ -41,6 +49,7 @@ describe("TestDashboardPage", () => {
           overall: { total: 22, passed: 22, failed: 0 },
           byBusiness: { 業務1_Todoダッシュボード: { total: 22, passed: 22, failed: 0 } },
         },
+        testDensity: testDensityFixture,
       })
     );
 
@@ -50,6 +59,9 @@ describe("TestDashboardPage", () => {
     expect(screen.getAllByText("業務1_Todoダッシュボード").length).toBeGreaterThan(0);
     expect(screen.getAllByText("19").length).toBeGreaterThan(0);
     expect(screen.getAllByText("22").length).toBeGreaterThan(0);
+    expect(screen.getByText("テスト密度")).toBeInTheDocument();
+    expect(screen.getByText("19.00")).toBeInTheDocument();
+    expect(screen.getByText("41.00")).toBeInTheDocument();
   });
 
   it("shows failed counts distinctly when a suite has failures", () => {
@@ -70,6 +82,7 @@ describe("TestDashboardPage", () => {
           overall: { total: 0, passed: 0, failed: 0 },
           byBusiness: {},
         },
+        testDensity: testDensityFixture,
       })
     );
 
@@ -96,6 +109,7 @@ describe("TestDashboardPage", () => {
           overall: { total: 3, passed: 2, failed: 1 },
           byBusiness: { 業務B: { total: 3, passed: 2, failed: 1 } },
         },
+        testDensity: testDensityFixture,
       })
     );
 

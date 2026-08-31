@@ -22,6 +22,13 @@ type Summary = {
     overall: Counts;
     byBusiness: Record<string, Counts>;
   };
+  testDensity: {
+    stepCount: number;
+    kStep: number;
+    unit: { count: number; density: number };
+    e2e: { count: number; density: number };
+    total: { count: number; density: number };
+  };
 };
 
 function loadSummary(): Summary | null {
@@ -75,7 +82,7 @@ export default function TestDashboardPage() {
     );
   }
 
-  const { unit, e2e } = summary;
+  const { unit, e2e, testDensity } = summary;
   const businesses = Array.from(
     new Set([...Object.keys(unit.byBusiness), ...Object.keys(e2e.byBusiness)])
   );
@@ -140,6 +147,40 @@ export default function TestDashboardPage() {
                 </tr>
               );
             })}
+          </tbody>
+        </table>
+      </section>
+
+      <section className={styles.section}>
+        <h2>テスト密度</h2>
+        <p className={styles.generatedAt}>
+          対象ステップ数(実行可能ステップ、src/app・src/lib配下、コメント・空行を除く):{" "}
+          {testDensity.stepCount} step({testDensity.kStep.toFixed(3)} KStep)
+        </p>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>種別</th>
+              <th>テスト件数</th>
+              <th>テスト密度(件/KStep)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ユニットテスト</td>
+              <td>{testDensity.unit.count}</td>
+              <td>{testDensity.unit.density.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td>E2Eテスト</td>
+              <td>{testDensity.e2e.count}</td>
+              <td>{testDensity.e2e.density.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td>合計</td>
+              <td>{testDensity.total.count}</td>
+              <td>{testDensity.total.density.toFixed(2)}</td>
+            </tr>
           </tbody>
         </table>
       </section>

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-31T12:23:42.101Z",
+  "generatedAt": "2026-08-31T12:42:35.060Z",
   "unit": {
     "overall": {
       "total": 54,
@@ -68,6 +68,22 @@
         "passed": 22,
         "failed": 0
       }
+    }
+  },
+  "testDensity": {
+    "stepCount": 582,
+    "kStep": 0.582,
+    "unit": {
+      "count": 54,
+      "density": 92.78350515463919
+    },
+    "e2e": {
+      "count": 22,
+      "density": 37.80068728522337
+    },
+    "total": {
+      "count": 76,
+      "density": 130.58419243986256
     }
   }
 }

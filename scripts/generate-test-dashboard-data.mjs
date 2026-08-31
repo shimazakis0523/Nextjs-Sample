@@ -15,8 +15,9 @@
 // 追記する。どちらのマッピングにも一致しないテストファイルは「未分類」として
 // 集計される(取りこぼしが起きても黙って消えず、必ず可視化されるようにするため)。
 
-import { readFileSync, writeFileSync, mkdirSync, cpSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, cpSync, existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
+import sloc from "sloc";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const BUSINESS_MAP_PATH = path.join(ROOT, "dashboard-data", "business-map.json");
@@ -27,6 +28,10 @@ const OUTPUT_PATH = path.join(ROOT, "dashboard-data", "summary.json");
 const COVERAGE_HTML_SRC = path.join(ROOT, "coverage");
 const COVERAGE_HTML_DEST = path.join(ROOT, "public", "coverage-report");
 const UNMAPPED_BUSINESS = "未分類";
+// テスト密度(NTTDATA用語: テスト密度 = テスト件数 ÷ step数(Ks))の分母となるstep数の
+// 集計対象。jest.config.tsのcollectCoverageFromと同じ範囲(テストファイル自身は除く)に
+// 揃える — ずれるとカバレッジと密度で「テスト対象」の定義が食い違ってしまうため。
+const STEP_COUNT_ROOTS = [path.join(ROOT, "src", "app"), path.join(ROOT, "src", "lib")];
 
 function loadJson(filePath, label) {
   if (!existsSync(filePath)) {
@@ -114,6 +119,53 @@ function aggregateE2e(businessMap, playwrightResults) {
   return { overall, byBusiness };
 }
 
+function collectSourceFiles(dir) {
+  const results = [];
+  if (!existsSync(dir)) {
+    return results;
+  }
+  for (const entry of readdirSync(dir)) {
+    const full = path.join(dir, entry);
+    if (statSync(full).isDirectory()) {
+      results.push(...collectSourceFiles(full));
+      continue;
+    }
+    if (/\.tsx?$/.test(entry) && !/\.test\.tsx?$/.test(entry)) {
+      results.push(full);
+    }
+  }
+  return results;
+}
+
+// 「実行可能ステップ数」= 空行・コメント行を除いた行数(NTTDATAのstep数の一般的な定義)。
+// slocはJSX/TSXのコメント判定も含めて数えられるため、素朴な正規表現による除外より正確。
+function computeStepCount() {
+  let stepCount = 0;
+  for (const root of STEP_COUNT_ROOTS) {
+    for (const file of collectSourceFiles(root)) {
+      const ext = file.endsWith(".tsx") ? "tsx" : "ts";
+      const code = readFileSync(file, "utf8");
+      stepCount += sloc(code, ext).source;
+    }
+  }
+  return stepCount;
+}
+
+function computeTestDensity(stepCount, unitCount, e2eCount) {
+  const kStep = stepCount / 1000;
+  const density = (count) => (kStep > 0 ? count / kStep : 0);
+  return {
+    stepCount,
+    kStep,
+    unit: { count: unitCount, density: density(unitCount) },
+    e2e: { count: e2eCount, density: density(e2eCount) },
+    total: {
+      count: unitCount + e2eCount,
+      density: density(unitCount + e2eCount),
+    },
+  };
+}
+
 function copyCoverageHtmlReport() {
   if (!existsSync(COVERAGE_HTML_SRC)) {
     return false;
@@ -133,6 +185,8 @@ function main() {
 
   const unit = aggregateUnit(businessMap, jestResults);
   const e2e = aggregateE2e(businessMap, playwrightResults);
+  const stepCount = computeStepCount();
+  const testDensity = computeTestDensity(stepCount, unit.overall.total, e2e.overall.total);
 
   const summary = {
     generatedAt: new Date().toISOString(),
@@ -142,6 +196,7 @@ function main() {
       coverage: coverageSummary.total,
     },
     e2e,
+    testDensity,
   };
 
   mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true });
@@ -152,6 +207,12 @@ function main() {
   console.log(`書き出し: ${path.relative(ROOT, OUTPUT_PATH)}`);
   console.log(`  unit: ${unit.overall.passed}/${unit.overall.total} passed`);
   console.log(`  e2e:  ${e2e.overall.passed}/${e2e.overall.total} passed`);
+  console.log(
+    `  step数: ${stepCount} (${testDensity.kStep.toFixed(3)} KStep) / ` +
+      `テスト密度: unit ${testDensity.unit.density.toFixed(2)}件/KStep, ` +
+      `e2e ${testDensity.e2e.density.toFixed(2)}件/KStep, ` +
+      `合計 ${testDensity.total.density.toFixed(2)}件/KStep`
+  );
   console.log(
     copiedHtmlReport
       ? `  HTMLカバレッジレポートを ${path.relative(ROOT, COVERAGE_HTML_DEST)} にコピーしました`
