@@ -95,6 +95,21 @@
   color: #d97706;
 }
 
+.rowActions {
+  display: flex;
+  gap: 8px;
+}
+
+.editButton {
+  background: none;
+  border: 1px solid rgba(37, 99, 235, 0.5);
+  color: #2563eb;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
 .deleteButton {
   background: none;
   border: 1px solid rgba(220, 38, 38, 0.5);

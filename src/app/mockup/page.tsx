@@ -6,7 +6,8 @@ import styles from "./mockup.module.css";
 export const metadata: Metadata = {
   title: "UIモックアップ | Todoダッシュボード",
   description:
-    "Todo一覧・Todo新規登録の静的UIモックアップ(doc/common/adr/0004-mockup-first-requirements.md)。",
+    "Todo一覧・Todo新規登録・Todo編集の静的UIモックアップ" +
+    "(doc/common/adr/0004-mockup-first-requirements.md)。",
 };
 
 const STATUS_CLASS: Record<TodoStatus, string> = {
@@ -35,6 +36,9 @@ export default function MockupPage() {
           <br />
           doc/common/adr/0004-mockup-first-requirements.mdに基づき、実装済み画面のスナップショット
           として、各ユースケース記述_*.mdのヘッダーから参照されています。
+          <br />
+          「Todo編集」は実装前の機能追加提案であり、視覚的合意のためのモックアップです
+          (issue #38)。合意後にユースケース記述・画面定義書を作成します。
         </p>
       </header>
 
@@ -76,9 +80,14 @@ export default function MockupPage() {
                     </span>
                   </td>
                   <td>
-                    <button type="button" className={dashboardStyles.deleteButton}>
-                      削除
-                    </button>
+                    <div className={dashboardStyles.rowActions}>
+                      <button type="button" className={dashboardStyles.editButton}>
+                        編集
+                      </button>
+                      <button type="button" className={dashboardStyles.deleteButton}>
+                        削除
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -130,6 +139,53 @@ export default function MockupPage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className={styles.screen} aria-labelledby="todo-edit-heading">
+        <h2 id="todo-edit-heading" className={styles.screenTitle}>
+          Todo編集(モーダル)
+        </h2>
+        <div className={`${styles.frame} ${styles.frameDark}`}>
+          <div className={dashboardStyles.overlay} style={{ position: "static" }}>
+            <div className={dashboardStyles.modal}>
+              <h2>Todoを編集</h2>
+              <label className={dashboardStyles.field}>
+                Todo名
+                <input type="text" defaultValue={SAMPLE_TODOS[0].title} readOnly />
+              </label>
+              <label className={dashboardStyles.field}>
+                期限
+                <input type="date" defaultValue={SAMPLE_TODOS[0].dueDate} readOnly />
+              </label>
+              <label className={dashboardStyles.field}>
+                担当者
+                <input type="text" defaultValue={SAMPLE_TODOS[0].assignee} readOnly />
+              </label>
+              <label className={dashboardStyles.field}>
+                ステータス
+                <select defaultValue={SAMPLE_TODOS[0].status} disabled>
+                  {STATUSES.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className={dashboardStyles.modalActions}>
+                <button type="button" disabled>
+                  Cancel
+                </button>
+                <button type="button" className={dashboardStyles.saveButton} disabled>
+                  更新
+                </button>
+              </div>
+            </div>
+          </div>
+          <p className={styles.frameNote}>
+            ※ 一覧の「編集」ボタンを押すと、そのTodoの現在の値があらかじめ入った状態でこの
+            モーダルが開く。
+          </p>
         </div>
       </section>
     </div>

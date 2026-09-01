@@ -1,5 +1,22 @@
 <!--
 Sync Impact Report
+- Version change: 2.19.0 → 2.20.0 (MINOR — materially expands the mockup-first
+  Development Workflow rule (Principle VI / ADR-0004): a screen-bearing
+  feature's GitHub Issue MUST now be created before or alongside mockup
+  creation, not deferred to `/speckit-taskstoissues`)
+- Modified sections: Development Workflow's mockup-first bullet gains the
+  Issue-creation requirement; `.claude/skills/speckit-specify/SKILL.md`
+  step 0 updated to check for/create the tracking Issue before the mockup
+  check.
+- Rationale: while adding a Todo editing feature's mockup to `/mockup`, the
+  user asked "イシュー切ってるか?" (have you cut an Issue?) and, once told
+  none was required yet under the existing rules, said an Issue should be
+  cut for mockup creation itself and that this should be written into the
+  rules rather than decided ad hoc. Until now, GitHub Issues for a
+  screen-bearing feature were only created at the `/speckit-taskstoissues`
+  stage — well after the mockup, spec, and plan already existed — leaving
+  the very first artifact of the pipeline untracked. See the 2026-09-01
+  addendum to ADR-0004 in `doc/common/adr/`.
 - Version change: 2.18.0 → 2.19.0 (MINOR — four new Core Principles XIV-XVII,
   adopting the relevant subset of Future Architect's "Webフロントエンド開発
   ガイドライン": XIV URL Path Design Conformance (check-url-path-design.mjs),
@@ -978,8 +995,14 @@ binding constraints, not an inventory.
   removes the ambiguity of describing a screen in natural-language prose
   alone. `/speckit-specify` MUST check for an agreed mockup and halt,
   directing to the `design` skill, if none exists. This does not apply
-  to features with no screen (e.g. a purely internal BFF change). See
-  ADR-0004 in `doc/common/adr/`.
+  to features with no screen (e.g. a purely internal BFF change). A
+  screen-bearing feature MUST also have a GitHub Issue created for it
+  before or alongside mockup creation — not deferred to
+  `/speckit-taskstoissues`, which only creates task-level Issues much
+  later once the spec/plan/tasks already exist. The Issue is referenced
+  in the commit/PR that adds the mockup, never in the ユースケース記述
+  header (Principle VI's one header exception is `**モックアップ**` only).
+  See ADR-0004 in `doc/common/adr/`.
 - App-wide technical facts (language/version, primary dependencies,
   target platform, project type, storage mechanism, repository layout)
   that hold for every feature MUST be documented once in
@@ -1120,4 +1143,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.19.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-09-01
+**Version**: 2.20.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-09-01

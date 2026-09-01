@@ -64,6 +64,16 @@ The text the user typed after `/speckit-specify` in the triggering message **is*
    more screens (any UI a person looks at or interacts with — a page, a modal, a dialog), this
    step is **MANDATORY** and MUST run before step 1. It does not apply to features with no UI
    surface at all (e.g. a pure backend/BFF-internal change with nothing a person looks at).
+   - **Check for a tracking GitHub Issue first**: a screen-bearing feature MUST have a GitHub
+     Issue created for it before, or at the same time as, mockup creation — do not defer this to
+     `speckit-taskstoissues` as with the rest of the pipeline (that stage only creates
+     task-level Issues much later, once the spec/plan/tasks already exist). If the user's message
+     doesn't name/link an existing Issue and none was created earlier in this conversation,
+     create one now (a concise title plus a short body summarizing the requested feature) before
+     producing the mockup. Record its number as `TRACKING_ISSUE`; reference it in the commit/PR
+     that adds the mockup (commit message or PR body, the same mechanism Principle VIII already
+     uses) — do NOT add it to the ユースケース記述 header, which Principle VI restricts to the
+     `**モックアップ**` field as its one exception to excluding project-management metadata.
    - Check whether an agreed-upon mockup already exists for this feature: either the user's
      message names/links a mockup Artifact (from the `design` skill), or one was produced and
      agreed on earlier in this same conversation.
