@@ -43,3 +43,14 @@ export function removeTodo(id: string): void {
     list.splice(index, 1);
   }
 }
+
+export function updateTodo(id: string, input: Omit<Todo, "id">): Todo | undefined {
+  const list = todos();
+  const index = list.findIndex((todo) => todo.id === id);
+  if (index === -1) {
+    return undefined;
+  }
+  const updated: Todo = { ...input, id };
+  list[index] = updated;
+  return updated;
+}

@@ -58,4 +58,37 @@ describe("TodoDashboard", () => {
     expect(screen.queryByText("Todoを追加")).not.toBeInTheDocument();
     expect(screen.getByText("タスクA")).toBeInTheDocument();
   });
+
+  it("opens the edit modal prefilled on 編集 click, and reflects the updated todo in the list on success", async () => {
+    const updatedTodo: Todo = {
+      id: "1",
+      title: "更新後タスク",
+      dueDate: "2026-11-01",
+      assignee: "更新太郎",
+      status: "完了",
+    };
+    (global.fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => updatedTodo });
+    render(<TodoDashboard initialTodos={initialTodos} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "編集" }));
+    expect(screen.getByText("Todoを編集")).toBeInTheDocument();
+    expect(screen.getByLabelText("Todo名")).toHaveValue("タスクA");
+
+    fireEvent.change(screen.getByLabelText("Todo名"), { target: { value: "更新後タスク" } });
+    fireEvent.click(screen.getByRole("button", { name: "更新" }));
+
+    await waitForElementToBeRemoved(() => screen.queryByText("Todoを編集"));
+    expect(screen.getByText("更新後タスク")).toBeInTheDocument();
+    expect(screen.queryByText("タスクA")).not.toBeInTheDocument();
+  });
+
+  it("closes the edit modal without changing the list when Cancel is clicked", () => {
+    render(<TodoDashboard initialTodos={initialTodos} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "編集" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(screen.queryByText("Todoを編集")).not.toBeInTheDocument();
+    expect(screen.getByText("タスクA")).toBeInTheDocument();
+  });
 });

@@ -13,10 +13,11 @@ const STATUS_CLASS: Record<TodoStatus, string> = {
 type TodoListProps = {
   todos: Todo[];
   onDeleted: (id: string) => void;
+  onEditClick: (todo: Todo) => void;
   onAddClick: () => void;
 };
 
-export default function TodoList({ todos, onDeleted, onAddClick }: TodoListProps) {
+export default function TodoList({ todos, onDeleted, onEditClick, onAddClick }: TodoListProps) {
   async function handleDelete(id: string) {
     if (!window.confirm("このTodoを削除しますか？")) {
       return;
@@ -68,13 +69,22 @@ export default function TodoList({ todos, onDeleted, onAddClick }: TodoListProps
                   </span>
                 </td>
                 <td>
-                  <button
-                    type="button"
-                    className={styles.deleteButton}
-                    onClick={() => handleDelete(todo.id)}
-                  >
-                    削除
-                  </button>
+                  <div className={styles.rowActions}>
+                    <button
+                      type="button"
+                      className={styles.editButton}
+                      onClick={() => onEditClick(todo)}
+                    >
+                      編集
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.deleteButton}
+                      onClick={() => handleDelete(todo.id)}
+                    >
+                      削除
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))

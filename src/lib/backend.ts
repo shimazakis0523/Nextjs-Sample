@@ -1,6 +1,13 @@
 import { backendFetch } from "./backend-client";
 import { mockUsers, type User } from "./mock-data";
-import { addTodo, listTodos, removeTodo, type Todo, type TodoStatus } from "./mock-todos";
+import {
+  addTodo,
+  listTodos,
+  removeTodo,
+  updateTodo as updateMockTodo,
+  type Todo,
+  type TodoStatus,
+} from "./mock-todos";
 
 // モックバックエンドと実バックエンドの切り替え地点。BACKEND_API_URLが未設定である限り、
 // Route Handlerは他のコード変更なしにモックデータを取得する。実バックエンドができたら
@@ -29,6 +36,20 @@ export async function createTodo(input: Omit<Todo, "id">): Promise<Todo> {
   }
   return backendFetch("/todos", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function updateTodo(
+  id: string,
+  input: Omit<Todo, "id">
+): Promise<Todo | undefined> {
+  if (USE_MOCK_BACKEND) {
+    return updateMockTodo(id, input);
+  }
+  return backendFetch(`/todos/${id}`, {
+    method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
   });

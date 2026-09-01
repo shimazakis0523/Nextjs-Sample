@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { addTodoViaUI, clearAllTodos, rowByTitle } from "./helpers";
+import { addTodoViaUI, clearAllTodos, openEditModal, rowByTitle } from "./helpers";
 
 // Covers specs/001-todo-dashboard/screens/todo-list/e2e-test-spec.md.
 // Tests run sequentially (playwright.config.ts: fullyParallel=false, workers=1)
@@ -16,11 +16,11 @@ test("TC-002: 0件のとき「Todoがありません」が表示される", asyn
   await expect(page.locator("table tbody tr td[colspan]")).toBeVisible();
 });
 
-test("TC-007: 見出しが「Todoダッシュボード」固定で表示される", async ({ page }) => {
+test("TC-008: 見出しが「Todoダッシュボード」固定で表示される", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Todoダッシュボード" })).toBeVisible();
 });
 
-test("TC-001, TC-008, TC-011: 追加順(古い順)で一覧表示され、各列が正しく表示される", async ({
+test("TC-001, TC-009, TC-013: 追加順(古い順)で一覧表示され、各列が正しく表示される", async ({
   page,
 }) => {
   await addTodoViaUI(page, {
@@ -51,7 +51,7 @@ test("TC-001, TC-008, TC-011: 追加順(古い順)で一覧表示され、各列
   expect(secondRowCells[0]).toBe("後で追加したタスク");
 });
 
-test("TC-009: ステータスバッジが4種類とも正しく表示される", async ({ page }) => {
+test("TC-010: ステータスバッジが4種類とも正しく表示される", async ({ page }) => {
   const statuses = ["未着手", "進行中", "完了", "保留"] as const;
   for (const status of statuses) {
     await addTodoViaUI(page, {
@@ -72,7 +72,40 @@ test("TC-003: Addボタンをクリックするとtodo-new(モーダル)が表�
   await expect(page.getByText("Todoを追加")).toBeVisible();
 });
 
-test("TC-004, TC-010, TC-012: 削除確認OKで該当行のみ削除される", async ({ page }) => {
+test("TC-004: 編集ボタンをクリックするとTodo編集画面が表示される", async ({ page }) => {
+  await addTodoViaUI(page, {
+    title: "編集対象タスク",
+    dueDate: "2026-10-01",
+    assignee: "山田太郎",
+    status: "未着手",
+  });
+
+  await openEditModal(page, "編集対象タスク");
+
+  await expect(page.locator('input[type="text"]').first()).toHaveValue("編集対象タスク");
+});
+
+test("TC-011: 編集ボタンが行ごとに独立して対象Todoに作用する", async ({ page }) => {
+  await addTodoViaUI(page, {
+    title: "タスクA",
+    dueDate: "2026-10-01",
+    assignee: "山田太郎",
+    status: "未着手",
+  });
+  await addTodoViaUI(page, {
+    title: "タスクB",
+    dueDate: "2026-10-02",
+    assignee: "鈴木花子",
+    status: "進行中",
+  });
+
+  await openEditModal(page, "タスクB");
+
+  await expect(page.locator('input[type="text"]').first()).toHaveValue("タスクB");
+  await expect(page.locator('input[type="text"]').first()).not.toHaveValue("タスクA");
+});
+
+test("TC-005, TC-012, TC-014: 削除確認OKで該当行のみ削除される", async ({ page }) => {
   await addTodoViaUI(page, {
     title: "残すタスク",
     dueDate: "2026-10-01",
@@ -99,7 +132,7 @@ test("TC-004, TC-010, TC-012: 削除確認OKで該当行のみ削除される", 
   await expect(rowByTitle(page, "残すタスク")).toHaveCount(1);
 });
 
-test("TC-005: 削除確認でキャンセルすると一覧は変更されない", async ({ page }) => {
+test("TC-006: 削除確認でキャンセルすると一覧は変更されない", async ({ page }) => {
   await addTodoViaUI(page, {
     title: "キャンセル対象タスク",
     dueDate: "2026-10-01",
@@ -114,7 +147,7 @@ test("TC-005: 削除確認でキャンセルすると一覧は変更されない
   await expect(rowByTitle(page, "キャンセル対象タスク")).toHaveCount(1);
 });
 
-test("TC-013: 最後の1件を削除すると空状態メッセージが表示される", async ({ page }) => {
+test("TC-015: 最後の1件を削除すると空状態メッセージが表示される", async ({ page }) => {
   await addTodoViaUI(page, {
     title: "最後のタスク",
     dueDate: "2026-10-01",
@@ -133,7 +166,7 @@ test("TC-013: 最後の1件を削除すると空状態メッセージが表示�
   await expect(page.getByText("Todoがありません")).toBeVisible();
 });
 
-test("TC-006: 削除リクエスト失敗時、一覧は変更されずエラー表示もない", async ({ page }) => {
+test("TC-007: 削除リクエスト失敗時、一覧は変更されずエラー表示もない", async ({ page }) => {
   await addTodoViaUI(page, {
     title: "削除失敗タスク",
     dueDate: "2026-10-01",

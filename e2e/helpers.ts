@@ -47,3 +47,9 @@ export async function addTodoViaUI(page: Page, input: NewTodoInput) {
 export function rowByTitle(page: Page, title: string) {
   return page.locator("table tbody tr", { has: page.getByText(title, { exact: true }) });
 }
+
+/** Clicks the 編集 button for the row with the given title -- leaves the edit modal open. */
+export async function openEditModal(page: Page, title: string) {
+  await rowByTitle(page, title).getByRole("button", { name: "編集" }).click();
+  await expect(page.getByText("Todoを編集")).toBeVisible();
+}

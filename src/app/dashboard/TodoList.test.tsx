@@ -17,7 +17,7 @@ describe("TodoList", () => {
   });
 
   it("renders each todo's title/dueDate/assignee/status", () => {
-    render(<TodoList todos={todos} onDeleted={jest.fn()} onAddClick={jest.fn()} />);
+    render(<TodoList todos={todos} onDeleted={jest.fn()} onEditClick={jest.fn()} onAddClick={jest.fn()} />);
 
     expect(screen.getByText("タスクA")).toBeInTheDocument();
     expect(screen.getByText("2026-10-01")).toBeInTheDocument();
@@ -26,25 +26,37 @@ describe("TodoList", () => {
   });
 
   it("shows the empty-state message when there are no todos", () => {
-    render(<TodoList todos={[]} onDeleted={jest.fn()} onAddClick={jest.fn()} />);
+    render(<TodoList todos={[]} onDeleted={jest.fn()} onEditClick={jest.fn()} onAddClick={jest.fn()} />);
 
     expect(screen.getByText("Todoがありません")).toBeInTheDocument();
   });
 
   it("calls onAddClick when the Add button is clicked", () => {
     const onAddClick = jest.fn();
-    render(<TodoList todos={todos} onDeleted={jest.fn()} onAddClick={onAddClick} />);
+    render(<TodoList todos={todos} onDeleted={jest.fn()} onEditClick={jest.fn()} onAddClick={onAddClick} />);
 
     fireEvent.click(screen.getByRole("button", { name: "+ Add" }));
 
     expect(onAddClick).toHaveBeenCalledTimes(1);
   });
 
+  it("calls onEditClick with the clicked row's todo, left of the delete button", () => {
+    const onEditClick = jest.fn();
+    render(<TodoList todos={todos} onDeleted={jest.fn()} onEditClick={onEditClick} onAddClick={jest.fn()} />);
+
+    const editButtons = screen.getAllByRole("button", { name: "編集" });
+    fireEvent.click(editButtons[1]);
+
+    expect(onEditClick).toHaveBeenCalledTimes(1);
+    expect(onEditClick).toHaveBeenCalledWith(todos[1]);
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
   it("calls DELETE and onDeleted for the clicked row when the user confirms", async () => {
     jest.spyOn(window, "confirm").mockReturnValue(true);
     (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
     const onDeleted = jest.fn();
-    render(<TodoList todos={todos} onDeleted={onDeleted} onAddClick={jest.fn()} />);
+    render(<TodoList todos={todos} onDeleted={onDeleted} onEditClick={jest.fn()} onAddClick={jest.fn()} />);
 
     fireEvent.click(screen.getAllByRole("button", { name: "削除" })[0]);
 
@@ -55,7 +67,7 @@ describe("TodoList", () => {
   it("does not call DELETE or onDeleted when the user cancels the confirm dialog", () => {
     jest.spyOn(window, "confirm").mockReturnValue(false);
     const onDeleted = jest.fn();
-    render(<TodoList todos={todos} onDeleted={onDeleted} onAddClick={jest.fn()} />);
+    render(<TodoList todos={todos} onDeleted={onDeleted} onEditClick={jest.fn()} onAddClick={jest.fn()} />);
 
     fireEvent.click(screen.getAllByRole("button", { name: "削除" })[0]);
 
@@ -67,7 +79,7 @@ describe("TodoList", () => {
     jest.spyOn(window, "confirm").mockReturnValue(true);
     (global.fetch as jest.Mock).mockResolvedValue({ ok: false });
     const onDeleted = jest.fn();
-    render(<TodoList todos={todos} onDeleted={onDeleted} onAddClick={jest.fn()} />);
+    render(<TodoList todos={todos} onDeleted={onDeleted} onEditClick={jest.fn()} onAddClick={jest.fn()} />);
 
     fireEvent.click(screen.getAllByRole("button", { name: "削除" })[0]);
 

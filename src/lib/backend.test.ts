@@ -11,6 +11,7 @@ jest.mock("./mock-todos", () => ({
   listTodos: jest.fn(),
   addTodo: jest.fn(),
   removeTodo: jest.fn(),
+  updateTodo: jest.fn(),
 }));
 
 const ORIGINAL_BACKEND_API_URL = process.env.BACKEND_API_URL;
@@ -71,6 +72,19 @@ describe("when BACKEND_API_URL is not set (mock backend)", () => {
     expect(removeTodo).toHaveBeenCalledWith("1");
     expect(backendFetch).not.toHaveBeenCalled();
   });
+
+  it("updateTodo delegates to mock-todos' updateTodo without calling backendFetch", async () => {
+    const { updateTodo } = await import("./backend");
+    const { updateTodo: updateMockTodo } = await import("./mock-todos");
+    const { backendFetch } = await import("./backend-client");
+    const input = { title: "T", dueDate: "2026-01-01", assignee: "A", status: "未着手" as const };
+    const updated: Todo = { id: "1", ...input };
+    (updateMockTodo as jest.Mock).mockReturnValue(updated);
+
+    await expect(updateTodo("1", input)).resolves.toBe(updated);
+    expect(updateMockTodo).toHaveBeenCalledWith("1", input);
+    expect(backendFetch).not.toHaveBeenCalled();
+  });
 });
 
 describe("when BACKEND_API_URL is set (real backend)", () => {
@@ -124,5 +138,20 @@ describe("when BACKEND_API_URL is set (real backend)", () => {
     await deleteTodo("1");
 
     expect(backendFetch).toHaveBeenCalledWith("/todos/1", { method: "DELETE" });
+  });
+
+  it("updateTodo delegates to backendFetch with a PUT request", async () => {
+    const { updateTodo } = await import("./backend");
+    const { backendFetch } = await import("./backend-client");
+    const input = { title: "T", dueDate: "2026-01-01", assignee: "A", status: "未着手" as const };
+    const updated: Todo = { id: "1", ...input };
+    (backendFetch as jest.Mock).mockResolvedValue(updated);
+
+    await expect(updateTodo("1", input)).resolves.toEqual(updated);
+    expect(backendFetch).toHaveBeenCalledWith("/todos/1", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
   });
 });

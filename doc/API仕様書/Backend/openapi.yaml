@@ -72,6 +72,30 @@ paths:
                 $ref: "../common/schemas/Todo.yaml#/Todo"
 
   /todos/{id}:
+    put:
+      tags: [todo]
+      summary: Todo更新
+      description: 指定したidのTodoをtitle・dueDate・assignee・statusで全体更新する。
+      operationId: updateTodo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../common/schemas/Todo.yaml#/TodoInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "../common/schemas/Todo.yaml#/Todo"
     delete:
       tags: [todo]
       summary: Todo削除

@@ -60,6 +60,42 @@ describe("mock-todos", () => {
     expect(listTodos()).toHaveLength(2);
   });
 
+  it("updateTodo replaces the matching todo's fields and returns it", async () => {
+    const { listTodos, updateTodo } = await loadModule();
+
+    const updated = updateTodo("1", {
+      title: "更新後タスク",
+      dueDate: "2026-11-01",
+      assignee: "更新太郎",
+      status: "完了",
+    });
+
+    expect(updated).toEqual({
+      id: "1",
+      title: "更新後タスク",
+      dueDate: "2026-11-01",
+      assignee: "更新太郎",
+      status: "完了",
+    });
+    const todos = listTodos();
+    expect(todos.find((todo) => todo.id === "1")).toEqual(updated);
+    expect(todos).toHaveLength(2);
+  });
+
+  it("updateTodo returns undefined and changes nothing for an unknown id", async () => {
+    const { listTodos, updateTodo } = await loadModule();
+
+    const result = updateTodo("does-not-exist", {
+      title: "無視される",
+      dueDate: "2026-11-01",
+      assignee: "誰か",
+      status: "完了",
+    });
+
+    expect(result).toBeUndefined();
+    expect(listTodos()).toHaveLength(2);
+  });
+
   it("persists additions across separate calls within the same process (globalThis cache)", async () => {
     const { addTodo } = await loadModule();
     addTodo({ title: "A", dueDate: "2026-10-01", assignee: "X", status: "未着手" });

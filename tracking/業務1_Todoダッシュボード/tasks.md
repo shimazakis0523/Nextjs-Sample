@@ -6,19 +6,21 @@ description: "Task list for feature implementation"
 
 **Input**: Design documents from `/doc/フロントエンド設計書/業務1_Todoダッシュボード/`
 
-**Prerequisites**: [詳細設計書](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/詳細設計書.md), [ユースケース記述(Todo一覧)](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/ユースケース記述_Todo一覧.md), [ユースケース記述(Todo新規登録)](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/ユースケース記述_Todo新規登録.md), [AP方式設計書(フロントエンド編)](../../doc/common/AP方式設計書(フロントエンド編).md), [AP方式設計書(バックエンド編)](../../doc/common/AP方式設計書(バックエンド編).md), [doc/API仕様書/](../../doc/API仕様書/)
+**Prerequisites**: [詳細設計書](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/詳細設計書.md), [ユースケース記述(Todo一覧)](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/ユースケース記述_Todo一覧.md), [ユースケース記述(Todo新規登録)](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/ユースケース記述_Todo新規登録.md), [ユースケース記述(Todo編集)](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/ユースケース記述_Todo編集.md), [AP方式設計書(フロントエンド編)](../../doc/common/AP方式設計書(フロントエンド編).md), [AP方式設計書(バックエンド編)](../../doc/common/AP方式設計書(バックエンド編).md), [doc/API仕様書/](../../doc/API仕様書/)
 
-**Note**: この業務は実装済みのため、以下は「新規実装タスク」ではなく「既存実装が仕様書
-(ユースケース記述・画面定義書 / doc/API仕様書/**)と一致しているかを確認するタスク」で
-ある。差分が見つかった場合は、実装と仕様書のどちらを正とするか判断した上で修正する。
+**Note**: Phase 1〜6(todo-list・todo-new)は実装済みの機能を遡って仕様書化したため、
+「新規実装タスク」ではなく「既存実装が仕様書と一致しているかを確認するタスク」だった。
+一方、Phase 7以降(todo-edit)は未実装の新機能であり、通常の「仕様書に基づいて新規実装する
+タスク」である。
 
-**Organization**: 画面(todo-list, todo-new)ごとにグループ化する。仕様書はユースケース単位の
-優先順位付け(P1/P2/P3)を持たないため(Principle VI: ユーザーストーリー形式の禁止)、代わりに
-画面をグループ単位として使う。
+**Organization**: 画面(todo-list, todo-new, todo-edit)ごとにグループ化する。仕様書は
+ユースケース単位の優先順位付け(P1/P2/P3)を持たないため(Principle VI: ユーザーストーリー
+形式の禁止)、代わりに画面をグループ単位として使う。
 
-**GitHub Issues**: 親Issue [#22](https://github.com/shimazakis0523/Nextjs-Sample/issues/22)。
-各タスクのIssue番号は下表の通り(`speckit-implement`の着手条件チェックが参照する、この機能の
-唯一の対応表)。
+**GitHub Issues**: 親Issue [#22](https://github.com/shimazakis0523/Nextjs-Sample/issues/22)
+(Phase 1〜6)、[#38](https://github.com/shimazakis0523/Nextjs-Sample/issues/38)(Phase 7〜8、
+Todo編集機能)。各タスクのIssue番号は下表の通り(`speckit-implement`の着手条件チェックが
+参照する、この機能の唯一の対応表)。
 
 | Task | Issue | Task | Issue | Task | Issue | Task | Issue |
 |---|---|---|---|---|---|---|---|
@@ -27,12 +29,15 @@ description: "Task list for feature implementation"
 | T003 | #4  | T008 | #9  | T013 | #14 | T018 | #19 |
 | T004 | #5  | T009 | #10 | T014 | #15 | T019 | #20 |
 | T005 | #6  | T010 | #11 | T015 | #16 | T020 | #21 |
-| T021 | #23 |     |     |     |     |     |     |
+| T021 | #23 | T022 | #39 | T023 | #40 | T024 | #41 |
+| T025 | #42 | T026 | #43 | T027 | #44 | T028 | #45 |
+| T029 | #46 | T030 | #47 | T031 | #48 | T032 | #49 |
+| T033 | #50 |     |     |     |     |     |     |
 
 ## Format: `[ID] [P?] [Screen] Description`
 
 - **[P]**: 並行実行可能(異なるファイル、依存関係なし)
-- **[Screen]**: 対象画面(US1 = todo-list, US2 = todo-new)
+- **[Screen]**: 対象画面(US1 = todo-list, US2 = todo-new, US3 = todo-edit)
 
 ## Phase 1: Setup (Shared Infrastructure)
 
@@ -145,6 +150,76 @@ TC-014をモーダル表示状態で手動実行する
 
 **Checkpoint**: コンポーネント構成が[詳細設計書](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/詳細設計書.md)と一致した状態
 
+## Phase 7: Todo編集機能 [US3]
+
+**Goal**: [ユースケース記述(Todo編集)](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/ユースケース記述_Todo編集.md)・[画面定義書(Todo編集)](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/画面定義書_Todo編集.md)
+の内容通りに、Todo一覧の編集ボタンから編集モーダルを開き、更新・永続化・一覧への反映が
+動作するようにする
+
+**Independent Test**: [E2E仕様書(Todo編集)](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/E2E仕様書_Todo編集.md) のTC-001〜
+TC-015をモーダル表示状態で実行する
+
+### 実装
+
+- [X] T022 [P] [US3] `doc/API仕様書/BFF/openapi.yaml`の`/todos/{id}`に`put`を追加する
+      (`operationId: updateTodo`、`requestBody`は既存の`TodoInput`を再利用、
+      `responses`は`200 Todo`・`400 BadRequest`(既存の`components.responses.BadRequest`
+      を再利用)・新規`404 NotFound`)。画面定義書(Todo編集) 処理仕様 #3が根拠。
+- [X] T023 [P] [US3] `src/lib/mock-todos.ts`に`updateTodo(id: string, input: Omit<Todo, "id">): Todo | undefined`
+      を追加する(該当idが無ければ`undefined`を返す。あれば該当要素を`{ ...input, id }`で
+      置き換えて返す)。`src/lib/mock-todos.test.ts`に、更新成功・対象なしの両方のケースを
+      追加する。
+- [X] T024 [US3] `src/lib/backend.ts`に`updateTodo(id: string, input: Omit<Todo, "id">): Promise<Todo | undefined>`
+      を追加する(mock分岐は`mock-todos.ts`の`updateTodo`を呼ぶ、実分岐は`backendFetch`で
+      `PUT /todos/${id}`を呼ぶ)。T023完了後に着手。
+- [X] T025 [US3] `src/app/api/todos/[id]/route.ts`に`PUT`ハンドラを追加する
+      (`POST /api/todos`と同じ必須項目チェックで不正なら400、`updateTodo()`の結果が
+      `undefined`なら404、成功時は更新後のTodoを200で返す)。`src/app/api/todos/[id]/route.test.ts`
+      に、成功・バリデーション失敗・対象なしの3ケースを追加する。T024完了後に着手。
+- [X] T026 [P] [US3] `src/app/dashboard/TodoEditModal.tsx`を新規作成する(`TodoNewModal.tsx`
+      と同じ構造で、`todo: Todo`をpropsで受け取りフォーム初期値に使う。更新ボタン押下で
+      `PUT /api/todos/${todo.id}`を呼び、成功時`onUpdated(todo)`、失敗時
+      「更新に失敗しました」を表示)。`src/app/dashboard/TodoEditModal.test.tsx`を同時に
+      作成し、初期値反映・必須項目ブロック・成功/失敗・Cancel/外側クリック/Escの各パスを
+      カバーする(Principle VII)。
+- [X] T027 [US3] `src/app/dashboard/TodoList.tsx`に、削除ボタンの左隣に編集ボタンを追加し
+      (`.rowActions`でラップ)、`onEditClick: (todo: Todo) => void` propsを追加してクリック
+      時に該当行の`todo`を渡す。`src/app/dashboard/TodoList.test.tsx`を更新し、編集ボタンの
+      表示・クリックで正しい`todo`が渡されることを確認するケースを追加する。
+- [X] T028 [US3] `src/app/dashboard/TodoDashboard.tsx`に`editingTodo: Todo | null` stateと
+      `handleEditClick(todo)`(`editingTodo`にセット)・`handleUpdated(todo)`(`todos`内の
+      同idの要素を置き換え、`editingTodo`を`null`に戻す)を追加し、`TodoList`に
+      `onEditClick={handleEditClick}`を渡し、`editingTodo`が非nullのとき`TodoEditModal`を
+      表示する。`src/app/dashboard/TodoDashboard.test.tsx`を更新し、編集→更新→一覧反映の
+      一連の流れを確認するケースを追加する。T026, T027完了後に着手。
+- [X] T029 [US3] `e2e/todo-edit.spec.ts`を新規作成し、[E2E仕様書(Todo編集)](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/E2E仕様書_Todo編集.md)
+      のTC-001〜TC-015に対応するテストケースを実装する。T025, T028完了後に着手。
+- [X] T030 [US3] `e2e/todo-list.spec.ts`に、[E2E仕様書(Todo一覧)](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/E2E仕様書_Todo一覧.md)の
+      TC-004(Todo編集画面を開く)・TC-011(編集ボタンの行独立性)に対応するケースを追加
+      する。T028完了後に着手。
+
+**Checkpoint**: Todo編集機能が仕様書通りに動作する状態
+
+## Phase 8: Polish & Cross-Cutting Concerns (Todo編集)
+
+**Purpose**: Todo編集機能追加に伴う画面横断のドキュメント整合性確認
+
+- [X] T031 [P] [画面遷移図](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/画面遷移図.md)がTodo一覧→Todo編集の遷移を反映して
+      いることを`update-screen-flow-diagram`スキルで確認する
+      — 確認OK: 3画面2遷移、Principle VI違反なし
+- [X] T032 [P] `check-openapi-contract`スキルで`doc/API仕様書/**`と実装の整合性を確認する
+      (`PUT /todos/{id}`を含む)
+      — `doc/API仕様書/Backend/openapi.yaml`に`PUT /todos/{id}`が抜けていた実際の不一致を
+      検出・修正(BFF契約には追加済みだったが、backend.tsの実バックエンド分岐が呼ぶ
+      Backend契約側への追加が漏れていた)。修正後、Redocly lint・Spectral・
+      check-openapi-bff-routes.mjsとも整合確認OK
+- [X] T033 [E2E仕様書(Todo編集)](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/E2E仕様書_Todo編集.md)と、編集ボタン追加を反映した
+      [E2E仕様書(Todo一覧)](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/E2E仕様書_Todo一覧.md)の全テストケースを`npx playwright test`
+      (playwright.config.tsのwebServer設定により`npm run dev`相当のサーバーを自動起動)で
+      実行し確認する — 確認OK: 38件全てpass(todo-edit 14件・todo-list 11件・todo-new 13件)
+
+**Checkpoint**: Todo編集機能が[詳細設計書](../../doc/フロントエンド設計書/業務1_Todoダッシュボード/詳細設計書.md)と一致し、既存2画面の回帰も無い状態
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -156,6 +231,11 @@ TC-014をモーダル表示状態で手動実行する
   (Addボタンからの遷移確認(T009)はTodo一覧画面側のタスク)
 - **Polish (Phase 5)**: 両画面の確認完了後
 - **コンポーネント分割 (Phase 6)**: 両画面の確認完了後。Polish(Phase 5)との順序制約はない
+- **Todo編集機能 [US3] (Phase 7)**: コンポーネント分割(Phase 6)完了後(`TodoList.tsx`・
+  `TodoDashboard.tsx`が分割済みであることが前提)。Phase 7内はT022/T023([P])→T024→T025
+  の直列、T026([P])は独立、T027はT026と並行可、T028はT026・T027完了後、T029はT025・T028
+  完了後、T030はT028完了後
+- **Todo編集機能 Polish (Phase 8)**: Phase 7完了後
 
 **着手条件(Issue単位)**: `speckit-implement`は、あるフェーズのタスクに着手する前に、下表の
 「前提Issue」が全てGitHub上でclosedであることを確認する。closedでない前提Issueがある場合、
@@ -169,6 +249,8 @@ TC-014をモーダル表示状態で手動実行する
 | 4 Todo新規登録画面 [US2] | #13〜#18 | #4, #5, #6 |
 | 5 Polish | #19, #20, #21 | #7〜#18(すべて) |
 | 6 コンポーネント分割 | #23 | #2〜#21(すべて) |
+| 7 Todo編集機能 [US3] | #39〜#47 | #23 |
+| 8 Todo編集機能 Polish | #48〜#50 | #39〜#47(すべて) |
 
 ### Parallel Opportunities
 
@@ -176,8 +258,13 @@ TC-014をモーダル表示状態で手動実行する
 - T006([P]、Phase 3)は他タスクと並行実行可能
 - Phase 3とPhase 4はFoundational完了後、並行して着手可能
 - T018〜T019([P]、Phase 5)は並行実行可能
+- T022〜T023([P]、Phase 7)は並行実行可能。T026([P]、Phase 7)は他タスクと並行実行可能
+- T031〜T032([P]、Phase 8)は並行実行可能
 
 ## Implementation Strategy
 
-この業務は実装済みのため「MVPから積み増す」フローではなく、Foundational→両画面→Polishの順に
-確認を進め、差分が見つかった時点で仕様書と実装のどちらを修正すべきか判断して対応する。
+Phase 1〜6は実装済みのため「MVPから積み増す」フローではなく、Foundational→両画面→Polishの
+順に確認を進め、差分が見つかった時点で仕様書と実装のどちらを修正すべきか判断して対応した。
+Phase 7〜8(Todo編集)は未実装の新機能であり、通常通りBFF層(openapi.yaml→backend.ts→
+route.ts)→UIコンポーネント(TodoEditModal→TodoList→TodoDashboard)→E2E→Polishの順に
+実装する。
