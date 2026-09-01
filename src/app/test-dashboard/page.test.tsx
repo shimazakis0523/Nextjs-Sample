@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { axe } from "jest-axe";
 
 jest.mock("node:fs", () => ({ readFileSync: jest.fn() }));
 
@@ -152,5 +153,15 @@ describe("TestDashboardPage", () => {
 
     expect(screen.getAllByText("業務A").length).toBeGreaterThan(0);
     expect(screen.getAllByText("業務B").length).toBeGreaterThan(0);
+  });
+
+  it("has no automatically detectable accessibility violations", async () => {
+    mockedReadFileSync.mockImplementation(() => {
+      throw new Error("ENOENT: no such file or directory");
+    });
+
+    const { container } = render(<TestDashboardPage />);
+
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

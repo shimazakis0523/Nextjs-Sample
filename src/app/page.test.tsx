@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import { axe } from "jest-axe";
 import Home from "./page";
 
 describe("Home (top page)", () => {
@@ -10,7 +11,7 @@ describe("Home (top page)", () => {
       name: "仕様駆動開発 × ハーネスエンジニアリング",
     });
     expect(heading).toBeInTheDocument();
-    expect(heading.closest("header")).toHaveTextContent(/Claude Code \(Web版\)/);
+    expect(screen.getByRole("banner")).toHaveTextContent(/Claude Code \(Web版\)/);
   });
 
   it("renders every development process step with its harness", () => {
@@ -35,11 +36,13 @@ describe("Home (top page)", () => {
       { phase: "実装", harness: "check-component-tests.sh(コンポーネント変更にテスト未追加を検出)" },
       {
         phase: "静的解析",
-        harness: "ESLint(複雑度/重複) + Spectral(OpenAPI規約) + 契約整合チェック",
+        harness:
+          "ESLint(複雑度/重複/testing-library) + Spectral(OpenAPI規約) + 契約整合チェック + " +
+          "URLパス設計/命名規則チェック",
       },
       {
         phase: "ユニットテスト",
-        harness: "カバレッジ閾値ゲート(statements/branches/functions/lines 95%)",
+        harness: "カバレッジ閾値ゲート(statements/branches/functions/lines 95%) + jest-axe",
       },
       { phase: "E2E", harness: "Playwright" },
       { phase: "品質分析", harness: "/test-dashboard" },
@@ -88,5 +91,11 @@ describe("Home (top page)", () => {
       "href",
       "/mockup"
     );
+  });
+
+  it("has no automatically detectable accessibility violations", async () => {
+    const { container } = render(<Home />);
+
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

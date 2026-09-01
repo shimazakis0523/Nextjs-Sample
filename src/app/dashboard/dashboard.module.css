@@ -5,6 +5,20 @@
   width: 100%;
 }
 
+/* 見た目には表示しないが、スクリーンリーダーには読み上げさせるテキスト用
+   (constitution.md Core Principle XV: axe-coreのempty-table-header違反を修正)。 */
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .header {
   display: flex;
   align-items: center;

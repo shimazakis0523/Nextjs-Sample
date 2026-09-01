@@ -59,6 +59,34 @@ jest.config.ts / jest.setup.ts  # Jestユニットテスト設定
 playwright.config.ts            # Playwright E2Eテスト設定
 ```
 
+## 非機能方針
+
+Future Architect社「Webフロントエンド開発ガイドライン」の該当章のうち、プロジェクト
+全体で一度だけ決定すればよい(機能ごとに再検討しない)方針をここに記録する。決定の
+背景・理由は`doc/common/adr/0024-web-frontend-guideline-conformance.md`を参照
+すること — このファイル自体は「なぜ」を説明せず、現時点の決定事項を記録するだけの
+事実集である。
+
+### 対応ブラウザ/サポートバージョン
+
+主要ブラウザ(Chrome, Edge, Firefox, Safari、iOS Safari/Android Chromeを含む)の
+最新2バージョンを対象とする。レガシーブラウザ(Internet Explorer等)は対象外。
+`package.json`の`browserslist`フィールドで機械的に表現する。
+
+### 国際化対応
+
+対応しない(日本語のみ)。多言語対応の要件が生じた時点で、あらためてADRとして
+決定し直す。
+
+### ダークモードの状態保持
+
+OS設定(`prefers-color-scheme`メディアクエリ)への追従のみとする。ユーザーによる
+手動切替トグルは設けない。
+
+### OGP
+
+設定しない。SNS等への積極的なリンク共有を想定した公開サービスではないため。
+
 ## 制約
 
 - 認証はまだ導入していない。

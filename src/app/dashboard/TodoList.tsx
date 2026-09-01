@@ -44,7 +44,9 @@ export default function TodoList({ todos, onDeleted, onAddClick }: TodoListProps
             <th>期限</th>
             <th>担当者</th>
             <th>ステータス</th>
-            <th aria-label="操作"></th>
+            <th>
+              <span className={styles.visuallyHidden}>操作</span>
+            </th>
           </tr>
         </thead>
         <tbody>

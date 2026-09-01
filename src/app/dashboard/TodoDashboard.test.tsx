@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
 import type { Todo } from "@/lib/backend";
 import TodoDashboard from "./TodoDashboard";
 
@@ -22,7 +22,7 @@ describe("TodoDashboard", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "削除" }));
 
-    await waitFor(() => expect(screen.getByText("Todoがありません")).toBeInTheDocument());
+    expect(await screen.findByText("Todoがありません")).toBeInTheDocument();
   });
 
   it("opens the modal on Add click, and adds the saved todo to the list on success", async () => {
@@ -44,7 +44,7 @@ describe("TodoDashboard", () => {
     fireEvent.change(screen.getByLabelText("担当者"), { target: { value: "担当太郎" } });
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
-    await waitFor(() => expect(screen.queryByText("Todoを追加")).not.toBeInTheDocument());
+    await waitForElementToBeRemoved(() => screen.queryByText("Todoを追加"));
     expect(screen.getByText("新規タスク")).toBeInTheDocument();
     expect(screen.getByText("タスクA")).toBeInTheDocument();
   });

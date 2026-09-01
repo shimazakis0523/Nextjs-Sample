@@ -1,5 +1,47 @@
 <!--
 Sync Impact Report
+- Version change: 2.18.0 → 2.19.0 (MINOR — four new Core Principles XIV-XVII,
+  adopting the relevant subset of Future Architect's "Webフロントエンド開発
+  ガイドライン": XIV URL Path Design Conformance (check-url-path-design.mjs),
+  XV Automated Accessibility Test Coverage (jest-axe + check-a11y-test-
+  coverage.sh), XVI Component & Test Authoring Lint Conventions
+  (eslint-plugin-testing-library + check-component-naming.mjs), XVII
+  Frontend Non-Functional Policy Documented (check-frontend-nonfunctional-
+  policy.mjs gating AP方式設計書(フロントエンド編).md's decisions on
+  対応ブラウザ/サポートバージョン・国際化対応・ダークモードの状態保持・OGP))
+- Modified sections: Four new Core Principles XIV-XVII added after Principle
+  XIII. New `doc/common/AP方式設計書(フロントエンド編).md` 非機能方針 section.
+  New non-normative `doc/common/フロントエンド設計ガイド.md`, referenced but
+  not enforced.
+- Rationale: the user shared Future Architect's Web Frontend Guideline (the
+  same publisher as ADR-0022's OpenAPI guideline, a different document) and
+  asked which sections should be excluded as inapplicable given the already-
+  adopted Next.js/BFF architecture, before deciding what to build. Reading
+  all 22 sections and sorting them into four buckets — sections to exclude
+  entirely (hosting/rendering/routing framework-selection frameworks,
+  authentication, PWA, the CORS-dev-server workaround the BFF pattern
+  already makes moot), harness candidates, items needing a one-time policy
+  decision recorded in a document rather than a per-feature choice, and
+  items needing human judgment too nuanced for a binary rule — the user
+  then directed each bucket's disposition: build harnesses for the
+  candidates (C), gate progression on the architecture document recording
+  the policy items' decisions rather than deciding their values unilaterally
+  (D), and write an advisory (non-enforced) guide for the nuanced items (E),
+  rather than silently picking values for the excluded/deferred items.
+  Building the accessibility-coverage harness (Principle XV) immediately
+  surfaced a real violation — an empty `<th aria-label="操作">` action-column
+  header in both `TodoList.tsx` and its mockup counterpart, which axe-core's
+  `empty-table-header` rule flags because an ARIA label alone isn't visible
+  text to all assistive technology — fixed with a visually-hidden `<span>`
+  rather than loosening the new gate to pass. Enabling
+  `eslint-plugin-testing-library`'s recommended rule set (Principle XVI)
+  likewise surfaced two real testing-detail violations (a `waitFor` +
+  `getByText` pattern instead of `findByText`, and `.closest("section")`
+  DOM traversal instead of an ARIA `region` role query) and one further
+  disappearance-check violation once the first fix removed an unused
+  import — all fixed in the test files themselves, consistent with this
+  project's practice of fixing what a new gate finds instead of exempting
+  it. See ADR-0024 in `doc/common/adr/`.
 - Version change: 2.17.0 → 2.18.0 (MINOR — new Core Principle XIII,
   Detailed Design Document Structural Conformance: every
   詳細設計書.md must have exactly the required section structure
@@ -802,6 +844,114 @@ violation in the document, so the rule was corrected to formally allow
 概要 rather than deleting content that was actually pulling its weight.
 See ADR-0023 in `doc/common/adr/`.
 
+### XIV. URL Path Design Conformance
+
+Every route-producing directory under `src/app/**` (page routes and BFF API
+routes alike — both are Next.js App Router-managed URL paths) MUST use
+kebab-case for static path segments, lowerCamelCase for dynamic segment
+parameters (`[paramName]`, not `[ParamName]`/`[param_name]`), and MUST NOT
+use an operation verb (`search`, `get`, `delete`, `fetch`, `list`, `update`,
+`create`, `remove`) as a segment name — a resource-centric noun MUST be used
+instead. `check-url-path-design.mjs` (the `url-path-design` job in the
+"Spec consistency" GitHub Actions workflow) enforces this on every PR,
+scanning every route-producing directory found under `src/app`, not only
+ones a PR touches (the same model as `openapi-routes`/`detailed-design-doc`).
+Deliberately excluded: enforcing that a resource name is plural (requires a
+dictionary and produces false positives on already-plural or irregular
+nouns) and query-parameter naming/usage conventions (requires semantic
+understanding of what a parameter represents, not a syntactic check) — see
+ADR-0024 for the full scope and reasoning.
+Rationale: the user asked which sections of Future Architect's Web Frontend
+Guideline should become mechanical checks. URL path design was judged the
+strongest candidate in the "URLパス設計" section — concrete, reliably
+checkable without semantic understanding, and this project's existing
+routes already conformed once checked. See ADR-0024 in `doc/common/adr/`.
+
+### XV. Automated Accessibility Test Coverage
+
+Every screen root (`src/app/**/page.tsx`) MUST have a colocated
+`jest-axe` assertion (`expect(await axe(container)).toHaveNoViolations()`)
+in its `page.test.tsx`, run as part of the existing Jest suite (`jest.setup.ts`
+registers the `toHaveNoViolations` matcher globally). `check-a11y-test-
+coverage.sh` (the `a11y-test-coverage` job in the "Spec consistency" GitHub
+Actions workflow) enforces that this assertion exists for every screen root
+on every PR, scanning all of `src/app/**/page.tsx`, not only ones a PR
+touches. This mechanism catches missing coverage and any violation reachable
+from the existing render call; it does not add end-to-end or interaction-
+state coverage beyond what the colocated test already renders. Deliberately
+excluded: a duplicate Playwright/E2E-level axe-core check — component-level
+Testing Library coverage already exercises every screen's static markup, and
+a second, largely redundant check at the E2E layer wasn't judged worth its
+added run time for this project's size — see ADR-0024.
+Rationale: the user asked to turn the Web Frontend Guideline's automated
+accessibility testing recommendation (axe-core combined with component/E2E
+tests) into a harness. Building the checker and wiring `jest-axe` into every
+screen's test immediately surfaced a real violation — `TodoList.tsx` and its
+mockup counterpart both had an action-column `<th aria-label="操作"></th>`
+that axe-core's `empty-table-header` rule flags, since an `aria-label` alone
+is not visible text to every assistive technology combination — fixed with a
+visually-hidden `<span>`, not by loosening the gate. See ADR-0024 in
+`doc/common/adr/`.
+
+### XVI. Component & Test Authoring Lint Conventions
+
+`eslint.config.mjs` MUST enable `eslint-plugin-testing-library`'s
+`flat/react` recommended rule set, scoped to `**/*.test.{ts,tsx}`, which
+mechanically enforces the Web Frontend Guideline's testing-trophy principle
+that a test verifies user-observable behavior rather than implementation
+details (e.g. `no-node-access` forbids reaching into the DOM directly instead
+of using Testing Library's own queries; `prefer-find-by`/`no-wait-for-side-
+effects` forbid a manual `waitFor` poll where a purpose-built async query
+already exists). `check-component-naming.mjs` (the `component-naming` job in
+the "Spec consistency" GitHub Actions workflow) additionally enforces that
+every component file under `src/app/**` (using the same special-filename
+exclusion as Principle VII) is named in PascalCase. The `code-quality` job
+already enforces the ESLint rules on every PR (`npm run lint:ci`);
+`component-naming` runs independently on every PR, scanning all of
+`src/app/**`, not only ones a PR touches. Deliberately excluded: a dedicated
+camelCase check for props/callback names — TypeScript/JSX syntax already
+makes a non-camelCase prop name so far outside idiomatic React usage that a
+dedicated rule would add negligible value over what the language already
+makes the path of least resistance — see ADR-0024.
+Rationale: the user asked to turn the Web Frontend Guideline's component-
+naming conventions and testing-trophy principle into harnesses. Enabling
+`eslint-plugin-testing-library`'s recommended rules immediately surfaced two
+real violations (a `waitFor` + `getByText` pattern where `findByText` was
+the purpose-built alternative, and `.closest("section")` DOM traversal
+instead of an ARIA `region`-role query) plus a knock-on disappearance-check
+violation once the first fix's now-unused `waitFor` import was removed —
+all fixed in the test files themselves, not exempted. See ADR-0024 in
+`doc/common/adr/`.
+
+### XVII. Frontend Non-Functional Policy Documented
+
+`doc/common/AP方式設計書(フロントエンド編).md`'s 非機能方針 section MUST
+record an explicit, non-placeholder decision for each of: 対応ブラウザ/
+サポートバージョン, 国際化対応, ダークモードの状態保持, OGP — project-wide
+policy questions the Web Frontend Guideline raises that need a one-time
+human decision, not a per-feature one, and that no per-feature design
+document has anywhere to state. `check-frontend-nonfunctional-policy.mjs`
+(the `frontend-nonfunctional-policy` job in the "Spec consistency" GitHub
+Actions workflow) enforces this on every PR, failing when a required
+`### ` section is missing, empty, or still holds a placeholder marker
+(未定/TBD/検討中/TODO). This is a document-acceptance gate on whether a
+decision has been recorded, not a check of whether the recorded decision's
+value is itself correct — it functions as an acceptance criterion for
+proceeding to detailed design/implementation, the same role Principle VI's
+mockup-agreement gate (ADR-0004) plays earlier in the pipeline, but
+expressed as a PR-blocking CI check (the same model as `openapi-routes`/
+`detailed-design-doc`) rather than a skill-level halt, since these are
+project-wide facts checked against a single document on every PR rather
+than a per-feature artifact requiring human sign-off before generation.
+Rationale: the user asked that these Web Frontend Guideline items — each
+needing a policy decision no harness should make unilaterally — become an
+architecture-document acceptance criterion rather than either a hard rule
+or a silent gap. The initially-recorded decisions (modern evergreen browsers
+via `browserslist`; no i18n; OS-only dark mode with no manual toggle; no
+OGP) and their rationale are in ADR-0024, not repeated here since this
+principle governs the presence of a decision, not its content. See
+ADR-0024 in `doc/common/adr/`.
+
 ## Technology & Deployment Constraints
 
 See `doc/common/AP方式設計書(フロントエンド編).md` and
@@ -891,6 +1041,13 @@ binding constraints, not an inventory.
   duplicated the component-relationship section or restated
   constitution.md without adding information. See ADR-0008 and ADR-0010
   in `doc/common/adr/`.
+- `doc/common/フロントエンド設計ガイド.md` records design considerations that
+  were deliberately NOT turned into a Principle or CI gate (CSS class naming
+  convention choice, validation message wording, screen-to-screen parameter
+  passing method, static-analysis rollout philosophy) — it is advisory only,
+  not enforced by CI or reviewed as a MUST/MUST NOT; consult it when a
+  relevant design decision comes up, but its non-conformance is never a PR
+  blocker. See ADR-0024 in `doc/common/adr/`.
 - Use `/speckit-clarify` when requirements are ambiguous, before
   `/speckit-plan`.
 - Run `/speckit-analyze` after `/speckit-tasks` and before
@@ -963,4 +1120,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.18.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31
+**Version**: 2.19.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-09-01

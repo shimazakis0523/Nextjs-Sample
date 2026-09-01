@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { axe } from "jest-axe";
 import * as backend from "@/lib/backend";
 import type { Todo } from "@/lib/backend";
 import DashboardPage from "./page";
@@ -23,5 +24,14 @@ describe("DashboardPage", () => {
     render(ui);
 
     expect(await screen.findByTestId("todo-dashboard")).toHaveTextContent("1 todos");
+  });
+
+  it("has no automatically detectable accessibility violations", async () => {
+    mockedBackend.getTodos.mockResolvedValue([]);
+
+    const ui = await DashboardPage();
+    const { container } = render(ui);
+
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

@@ -47,6 +47,43 @@ jobs:
           node-version: 22
       - run: node .github/scripts/check-detailed-design-doc.mjs
 
+  frontend-nonfunctional-policy:
+    name: AP方式設計書(フロントエンド編).md's non-functional policy is decided
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node .github/scripts/check-frontend-nonfunctional-policy.mjs
+
+  url-path-design:
+    name: src/app/** route segments conform to URL path design conventions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node .github/scripts/check-url-path-design.mjs
+
+  component-naming:
+    name: src/app/**/*.tsx component files are PascalCase
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node .github/scripts/check-component-naming.mjs
+
+  a11y-test-coverage:
+    name: src/app/**/page.tsx screens have an automated axe-core check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: .github/scripts/check-a11y-test-coverage.sh
+
   component-test-coverage:
     name: src/app/**/*.tsx components have a unit test
     runs-on: ubuntu-latest

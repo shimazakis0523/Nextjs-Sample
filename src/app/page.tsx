@@ -43,13 +43,17 @@ const PROCESS_STEPS: ProcessStep[] = [
   },
   {
     phase: "静的解析",
-    description: "コードの複雑度・重複と、OpenAPI仕様書の規約準拠・実装との整合を機械検証する。",
-    harness: "ESLint(複雑度/重複) + Spectral(OpenAPI規約) + 契約整合チェック",
+    description:
+      "コードの複雑度・重複、OpenAPI仕様書の規約準拠・実装との整合、URLパス設計・" +
+      "コンポーネント命名規則を機械検証する。",
+    harness:
+      "ESLint(複雑度/重複/testing-library) + Spectral(OpenAPI規約) + 契約整合チェック + " +
+      "URLパス設計/命名規則チェック",
   },
   {
     phase: "ユニットテスト",
-    description: "Jestでロジック・コンポーネント単位の振る舞いを検証する。",
-    harness: "カバレッジ閾値ゲート(statements/branches/functions/lines 95%)",
+    description: "Jestでロジック・コンポーネント単位の振る舞いと、画面のA11yを検証する。",
+    harness: "カバレッジ閾値ゲート(statements/branches/functions/lines 95%) + jest-axe",
   },
   {
     phase: "E2E",
