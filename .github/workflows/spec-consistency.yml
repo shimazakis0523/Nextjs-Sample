@@ -37,6 +37,16 @@ jobs:
       - run: npm ci
       - run: npm run openapi:lint:spectral
 
+  detailed-design-doc:
+    name: doc/フロントエンド設計書/**/詳細設計書.md structural conformance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node .github/scripts/check-detailed-design-doc.mjs
+
   component-test-coverage:
     name: src/app/**/*.tsx components have a unit test
     runs-on: ubuntu-latest

@@ -20,11 +20,19 @@ describe("Home (top page)", () => {
     const steps = [
       {
         phase: "UIモックアップ合意",
-        harness: "design skill(Claude Design Artifact) + /speckit-specify(合意なしは停止)",
+        harness: "/speckit-specify step 0の合意確認(未合意なら仕様書生成を停止。ADR-0004)",
       },
-      { phase: "仕様書作成", code: "(BD)", harness: "/speckit-specify" },
-      { phase: "詳細設計", code: "(PD)", harness: "/speckit-plan・/speckit-tasks" },
-      { phase: "実装", harness: "/speckit-implement" },
+      {
+        phase: "仕様書作成",
+        code: "(BD)",
+        harness: "check-spec-sync.sh(E2E仕様書・画面遷移図の追従漏れを検出)",
+      },
+      {
+        phase: "詳細設計",
+        code: "(PD)",
+        harness: "check-detailed-design-doc.mjs(セクション構成・図ファーストを検証)",
+      },
+      { phase: "実装", harness: "check-component-tests.sh(コンポーネント変更にテスト未追加を検出)" },
       {
         phase: "静的解析",
         harness: "ESLint(複雑度/重複) + Spectral(OpenAPI規約) + 契約整合チェック",

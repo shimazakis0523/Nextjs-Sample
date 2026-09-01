@@ -1,5 +1,35 @@
 <!--
 Sync Impact Report
+- Version change: 2.17.0 → 2.18.0 (MINOR — new Core Principle XIII,
+  Detailed Design Document Structural Conformance: every
+  詳細設計書.md must have exactly the required section structure
+  (optional 概要, then 登場するコンポーネントと関係, then Project
+  Structure) with the diagram-first/role-stated-per-file rules already
+  in Development Workflow, enforced by a new `detailed-design-doc` CI
+  job; also corrects the pre-existing Development Workflow rule that
+  詳細設計書 holds "exactly two sections" to formally allow 概要 as an
+  optional third)
+- Modified sections: New Core Principle XIII added after Principle XII;
+  the 詳細設計書 section-count rule under Development Workflow amended to
+  allow an optional 概要 section.
+- Rationale: the user pointed out that the landing page's "ハーネス"
+  (harness) labels on several process steps actually named the authoring
+  skill that produces an artifact (`/speckit-specify`, `design skill`,
+  `/speckit-implement`) rather than the mechanism that checks that
+  artifact and blocks on failure — confirming the user's understanding of
+  "harness" (a check/gate, not a generator) was correct and the labels
+  were wrong. Fixing the labels meant identifying each step's REAL
+  harness; 静的解析/ユニットテスト/E2E already had one, but 詳細設計書
+  (PD) had none — every 詳細設計書 could silently drift from its required
+  structure. Building `check-detailed-design-doc.mjs` to close that gap
+  then surfaced a second, independent problem: the existing "exactly two
+  sections" rule would have failed the one 詳細設計書 already in the
+  repository, which has a third (概要) holding the business's screen
+  roster — content neither of the other two sections has anywhere to
+  state, and not a restatement of anything else, so it was a real gap in
+  the RULE rather than a violation in the document. 概要 was formalized
+  as an allowed (and, for multi-screen businesses, required) section
+  instead of being deleted. See ADR-0023 in `doc/common/adr/`.
 - Version change: 2.16.0 → 2.17.0 (MINOR — new Core Principle XII, OpenAPI
   Style Guide Conformance: doc/API仕様書/{BFF,Backend}/openapi.yaml must
   conform to a Spectral ruleset implementing the version-agnostic subset
@@ -733,6 +763,45 @@ verified against actual mock behavior (e.g. `deleteTodo`'s idempotent
 204 claim was checked against `mock-todos.ts`'s `removeTodo`) rather than
 loosening the ruleset to pass. See ADR-0022 in `doc/common/adr/`.
 
+### XIII. Detailed Design Document Structural Conformance
+
+Every `doc/フロントエンド設計書/<業務>/詳細設計書.md` MUST have exactly the
+section structure described under Development Workflow above — an
+optional 概要 followed by 登場するコンポーネントと関係 then Project
+Structure, in that order, with no other `##` heading (in particular none
+of the retired spec-kit sections: Summary, Technical Context,
+Constitution Check, Complexity Tracking, "Documentation (this
+feature)"). When 登場するコンポーネントと関係 is not omitted, its Mermaid
+diagram MUST appear before any per-file `### ` subsection (diagram
+first, detail second), and every such subsection MUST state the file's
+role on the first line after its heading (never a bare heading with no
+body). The `detailed-design-doc` job in the "Spec consistency" GitHub
+Actions workflow runs `node .github/scripts/check-detailed-design-doc.mjs`
+(checking every 詳細設計書.md found under
+`doc/フロントエンド設計書/**`, not only ones a PR touches — the same
+model as the `openapi-routes` job) on every PR against `main` and MUST
+pass with zero violations. Whether a component-relationship diagram's
+edges actually match the real props/callback/fetch relationships, and
+whether edge labels state field-level type signatures, are NOT
+mechanically checked — free-form Mermaid syntax and natural-language
+role descriptions need semantic understanding a text-processing script
+cannot reliably provide without a high false-positive rate; these stay
+human-reviewed. See ADR-0023 for the full scope and exclusions.
+Rationale: while fixing landing-page copy that mislabeled several
+process steps' "ハーネス" (harness) as the authoring skill that produces
+an artifact rather than the mechanism that checks and blocks it, 詳細設計書
+(PD) turned out to have no such mechanism at all — every other
+CI-blocking step already had one, but a business's 詳細設計書 could drift
+from its required structure with nothing to catch it. Building the
+checker surfaced a second, independent gap: the existing rule said
+"exactly two sections", but the one 詳細設計書 already in the repository
+(and evidently accepted as correct at the time) had a third, 概要,
+holding the business-level screen roster neither of the other two
+sections has anywhere to state — a real omission in the rule, not a
+violation in the document, so the rule was corrected to formally allow
+概要 rather than deleting content that was actually pulling its weight.
+See ADR-0023 in `doc/common/adr/`.
+
 ## Technology & Deployment Constraints
 
 See `doc/common/AP方式設計書(フロントエンド編).md` and
@@ -781,8 +850,15 @@ binding constraints, not an inventory.
   `doc/フロントエンド設計書/<業務>/詳細設計書.md` — always at
   business/feature level, never split per screen, even when the business
   has multiple screens (ADR-0007, superseding ADR-0006's per-screen
-  split). 詳細設計書 holds exactly two sections: **登場するコンポーネント
-  と関係** (scoped to every file this business adds or changes that has a
+  split). 詳細設計書 holds exactly two required sections, optionally
+  preceded by a third: an OPTIONAL **概要** (business-level overview —
+  what the business does, plus a table of its screens: screen ID, screen
+  name, URL, and links to that screen's ユースケース記述/画面定義書;
+  required once a business has two or more screens, since neither of the
+  other two sections has anywhere to state that roster; omitted for a
+  single-screen business where there is nothing to enumerate — see
+  ADR-0023), **登場するコンポーネントと関係** (scoped to every file this
+  business adds or changes that has a
   non-obvious relationship to another — not React components only: this
   business's own BFF Route Handlers under `src/app/api/**` MUST get the
   same treatment, since a file path and a one-line comment in Project
@@ -887,4 +963,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.17.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31
+**Version**: 2.18.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-08-31
