@@ -2,7 +2,7 @@
 
 **画面ID**: `todo-new`
 
-**モックアップ**: [Todoダッシュボード モックアップ](https://claude.ai/code/artifact/392c8ee9-5e33-4bd3-83f6-0bef8f1ada65)(アートボード「Todo新規登録」。既存画面の遡及記録。doc/common/adr/0004-mockup-first-requirements.md参照)
+**モックアップ**: [/mockup#todo-new-heading](/mockup#todo-new-heading)(既存画面の遡及記録。doc/common/adr/0004-mockup-first-requirements.md参照)
 
 **表示形式**: モーダル。独立したURLは持たない。
 

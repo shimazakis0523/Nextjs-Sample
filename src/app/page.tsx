@@ -136,12 +136,7 @@ export default function Home() {
             <a className={`${styles.link} ${styles.linkSecondary}`} href="/test-dashboard">
               品質ダッシュボードを見る
             </a>
-            <a
-              className={`${styles.link} ${styles.linkSecondary}`}
-              href="https://claude.ai/code/artifact/392c8ee9-5e33-4bd3-83f6-0bef8f1ada65"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a className={`${styles.link} ${styles.linkSecondary}`} href="/mockup">
               UIモックアップを見る
             </a>
             <a

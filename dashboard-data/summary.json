@@ -1,44 +1,44 @@
 {
-  "generatedAt": "2026-08-31T23:26:50.852Z",
+  "generatedAt": "2026-09-01T01:27:46.874Z",
   "unit": {
     "overall": {
-      "total": 64,
-      "passed": 64,
+      "total": 66,
+      "passed": 66,
       "failed": 0
     },
     "byBusiness": {
-      "共通基盤・開発ツール(業務非依存)": {
-        "total": 18,
-        "passed": 18,
-        "failed": 0
-      },
       "未分類": {
-        "total": 14,
-        "passed": 14,
+        "total": 16,
+        "passed": 16,
         "failed": 0
       },
       "業務1_Todoダッシュボード": {
         "total": 32,
         "passed": 32,
         "failed": 0
+      },
+      "共通基盤・開発ツール(業務非依存)": {
+        "total": 18,
+        "passed": 18,
+        "failed": 0
       }
     },
     "coverage": {
       "lines": {
-        "total": 172,
-        "covered": 172,
+        "total": 181,
+        "covered": 181,
         "skipped": 0,
         "pct": 100
       },
       "statements": {
-        "total": 181,
-        "covered": 179,
+        "total": 191,
+        "covered": 188,
         "skipped": 0,
-        "pct": 98.89
+        "pct": 98.42
       },
       "functions": {
-        "total": 60,
-        "covered": 60,
+        "total": 63,
+        "covered": 63,
         "skipped": 0,
         "pct": 100
       },
@@ -72,36 +72,36 @@
   },
   "testDensity": {
     "overall": {
-      "stepCount": 1069,
-      "kStep": 1.069,
+      "stepCount": 1191,
+      "kStep": 1.191,
       "unit": {
-        "count": 64,
-        "density": 59.869036482694106
+        "count": 66,
+        "density": 55.415617128463474
       },
       "e2e": {
         "count": 22,
-        "density": 20.5799812909261
+        "density": 18.47187237615449
       },
       "total": {
-        "count": 86,
-        "density": 80.44901777362021
+        "count": 88,
+        "density": 73.88748950461796
       }
     },
     "byBusiness": {
       "未分類": {
-        "stepCount": 432,
-        "kStep": 0.432,
+        "stepCount": 554,
+        "kStep": 0.554,
         "unit": {
-          "count": 14,
-          "density": 32.407407407407405
+          "count": 16,
+          "density": 28.880866425992778
         },
         "e2e": {
           "count": 0,
           "density": 0
         },
         "total": {
-          "count": 14,
-          "density": 32.407407407407405
+          "count": 16,
+          "density": 28.880866425992778
         }
       },
       "共通基盤・開発ツール(業務非依存)": {

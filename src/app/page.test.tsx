@@ -69,15 +69,12 @@ describe("Home (top page)", () => {
     expect(repoLink).toHaveAttribute("rel", "noopener noreferrer");
   });
 
-  it("renders a button-styled link to the UI mockup that opens in a new tab", () => {
+  it("renders a button-styled link to the UI mockup page", () => {
     render(<Home />);
 
-    const mockupLink = screen.getByRole("link", { name: "UIモックアップを見る" });
-    expect(mockupLink).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "UIモックアップを見る" })).toHaveAttribute(
       "href",
-      "https://claude.ai/code/artifact/392c8ee9-5e33-4bd3-83f6-0bef8f1ada65"
+      "/mockup"
     );
-    expect(mockupLink).toHaveAttribute("target", "_blank");
-    expect(mockupLink).toHaveAttribute("rel", "noopener noreferrer");
   });
 });
