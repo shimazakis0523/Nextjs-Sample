@@ -93,6 +93,18 @@ describe("Home (top page)", () => {
     );
   });
 
+  it("renders links to the development-process detail page from both the process section and the CTA group", () => {
+    render(<Home />);
+
+    expect(
+      screen.getByRole("link", { name: "各SkillとハーネスをすべてSkill単位・ハーネス単位で詳しく見る →" })
+    ).toHaveAttribute("href", "/development-process");
+    expect(screen.getByRole("link", { name: "Skill・ハーネスの詳細を見る" })).toHaveAttribute(
+      "href",
+      "/development-process"
+    );
+  });
+
   it("has no automatically detectable accessibility violations", async () => {
     const { container } = render(<Home />);
 

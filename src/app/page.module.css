@@ -196,6 +196,17 @@
   color: #666;
 }
 
+.detailLink {
+  align-self: center;
+  font-size: 13px;
+  color: #666;
+  text-decoration: none;
+}
+
+.detailLink:hover {
+  text-decoration: underline;
+}
+
 .ctaGroup {
   display: flex;
   flex-wrap: wrap;
@@ -257,6 +268,10 @@
   .sectionLead,
   .scrollHint {
     color: #ccc;
+  }
+
+  .detailLink {
+    color: #aaa;
   }
 
   .scrollHint {

@@ -129,6 +129,9 @@ export default function Home() {
               </div>
             ))}
           </div>
+          <a className={styles.detailLink} href="/development-process">
+            各SkillとハーネスをすべてSkill単位・ハーネス単位で詳しく見る →
+          </a>
         </div>
         <span className={styles.slideNumber}>
           03<span className={styles.slideNumberTotal}> / {SLIDE_COUNT}</span>
@@ -149,6 +152,9 @@ export default function Home() {
             </a>
             <a className={`${styles.link} ${styles.linkSecondary}`} href="/mockup">
               UIモックアップを見る
+            </a>
+            <a className={`${styles.link} ${styles.linkSecondary}`} href="/development-process">
+              Skill・ハーネスの詳細を見る
             </a>
             <a
               className={`${styles.link} ${styles.linkSecondary}`}
