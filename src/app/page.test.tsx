@@ -18,6 +18,10 @@ describe("Home (top page)", () => {
     const processSteps = within(screen.getByTestId("process-steps"));
 
     const steps = [
+      {
+        phase: "UIモックアップ合意",
+        harness: "design skill(Claude Design Artifact) + /speckit-specify(合意なしは停止)",
+      },
       { phase: "仕様書作成", code: "(BD)", harness: "/speckit-specify" },
       { phase: "詳細設計", code: "(PD)", harness: "/speckit-plan・/speckit-tasks" },
       { phase: "実装", harness: "/speckit-implement" },

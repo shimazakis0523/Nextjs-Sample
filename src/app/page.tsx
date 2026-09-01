@@ -5,7 +5,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "仕様駆動開発 × ハーネスエンジニアリング デモ",
   description:
-    "Claude Code (Web版)・GitHub・Vercelを連携させ、仕様書作成から品質分析までを" +
+    "Claude Code (Web版)・GitHub・Vercelを連携させ、UIモックアップ合意から品質分析までを" +
     "ほぼ自動で回し、結果を可視化するデモアプリです。",
 };
 
@@ -18,9 +18,16 @@ type ProcessStep = {
 
 const PROCESS_STEPS: ProcessStep[] = [
   {
+    phase: "UIモックアップ合意",
+    description:
+      "画面を持つ機能は、design skillで作成したモックアップでユーザとプロダクトの" +
+      "要件・見た目を先に合意してから仕様書作成に進む。",
+    harness: "design skill(Claude Design Artifact) + /speckit-specify(合意なしは停止)",
+  },
+  {
     phase: "仕様書作成",
     code: "BD",
-    description: "業務ごとにユースケース記述・画面定義書を作成する。",
+    description: "合意したモックアップをもとに、業務ごとにユースケース記述・画面定義書を作成する。",
     harness: "/speckit-specify",
   },
   {
@@ -66,10 +73,10 @@ export default function Home() {
           <p className={styles.eyebrow}>Demo</p>
           <h1 className={styles.title}>仕様駆動開発 × ハーネスエンジニアリング</h1>
           <p className={styles.lead}>
-            Claude Code (Web版)・GitHub・Vercelを連携させることで、「仕様書作成→詳細設計→
-            実装→静的解析→ユニットテスト→E2E→品質分析」のサイクルをほぼ自動で回し、結果を
-            可視化できる仕組みのデモです。工程ごとに機械的なチェック(ハーネス)が組み込まれて
-            おり、違反があればCIが即座にブロックします。
+            Claude Code (Web版)・GitHub・Vercelを連携させることで、「UIモックアップ合意→
+            仕様書作成→詳細設計→実装→静的解析→ユニットテスト→E2E→品質分析」のサイクルを
+            ほぼ自動で回し、結果を可視化できる仕組みのデモです。工程ごとに機械的なチェック
+            (ハーネス)が組み込まれており、違反があればCIが即座にブロックします。
           </p>
           <p className={styles.scrollHint}>スクロールして次へ ↓</p>
         </div>
