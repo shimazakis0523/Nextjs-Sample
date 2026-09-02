@@ -150,6 +150,9 @@ export default function Home() {
             <a className={`${styles.link} ${styles.linkSecondary}`} href="/test-dashboard">
               品質ダッシュボードを見る
             </a>
+            <a className={`${styles.link} ${styles.linkSecondary}`} href="/test-dashboard#defect-log">
+              品質不具合台帳を見る
+            </a>
             <a className={`${styles.link} ${styles.linkSecondary}`} href="/mockup">
               UIモックアップを見る
             </a>

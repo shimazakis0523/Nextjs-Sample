@@ -367,7 +367,7 @@ export default function TestDashboardPage() {
         )}
       </section>
 
-      <section className={styles.section}>
+      <section className={styles.section} id="defect-log">
         <h2>品質不具合分析</h2>
         <p className={styles.generatedAt}>
           新規ハーネス・Lintルールの導入や人によるレビューが、既に実装済みのコード/文書に

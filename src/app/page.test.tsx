@@ -75,6 +75,15 @@ describe("Home (top page)", () => {
     );
   });
 
+  it("renders a button-styled link to the defect discovery ledger section on the quality dashboard", () => {
+    render(<Home />);
+
+    expect(screen.getByRole("link", { name: "品質不具合台帳を見る" })).toHaveAttribute(
+      "href",
+      "/test-dashboard#defect-log"
+    );
+  });
+
   it("renders a button-styled link to the public GitHub repository that opens in a new tab", () => {
     render(<Home />);
 
