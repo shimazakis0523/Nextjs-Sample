@@ -43,6 +43,30 @@ type DensityRow = {
 
 type QualityCounts = { errorCount: number; warningCount: number };
 
+type DefectEntry = {
+  id: string;
+  title: string;
+  discoveredAt: string;
+  discoveryKind: string;
+  discoveryDetail: string;
+  categories: string[];
+  files: string[];
+  fix: string;
+  lateralCheck: { status: string; detail: string };
+  reference: string;
+};
+
+type DefectLog = {
+  generatedAt: string;
+  entries: DefectEntry[];
+  summary: {
+    total: number;
+    byCategory: Record<string, number>;
+    byDiscoveryKind: Record<string, number>;
+    byLateralCheckStatus: Record<string, number>;
+  };
+};
+
 function loadSummary(): Summary | null {
   try {
     const filePath = path.join(process.cwd(), "dashboard-data", "summary.json");
@@ -50,6 +74,52 @@ function loadSummary(): Summary | null {
   } catch {
     return null;
   }
+}
+
+function loadDefectLog(): DefectLog | null {
+  try {
+    const filePath = path.join(process.cwd(), "dashboard-data", "defect-log.json");
+    return JSON.parse(readFileSync(filePath, "utf8")) as DefectLog;
+  } catch {
+    return null;
+  }
+}
+
+// "[ADR-0011](./adr/0011-...)" のようなMarkdownリンク記法から表示用テキストのみを
+// 取り出す(このダッシュボードはdoc/配下のMarkdownを配信していないため、実際の
+// リンクにはしない)。マッチしない場合は原文をそのまま表示する。
+function formatReference(reference: string): string {
+  const match = reference.match(/^\[(.+?)\]\(.+?\)$/);
+  return match ? match[1] : reference;
+}
+
+function CountTable({
+  caption,
+  counts,
+}: {
+  caption: string;
+  counts: Record<string, number>;
+}) {
+  const entries = Object.entries(counts).sort(([, a], [, b]) => b - a);
+  return (
+    <table className={styles.table}>
+      <caption className={styles.tableCaption}>{caption}</caption>
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>件数</th>
+        </tr>
+      </thead>
+      <tbody>
+        {entries.map(([key, count]) => (
+          <tr key={key}>
+            <td>{key}</td>
+            <td>{count}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
 }
 
 function CountsRow({ label, counts }: { label: string; counts: Counts }) {
@@ -81,6 +151,7 @@ function CoverageBar({ label, metric }: { label: string; metric: CoverageMetric 
 
 export default function TestDashboardPage() {
   const summary = loadSummary();
+  const defectLog = loadDefectLog();
 
   if (!summary) {
     return (
@@ -292,6 +363,69 @@ export default function TestDashboardPage() {
                   ))}
               </tbody>
             </table>
+          </>
+        )}
+      </section>
+
+      <section className={styles.section}>
+        <h2>品質不具合分析</h2>
+        <p className={styles.generatedAt}>
+          新規ハーネス・Lintルールの導入や人によるレビューが、既に実装済みのコード/文書に
+          実際に見つけた不具合の記録(<code>doc/common/品質不具合台帳.md</code>、
+          constitution.md Core Principle XVIII)。原因分類・発見区分は、同じ原因の不具合を
+          今後どのハーネスで防げばよいかを俯瞰するための分類。横展開は、見つかった不具合と
+          同じ原因が他の箇所にも無いか確認したかどうかを示す。
+        </p>
+        {!defectLog || defectLog.entries.length === 0 ? (
+          <p>
+            dashboard-data/defect-log.json がまだありません。
+            <code>npm run defect-log:data</code> を実行してください(通常はCIが実行して
+            コミットします)。
+          </p>
+        ) : (
+          <>
+            <p className={styles.generatedAt}>合計 {defectLog.summary.total} 件</p>
+            <div className={styles.defectSummaryGrid}>
+              <CountTable caption="原因分類別" counts={defectLog.summary.byCategory} />
+              <CountTable caption="発見区分別" counts={defectLog.summary.byDiscoveryKind} />
+              <CountTable caption="横展開の実施状況" counts={defectLog.summary.byLateralCheckStatus} />
+            </div>
+
+            <h3>一覧</h3>
+            <div className={styles.tableScroll}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>発見日</th>
+                    <th>概要</th>
+                    <th>原因分類</th>
+                    <th>発見区分</th>
+                    <th>横展開</th>
+                    <th>根拠</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {defectLog.entries.map((entry) => (
+                    <tr key={entry.id}>
+                      <td>{entry.id}</td>
+                      <td>{entry.discoveredAt}</td>
+                      <td className={styles.defectTitle}>{entry.title}</td>
+                      <td>{entry.categories.join(" / ")}</td>
+                      <td>{entry.discoveryKind}</td>
+                      <td
+                        className={
+                          entry.lateralCheck.status === "未実施" ? styles.failed : styles.passed
+                        }
+                      >
+                        {entry.lateralCheck.status}
+                      </td>
+                      <td>{formatReference(entry.reference)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </>
         )}
       </section>

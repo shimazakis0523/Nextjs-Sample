@@ -1,0 +1,227 @@
+{
+  "generatedAt": "2026-09-02T06:41:15.661Z",
+  "entries": [
+    {
+      "id": "BUG-001",
+      "title": "TodoList.tsx等の分割後、3コンポーネントいずれにもユニットテストが無かった",
+      "discoveredAt": "2026-08-30",
+      "discoveryKind": "人によるレビュー・指摘",
+      "discoveryDetail": "人によるコードレビュー(この後Component Test Coverageハーネスを新設)",
+      "categories": [
+        "タスク定義の不備"
+      ],
+      "files": [
+        "src/app/dashboard/TodoList.tsx",
+        "TodoNewModal.tsx",
+        "TodoDashboard.tsx"
+      ],
+      "fix": "3コンポーネントにユニットテストを追加。再発防止として`check-component-tests.sh`(`component-test-coverage`ジョブ)を新設し、以後コンポーネント変更にテストが伴わない場合はCIが失敗するようにした。",
+      "lateralCheck": {
+        "status": "実施",
+        "detail": "`src/app/**`配下の他の既存コンポーネントを確認し、未テストのものが他に無いことを確認した。"
+      },
+      "reference": "[ADR-0011](./adr/0011-component-test-coverage-gate.md)"
+    },
+    {
+      "id": "BUG-002",
+      "title": "route.tsのサーバー側バリデーションが0%カバレッジだった",
+      "discoveredAt": "2026-08-31",
+      "discoveryKind": "人によるレビュー・指摘",
+      "discoveryDetail": "ユーザーによるカバレッジレポートの目視レビュー。E2Eテストはブラウザ側のHTML5 `required`属性で送信がブロックされるため、サーバー側のバリデーション分岐に一度も到達していなかった。",
+      "categories": [
+        "テスト技法の観点漏れ"
+      ],
+      "files": [
+        "src/app/api/todos/route.ts (POSTハンドラ)",
+        "src/lib/backend.ts",
+        "src/lib/backend-client.ts"
+      ],
+      "fix": "該当ファイルにユニットテストを追加(46%→90%、37%→92%)。再発防止としてCoverage Threshold Gate(Core Principle IX)を新設。",
+      "lateralCheck": {
+        "status": "実施",
+        "detail": "0%カバレッジの他のファイル(`src/app/api/users`・`src/app/api/health`・`backend-client.ts`)も同時に洗い出し、まとめて対応した。"
+      },
+      "reference": "[ADR-0019](./adr/0019-coverage-threshold-gate.md)"
+    },
+    {
+      "id": "BUG-003",
+      "title": "jest.config.tsに`@/*`パスエイリアスのmoduleNameMapperが無かった",
+      "discoveredAt": "2026-08-31",
+      "discoveryKind": "既存ハーネス実行中の副次的発見",
+      "discoveryDetail": "BUG-002対応中、実行時import(`jest.mock(\"@/lib/backend\")`)を初めて書いたときに発覚(既存テストは全て`import type`経由だったため、型のみのimportではモジュール解決の不備が表面化しなかった)",
+      "categories": [
+        "設定不備"
+      ],
+      "files": [
+        "jest.config.ts"
+      ],
+      "fix": "`moduleNameMapper: { \"^@/(.*)$\": \"<rootDir>/src/$1\" }`を明示的に追加。",
+      "lateralCheck": {
+        "status": "対象外",
+        "detail": "設定ファイル1箇所のみが原因であり、他に同種の設定漏れが入り込む箇所が無い。"
+      },
+      "reference": "[ADR-0019](./adr/0019-coverage-threshold-gate.md)"
+    },
+    {
+      "id": "BUG-004",
+      "title": "check-openapi-bff-routes.mjsが複雑度・認知的複雑度の上限を超過していた",
+      "discoveredAt": "2026-08-31",
+      "discoveryKind": "新規ハーネス導入時",
+      "discoveryDetail": "ESLint品質ルール(`complexity`・`sonarjs/cognitive-complexity`)導入時の実行結果",
+      "categories": [
+        "品質ルール未導入"
+      ],
+      "files": [
+        ".github/scripts/check-openapi-bff-routes.mjs"
+      ],
+      "fix": "spec→impl・impl→specの対称な2ロジックを`collectMismatches`という共通ヘルパーに抽出。抽出後に`max-params`へ新たに抵触したため、コールバック2つを`messages`オブジェクトにまとめた。",
+      "lateralCheck": {
+        "status": "実施",
+        "detail": "`.github/scripts/`配下の他のスクリプトも同じルールセットで検査され、他に違反が無いことを確認した。"
+      },
+      "reference": "[ADR-0021](./adr/0021-static-code-quality-gate.md)"
+    },
+    {
+      "id": "BUG-005",
+      "title": "OpenAPI YAML(BFF/Backend)がservers.description欠落・tags未定義等の複数箇所で規約に不適合だった",
+      "discoveredAt": "2026-08-31",
+      "discoveryKind": "新規ハーネス導入時",
+      "discoveryDetail": "Spectralルールセット(Future Architect社OpenAPI規約準拠)導入時の実行結果",
+      "categories": [
+        "品質ルール未導入"
+      ],
+      "files": [
+        "doc/API仕様書/BFF/openapi.yaml",
+        "doc/API仕様書/Backend/openapi.yaml"
+      ],
+      "fix": "servers.description追加、tags未定義・各operationのtags/description欠落を解消、BFFの400レスポンスをcomponents化。",
+      "lateralCheck": {
+        "status": "実施",
+        "detail": "BFF・Backend両ファイルを同一の17ルールで機械的に検査し、両ファイルの不適合をまとめて修正した。"
+      },
+      "reference": "[ADR-0022](./adr/0022-openapi-style-guide-conformance.md)"
+    },
+    {
+      "id": "BUG-006",
+      "title": "トップページが生成Skill名を「ハーネス」と誤表示し、PD工程にはハーネスが1つも無かった",
+      "discoveredAt": "2026-08-31",
+      "discoveryKind": "人によるレビュー・指摘",
+      "discoveryDetail": "ユーザーからの指摘(「ハーネスの理解が誤っていないか」)",
+      "categories": [
+        "用語・表記の誤り",
+        "ドキュメント構造のルール漏れ"
+      ],
+      "files": [
+        "src/app/page.tsx",
+        "doc/common/開発サイクル図.md"
+      ],
+      "fix": "全8ステップの「本当のハーネス」を洗い出して表記を是正。詳細設計書(PD)工程だけ検証機構が1つも無いことが判明したため、`check-detailed-design-doc.mjs`(Core Principle XIII)を新設。",
+      "lateralCheck": {
+        "status": "実施",
+        "detail": "全8ステップ分の表記を1件ずつ確認し、他に生成Skill名とハーネス名の取り違えが無いことを確認した。"
+      },
+      "reference": "[ADR-0023](./adr/0023-detailed-design-doc-harness.md)"
+    },
+    {
+      "id": "BUG-007",
+      "title": "TodoList.tsx・mockup/page.tsxの操作列ヘッダーがaxe-coreのempty-table-header違反だった",
+      "discoveredAt": "2026-09-01",
+      "discoveryKind": "新規ハーネス導入時",
+      "discoveryDetail": "`jest-axe`導入時の実行結果(Automated Accessibility Test Coverageハーネス新設に伴う)",
+      "categories": [
+        "品質ルール未導入"
+      ],
+      "files": [
+        "src/app/dashboard/TodoList.tsx",
+        "src/app/mockup/page.tsx"
+      ],
+      "fix": "`aria-label`のみだった空の`<th>`を、視覚的には隠しつつスクリーンリーダーには読み上げられる`<span>`(`.visuallyHidden`)に置き換えた。",
+      "lateralCheck": {
+        "status": "実施",
+        "detail": "`TodoList.tsx`で最初に検出した後、同一パターン(`<th aria-label=\"操作\"></th>`)が`mockup/page.tsx`にも存在することを確認し、同時に修正した。"
+      },
+      "reference": "[ADR-0024](./adr/0024-web-frontend-guideline-conformance.md)"
+    },
+    {
+      "id": "BUG-008",
+      "title": "複数のテストファイルがtesting-libraryの推奨に反する書き方をしていた",
+      "discoveredAt": "2026-09-01",
+      "discoveryKind": "新規ハーネス導入時",
+      "discoveryDetail": "`eslint-plugin-testing-library`導入時の実行結果",
+      "categories": [
+        "品質ルール未導入"
+      ],
+      "files": [
+        "src/app/dashboard/TodoDashboard.test.tsx (`waitFor` + `getByText`)",
+        "src/app/mockup/page.test.tsx",
+        "src/app/page.test.tsx (`.closest()`によるDOM直接走査)"
+      ],
+      "fix": "`waitFor` + `getByText`を`findByText`に、`.closest(\"section\")`/`.closest(\"header\")`を`screen.getByRole(\"region\"/\"banner\")`に置き換えた。",
+      "lateralCheck": {
+        "status": "実施",
+        "detail": "ESLintはリポジトリ全体のテストファイルを対象に実行されるため、他に同種の違反が無いことを確認済み。"
+      },
+      "reference": "[ADR-0024](./adr/0024-web-frontend-guideline-conformance.md)"
+    },
+    {
+      "id": "BUG-009",
+      "title": "doc/API仕様書/Backend/openapi.yamlにPUT /todos/{id}の定義が漏れていた",
+      "discoveredAt": "2026-09-01",
+      "discoveryKind": "既存スキルでの整合性確認",
+      "discoveryDetail": "`check-openapi-contract`スキルによる整合性確認(Todo編集機能の実装完了確認として実行)。BFF契約には`PUT /todos/{id}`を追加していたが、`backend.ts`の実バックエンド分岐が呼ぶBackend契約側への反映が漏れていた。",
+      "categories": [
+        "契約ドキュメントの二重管理漏れ"
+      ],
+      "files": [
+        "doc/API仕様書/Backend/openapi.yaml"
+      ],
+      "fix": "BFF契約と対応する`put`操作(`operationId: updateTodo`)を追加。",
+      "lateralCheck": {
+        "status": "実施",
+        "detail": "`check-openapi-contract`スキルはBFF・Backend双方の全エンドポイントを突き合わせるため、他に同種の片方だけの更新漏れが無いことを確認済み。"
+      },
+      "reference": "Todo編集機能実装(コミット a256962、Issue #38)"
+    },
+    {
+      "id": "BUG-010",
+      "title": "test-dashboard.ymlのpaths-ignoreが広すぎ、business-map.json単独の変更を見逃す",
+      "discoveredAt": "2026-09-01",
+      "discoveryKind": "既存ハーネス実行中の副次的発見",
+      "discoveryDetail": "この品質不具合台帳自体の追加作業で、`defect-log.json`もコミット対象に含めるため`.github/workflows/test-dashboard.yml`のpaths-ignoreを見直していて発覚。`dashboard-data/**`という指定は生成物(`summary.json`)だけでなく手動保守ファイル(`business-map.json`)も含んでしまい、`business-map.json`だけを変更するpush(他に変更ファイルが無い場合)ではワークフロー自体が起動しない。過去3回の変更はいずれも他のファイルと同時だったため一度も表面化していなかった(git logで確認)。",
+      "categories": [
+        "設定不備"
+      ],
+      "files": [
+        ".github/workflows/test-dashboard.yml"
+      ],
+      "fix": "paths-ignoreを`dashboard-data/**`から、生成物である`dashboard-data/summary.json`・`dashboard-data/defect-log.json`のみに限定した。",
+      "lateralCheck": {
+        "status": "実施",
+        "detail": "他のワークフロー(`spec-consistency.yml`)にpaths-ignore/paths指定が無いことを確認し、同種の問題が他に無いことを確認した。"
+      },
+      "reference": "品質不具合台帳の新設作業(このADR、[ADR-0025](./adr/0025-defect-log.md))"
+    }
+  ],
+  "summary": {
+    "total": 10,
+    "byCategory": {
+      "タスク定義の不備": 1,
+      "テスト技法の観点漏れ": 1,
+      "設定不備": 2,
+      "品質ルール未導入": 4,
+      "用語・表記の誤り": 1,
+      "ドキュメント構造のルール漏れ": 1,
+      "契約ドキュメントの二重管理漏れ": 1
+    },
+    "byDiscoveryKind": {
+      "人によるレビュー・指摘": 3,
+      "既存ハーネス実行中の副次的発見": 2,
+      "新規ハーネス導入時": 4,
+      "既存スキルでの整合性確認": 1
+    },
+    "byLateralCheckStatus": {
+      "実施": 9,
+      "対象外": 1
+    }
+  }
+}

@@ -1,5 +1,41 @@
 <!--
 Sync Impact Report
+- Version change: 2.20.0 → 2.21.0 (MINOR — new Core Principle XVIII: Defect
+  Discovery Ledger and Lateral Check)
+- Modified sections: New Core Principle XVIII added after Principle XVII.
+- Rationale: the user asked for a mechanism to record bugs discovered
+  mid-development (during new-harness introductions or human review) and to
+  visualize, across all such discoveries, whether a lateral check for the
+  same root cause elsewhere was performed and how the discoveries cluster
+  by root-cause category — "途中で発見したバグを記録し、類似バグの横並び
+  チェック結果や原因分析起点の品質点検の結果を可視化する仕組みを作れない
+  ですか?" This project had already been doing this informally every time a
+  new harness surfaced a real pre-existing defect (ADR-0011, 0019, 0021,
+  0022, 0023, 0024) and once more from `check-openapi-contract` during the
+  Todo edit feature; the request was to make the practice itself durable
+  and visible rather than scattered across ADR prose. `doc/common/
+  品質不具合台帳.md` was created (retroactively populated as BUG-001 through
+  BUG-009 from those ADRs, plus a new BUG-010 found while building this very
+  feature — see below), with controlled-vocabulary 発見区分/原因分類/横展開
+  fields kept separate from free-text narrative fields so they aggregate
+  mechanically. `scripts/generate-defect-log-data.mjs` parses the ledger
+  into `dashboard-data/defect-log.json`, and `/test-dashboard` gained a
+  「品質不具合分析」section visualizing counts by category, by discovery
+  kind, and by lateral-check status, plus the full entry list. Building this
+  surfaced a genuine latent bug in `.github/workflows/test-dashboard.yml`:
+  its `paths-ignore: ["dashboard-data/**"]` would silently skip the whole
+  workflow for a push touching only the hand-maintained
+  `dashboard-data/business-map.json`, never triggering regeneration — never
+  observed in practice only because all 3 historical changes to that file
+  happened to land alongside other non-ignored files. Fixed by narrowing
+  `paths-ignore` to the two generated JSON paths, and recorded as BUG-010,
+  itself demonstrating the lateral-check practice this principle formalizes
+  (checked every other workflow file for the same pattern; none matched).
+  Like Principle VI's mockup-agreement gate and its 2026-09-01 GitHub-Issue
+  addendum, this is a soft/process gate (Skill-procedure and constitution
+  text, not a CI check) because "was a real defect actually found" needs
+  human judgment a script cannot reliably automate. See ADR-0025 in
+  `doc/common/adr/`.
 - Version change: 2.19.0 → 2.20.0 (MINOR — materially expands the mockup-first
   Development Workflow rule (Principle VI / ADR-0004): a screen-bearing
   feature's GitHub Issue MUST now be created before or alongside mockup
@@ -969,6 +1005,34 @@ OGP) and their rationale are in ADR-0024, not repeated here since this
 principle governs the presence of a decision, not its content. See
 ADR-0024 in `doc/common/adr/`.
 
+### XVIII. Defect Discovery Ledger and Lateral Check
+
+When introducing a new harness (a lint rule, coverage gate, or other
+automated check) or performing a human review, discovering an actual defect
+in already-implemented code or documentation — not a newly-introduced
+regression, but something wrong that was already there — MUST be recorded
+in `doc/common/品質不具合台帳.md` and a lateral check performed (searching
+the rest of the codebase for the same root cause elsewhere) before the fix
+is considered complete. Each entry records 発見日, 発見区分 and 原因分類
+(both controlled-vocabulary fields drawn from the legends at the top of the
+ledger, kept separate from free-text explanation so they aggregate
+mechanically), 対象ファイル, 修正内容, 横展開 (実施/対象外/未実施 plus what
+was checked), and 根拠 (a link to the ADR or commit that made the fix).
+`npm run defect-log:data` (`scripts/generate-defect-log-data.mjs`) parses
+the ledger into `dashboard-data/defect-log.json`, which `/test-dashboard`'s
+「品質不具合分析」section visualizes as counts by 原因分類, by 発見区分,
+and by 横展開 status, alongside the full entry list. Like Principle VI's
+mockup-agreement gate (ADR-0004), this is a soft/process gate — a Skill
+procedure and this constitution's text, not a CI check — because whether a
+given finding is genuinely a pre-existing defect (versus a design choice, a
+newly-introduced bug, or a non-issue) needs human judgment no script can
+reliably automate. Rationale: this project had already been doing this
+informally every time a new harness surfaced a real defect (ADR-0011, 0019,
+0021, 0022, 0023, 0024); the user asked that the practice be made durable
+and visible instead of scattered across ADR prose, so future defects
+accumulate into one place that shows whether the same root cause recurs and
+whether it was checked for elsewhere. See ADR-0025 in `doc/common/adr/`.
+
 ## Technology & Deployment Constraints
 
 See `doc/common/AP方式設計書(フロントエンド編).md` and
@@ -1143,4 +1207,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.20.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-09-01
+**Version**: 2.21.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-09-02

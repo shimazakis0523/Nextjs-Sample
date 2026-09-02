@@ -90,6 +90,30 @@
   margin-top: 16px;
 }
 
+.defectSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.tableCaption {
+  caption-side: top;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.tableScroll {
+  overflow-x: auto;
+}
+
+.defectTitle {
+  text-align: left;
+  max-width: 320px;
+}
+
 @media (prefers-color-scheme: dark) {
   .generatedAt {
     color: #999;
