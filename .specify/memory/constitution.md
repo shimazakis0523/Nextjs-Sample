@@ -1,5 +1,38 @@
 <!--
 Sync Impact Report
+- Version change: 2.21.0 → 2.22.0 (MINOR — tightens Core Principle XVIII's
+  definition of "品質不具合"; narrows which findings the ledger records)
+- Modified sections: Core Principle XVIII's opening paragraph now defines
+  品質不具合 narrowly as either プログラムバグ (code that misbehaves) or
+  設計書のエラー (an error/omission in a design artifact), explicitly
+  excluding harness-coverage gaps (missing tests, a not-yet-adopted lint
+  rule) from qualifying. `doc/common/品質不具合台帳.md` gained an explicit
+  definition paragraph matching this wording.
+- Rationale: the user stated the definition directly — "品質不具合は
+  プログラムバグまたは設計書のエラーです" — after the ledger's initial
+  rollout (v2.21.0) had recorded 10 entries under a looser "an actual
+  defect in already-implemented code or documentation" standard. Applying
+  the narrow definition to the existing entries showed 5 of the original 10
+  (BUG-001 missing unit tests, BUG-002 an untested-but-correct validation
+  branch, BUG-004 a script exceeding a complexity threshold, BUG-006 a
+  mislabeled process-diagram term plus a missing harness, BUG-008
+  testing-library style violations in passing tests) were harness-coverage
+  gaps, not defects — the underlying code/document was already behaving
+  correctly; only the ability to verify or enforce that class of problem
+  was missing. Asked how to apply the definition, the user chose to state
+  it explicitly in the ledger and remove the non-qualifying entries rather
+  than keep them with a type label or leave the ledger unchanged. The
+  remaining 5 entries (BUG-003, 005, 007, 009, 010) were kept: BUG-003
+  (jest.config.ts missing a moduleNameMapper) and BUG-010
+  (test-dashboard.yml's paths-ignore silently skipping a real push) are
+  プログラムバグ — config code that misbehaves once actually exercised, not
+  merely unverified; BUG-005 and BUG-009 (OpenAPI YAML style/regulatory
+  non-conformance and a missing endpoint definition) are 設計書のエラー —
+  the contract document itself was wrong; BUG-007 (an axe-core
+  empty-table-header violation in shipped component code) is a プログラムバグ
+  — a real accessibility defect experienced by screen-reader users, not an
+  absence of verification. See the 2026-09-02 addendum to ADR-0025 in
+  `doc/common/adr/`.
 - Version change: 2.20.0 → 2.21.0 (MINOR — new Core Principle XVIII: Defect
   Discovery Ledger and Lateral Check)
 - Modified sections: New Core Principle XVIII added after Principle XVII.
@@ -1008,30 +1041,45 @@ ADR-0024 in `doc/common/adr/`.
 ### XVIII. Defect Discovery Ledger and Lateral Check
 
 When introducing a new harness (a lint rule, coverage gate, or other
-automated check) or performing a human review, discovering an actual defect
-in already-implemented code or documentation — not a newly-introduced
-regression, but something wrong that was already there — MUST be recorded
-in `doc/common/品質不具合台帳.md` and a lateral check performed (searching
-the rest of the codebase for the same root cause elsewhere) before the fix
-is considered complete. Each entry records 発見日, 発見区分 and 原因分類
-(both controlled-vocabulary fields drawn from the legends at the top of the
-ledger, kept separate from free-text explanation so they aggregate
-mechanically), 対象ファイル, 修正内容, 横展開 (実施/対象外/未実施 plus what
-was checked), and 根拠 (a link to the ADR or commit that made the fix).
-`npm run defect-log:data` (`scripts/generate-defect-log-data.mjs`) parses
-the ledger into `dashboard-data/defect-log.json`, which `/test-dashboard`'s
+automated check) or performing a human review, discovering a genuine
+pre-existing **品質不具合** — defined narrowly as either (1) a
+**プログラムバグ**: already-implemented code that does not behave as
+specified, or returns an incorrect result/experience to a user, or (2) a
+**設計書のエラー**: an error or omission in a design artifact itself
+(a spec, a contract document) — MUST be recorded in
+`doc/common/品質不具合台帳.md` and a lateral check performed (searching the
+rest of the codebase for the same root cause elsewhere) before the fix is
+considered complete. A finding where the code/document already behaves
+correctly but a verification or quality-enforcement mechanism for that
+class of problem did not yet exist (missing tests, an not-yet-adopted lint
+rule, a complexity violation) is not itself a 品質不具合 under this
+definition and does NOT belong in the ledger — it is a harness-coverage
+gap, a different kind of finding entirely. Each entry records 発見日,
+発見区分 and 原因分類 (both controlled-vocabulary fields drawn from the
+legends at the top of the ledger, kept separate from free-text explanation
+so they aggregate mechanically), 対象ファイル, 修正内容, 横展開
+(実施/対象外/未実施 plus what was checked), and 根拠 (a link to the ADR or
+commit that made the fix). `npm run defect-log:data`
+(`scripts/generate-defect-log-data.mjs`) parses the ledger into
+`dashboard-data/defect-log.json`, which `/test-dashboard`'s
 「品質不具合分析」section visualizes as counts by 原因分類, by 発見区分,
 and by 横展開 status, alongside the full entry list. Like Principle VI's
 mockup-agreement gate (ADR-0004), this is a soft/process gate — a Skill
 procedure and this constitution's text, not a CI check — because whether a
-given finding is genuinely a pre-existing defect (versus a design choice, a
-newly-introduced bug, or a non-issue) needs human judgment no script can
-reliably automate. Rationale: this project had already been doing this
-informally every time a new harness surfaced a real defect (ADR-0011, 0019,
-0021, 0022, 0023, 0024); the user asked that the practice be made durable
-and visible instead of scattered across ADR prose, so future defects
-accumulate into one place that shows whether the same root cause recurs and
-whether it was checked for elsewhere. See ADR-0025 in `doc/common/adr/`.
+given finding is genuinely a pre-existing 品質不具合 under this definition
+(versus a design choice, a newly-introduced bug, or a harness-coverage gap)
+needs human judgment no script can reliably automate. Rationale: this
+project had already been doing this informally every time a new harness
+surfaced a real defect (ADR-0011, 0019, 0021, 0022, 0023, 0024); the user
+asked that the practice be made durable and visible instead of scattered
+across ADR prose, so future defects accumulate into one place that shows
+whether the same root cause recurs and whether it was checked for
+elsewhere. The narrow プログラムバグ/設計書のエラー definition was added
+after the initial rollout, once the user pointed out it needed a precise
+boundary; applying it to the initially-recorded entries showed roughly half
+did not qualify (they were harness-coverage gaps, not defects) and were
+removed from the ledger. See ADR-0025 (including its 2026-09-02 addendum)
+in `doc/common/adr/`.
 
 ## Technology & Deployment Constraints
 
@@ -1207,4 +1255,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.21.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-09-02
+**Version**: 2.22.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-09-02
