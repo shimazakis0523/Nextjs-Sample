@@ -118,3 +118,47 @@ constitution.mdの明文化によるソフトゲートとする。
 - `doc/common/品質不具合台帳.md`に品質不具合の定義を明記し、BUG-001, 002, 004,
   006, 008を削除(BUG-003, 005, 007, 009, 010の5件のみ残存)。
 - constitution.md Core Principle XVIIIの定義文を改訂(v2.22.0)。
+
+## 追記(2026-09-05): 種別フィールドの機械検証化と、/defect-logページへの分離
+
+ユーザーから2件の指摘があった。(1)「バグはプログラムか設計書のエラーのみに
+しなさい」— 2026-09-02追記で明文化した定義を、台帳の説明文だけでなく機械的に
+強制すべきという指摘。(2)「テスト結果ダッシュボード内にバグ一覧があると大量に
+なったときに見通しが悪い」— `/test-dashboard`にエントリ一覧を埋め込む現状の
+実装は、件数が増えるほど見通しが悪くなるという指摘。
+
+### 決定
+
+**種別フィールドの新設**: `doc/common/品質不具合台帳.md`の各エントリに
+**種別**フィールドを追加し、値を「プログラムバグ」「設計書のエラー」の2値のみに
+限定した。`scripts/generate-defect-log-data.mjs`がこの2値以外をエラーとして
+弾く(サンドボックスで「バグ」という不正な値を仕込んで実際にエラー終了することを
+確認済み)。既存5件を分類した:
+
+| エントリ | 種別 | 理由 |
+|---|---|---|
+| BUG-003(jest.config.tsのmoduleNameMapper欠落) | プログラムバグ | 実行時に実際にモジュール解決が失敗する |
+| BUG-005(OpenAPI YAMLの規約不適合) | 設計書のエラー | 契約文書そのものの誤り |
+| BUG-007(axe-coreのempty-table-header違反) | プログラムバグ | 実際に発生するアクセシビリティ上の不具合 |
+| BUG-009(Backend openapi.yamlのPUT欠落) | 設計書のエラー | 契約文書の欠落 |
+| BUG-010(test-dashboard.ymlのpaths-ignore不備) | プログラムバグ | 実際にワークフローが起動しない |
+
+**`/defect-log`ページへの分離**: `/test-dashboard`の「品質不具合分析」
+セクションから、種別別・原因分類別・発見区分別・横展開実施状況のサマリと
+エントリ一覧表を`src/app/defect-log/page.tsx`という新しいページに移動した。
+`/test-dashboard`側は概要説明と`/defect-log`へのリンクのみを残す。
+ランディングページの「品質不具合台帳を見る」リンクも`/test-dashboard#defect-log`
+から`/defect-log`に変更した。
+
+## 影響(2026-09-05追記分)
+
+- `doc/common/品質不具合台帳.md`の各エントリに種別フィールドを追加。
+- `scripts/generate-defect-log-data.mjs`が種別フィールドの値を検証するように
+  変更(不正な値はビルド時エラー)。
+- `src/app/defect-log/page.tsx`・`defect-log.module.css`・`page.test.tsx`を
+  新規作成。
+- `src/app/test-dashboard/page.tsx`の「品質不具合分析」セクションを、
+  `/defect-log`へのリンクのみの短い内容に縮小(未使用になったCSSクラス・型・
+  関数も削除)。
+- `src/app/page.tsx`の「品質不具合台帳を見る」リンク先を`/defect-log`に変更。
+- constitution.md Core Principle XVIIIの定義文を改訂(v2.23.0)。

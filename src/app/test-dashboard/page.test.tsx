@@ -16,21 +16,8 @@ const densityRow = (unitCount: number, e2eCount: number) => ({
   total: { count: unitCount + e2eCount, density: unitCount + e2eCount },
 });
 
-// summary.json / defect-log.json のどちらを読んでいるかをファイルパス引数で判別し、
-// それぞれ別の内容を返す(loadSummary/loadDefectLogは同じreadFileSyncを別々の
-// パスで呼ぶため、単一のmockReturnValueでは両方に同じ内容が返ってしまう)。
-function mockFs({
-  summary,
-  defectLog,
-}: {
-  summary?: unknown;
-  defectLog?: unknown;
-}) {
-  mockedReadFileSync.mockImplementation((filePath: string) => {
-    if (filePath.toString().includes("defect-log.json")) {
-      if (defectLog === undefined) throw new Error("ENOENT: no such file or directory");
-      return JSON.stringify(defectLog);
-    }
+function mockFs({ summary }: { summary?: unknown }) {
+  mockedReadFileSync.mockImplementation(() => {
     if (summary === undefined) throw new Error("ENOENT: no such file or directory");
     return JSON.stringify(summary);
   });
@@ -63,30 +50,6 @@ const SAMPLE_SUMMARY = {
       "sonarjs/no-duplicate-string": { errorCount: 0, warningCount: 2 },
       complexity: { errorCount: 1, warningCount: 0 },
     },
-  },
-};
-
-const SAMPLE_DEFECT_LOG = {
-  generatedAt: "2026-09-01T00:00:00.000Z",
-  entries: [
-    {
-      id: "BUG-001",
-      title: "TodoList.tsx等の分割後、ユニットテストが無かった",
-      discoveredAt: "2026-08-30",
-      discoveryKind: "人によるレビュー・指摘",
-      discoveryDetail: "人によるコードレビュー",
-      categories: ["タスク定義の不備"],
-      files: ["src/app/dashboard/TodoList.tsx"],
-      fix: "ユニットテストを追加",
-      lateralCheck: { status: "実施", detail: "他に未テストのコンポーネントなし" },
-      reference: "[ADR-0011](./adr/0011-component-test-coverage-gate.md)",
-    },
-  ],
-  summary: {
-    total: 1,
-    byCategory: { タスク定義の不備: 1 },
-    byDiscoveryKind: { "人によるレビュー・指摘": 1 },
-    byLateralCheckStatus: { 実施: 1 },
   },
 };
 
@@ -181,28 +144,16 @@ describe("TestDashboardPage", () => {
     expect(screen.getAllByText("業務B").length).toBeGreaterThan(0);
   });
 
-  it("shows a setup message for the defect log when defect-log.json does not exist", () => {
+  it("renders a link to the defect log page instead of an inline list", () => {
     mockFs({ summary: SAMPLE_SUMMARY });
 
     render(<TestDashboardPage />);
 
-    expect(screen.getByText(/defect-log\.json/)).toBeInTheDocument();
-    expect(screen.getByText(/npm run defect-log:data/)).toBeInTheDocument();
-  });
-
-  it("renders the defect log summary and entries when defect-log.json exists", () => {
-    mockFs({ summary: SAMPLE_SUMMARY, defectLog: SAMPLE_DEFECT_LOG });
-
-    render(<TestDashboardPage />);
-
     expect(screen.getByText("品質不具合分析")).toBeInTheDocument();
-    expect(screen.getByText("合計 1 件")).toBeInTheDocument();
-    expect(screen.getByText("BUG-001")).toBeInTheDocument();
-    expect(screen.getByText("TodoList.tsx等の分割後、ユニットテストが無かった")).toBeInTheDocument();
-    expect(screen.getAllByText("タスク定義の不備").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("人によるレビュー・指摘").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("実施").length).toBeGreaterThan(0);
-    expect(screen.getByText("ADR-0011")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "品質不具合台帳を見る →" })).toHaveAttribute(
+      "href",
+      "/defect-log"
+    );
   });
 
   it("has no automatically detectable accessibility violations", async () => {

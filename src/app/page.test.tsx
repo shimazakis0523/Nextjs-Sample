@@ -75,12 +75,12 @@ describe("Home (top page)", () => {
     );
   });
 
-  it("renders a button-styled link to the defect discovery ledger section on the quality dashboard", () => {
+  it("renders a button-styled link to the defect discovery ledger page", () => {
     render(<Home />);
 
     expect(screen.getByRole("link", { name: "品質不具合台帳を見る" })).toHaveAttribute(
       "href",
-      "/test-dashboard#defect-log"
+      "/defect-log"
     );
   });
 

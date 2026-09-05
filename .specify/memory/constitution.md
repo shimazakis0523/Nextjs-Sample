@@ -1,5 +1,38 @@
 <!--
 Sync Impact Report
+- Version change: 2.22.0 → 2.23.0 (MINOR — Core Principle XVIII's
+  プログラムバグ/設計書のエラー definition becomes a machine-validated 種別
+  field, not just prose; its visualization moves off `/test-dashboard` to a
+  dedicated `/defect-log` page)
+- Modified sections: Core Principle XVIII now requires a 種別 field (exactly
+  プログラムバグ or 設計書のエラー) per ledger entry, validated by
+  `scripts/generate-defect-log-data.mjs` (throws on any other value); the
+  principle's visualization reference changes from `/test-dashboard`'s
+  「品質不具合分析」section to a new dedicated `/defect-log` page, with
+  `/test-dashboard` only linking to it.
+- Rationale: two follow-up requests after the definition itself was first
+  encoded (v2.22.0). First, the user pointed out that recording the
+  definition as prose was not enough — "バグはプログラムか設計書のエラーの
+  みにしなさい" ("restrict bugs to only program or design-document errors")
+  — asking that it be enforced. `doc/common/品質不具合台帳.md` gained a
+  種別 field with exactly two allowed values, and
+  `scripts/generate-defect-log-data.mjs` now throws if an entry's 種別 is
+  anything else (sandbox-verified: an entry with 種別 "バグ" fails
+  generation with a clear error). The 5 current entries were classified:
+  BUG-003 (jest.config.ts missing a moduleNameMapper) and BUG-010
+  (test-dashboard.yml's overly-broad paths-ignore) as プログラムバグ — both
+  are config code that misbehaves once actually exercised; BUG-007 (an
+  axe-core violation in shipped component code) as プログラムバグ — a real
+  accessibility defect; BUG-005 and BUG-009 (OpenAPI YAML non-conformance
+  and a missing endpoint) as 設計書のエラー. Second, the user separately
+  observed that keeping the full entry list inside `/test-dashboard` would
+  become hard to scan as it grows — "テスト結果ダッシュボード内にバグ一覧が
+  あると大量になったときに見通しが悪い" — asking for a dedicated page
+  reached by a link instead. The list, its per-field CountTable summaries
+  (now including 種別別), and the setup-message fallback moved from
+  `src/app/test-dashboard/page.tsx` to a new `src/app/defect-log/page.tsx`;
+  `/test-dashboard` kept only a short description and a link. See the
+  2026-09-05 addendum to ADR-0025 in `doc/common/adr/`.
 - Version change: 2.21.0 → 2.22.0 (MINOR — tightens Core Principle XVIII's
   definition of "品質不具合"; narrows which findings the ledger records)
 - Modified sections: Core Principle XVIII's opening paragraph now defines
@@ -1054,32 +1087,42 @@ correctly but a verification or quality-enforcement mechanism for that
 class of problem did not yet exist (missing tests, an not-yet-adopted lint
 rule, a complexity violation) is not itself a 品質不具合 under this
 definition and does NOT belong in the ledger — it is a harness-coverage
-gap, a different kind of finding entirely. Each entry records 発見日,
-発見区分 and 原因分類 (both controlled-vocabulary fields drawn from the
-legends at the top of the ledger, kept separate from free-text explanation
-so they aggregate mechanically), 対象ファイル, 修正内容, 横展開
-(実施/対象外/未実施 plus what was checked), and 根拠 (a link to the ADR or
-commit that made the fix). `npm run defect-log:data`
-(`scripts/generate-defect-log-data.mjs`) parses the ledger into
-`dashboard-data/defect-log.json`, which `/test-dashboard`'s
-「品質不具合分析」section visualizes as counts by 原因分類, by 発見区分,
-and by 横展開 status, alongside the full entry list. Like Principle VI's
+gap, a different kind of finding entirely. Each entry records 発見日, 種別
+(exactly one of プログラムバグ/設計書のエラー — the ledger's own definition
+restated as a machine-validated field, not merely prose; a value outside
+this pair makes `scripts/generate-defect-log-data.mjs` fail loudly rather
+than silently accepting a mis-classified entry), 発見区分 and 原因分類 (both
+controlled-vocabulary fields drawn from the legends at the top of the
+ledger, kept separate from free-text explanation so they aggregate
+mechanically), 対象ファイル, 修正内容, 横展開 (実施/対象外/未実施 plus what
+was checked), and 根拠 (a link to the ADR or commit that made the fix).
+`npm run defect-log:data` (`scripts/generate-defect-log-data.mjs`) parses
+the ledger into `dashboard-data/defect-log.json`, which a dedicated
+`/defect-log` page visualizes as counts by 種別, by 原因分類, by 発見区分,
+and by 横展開 status, alongside the full entry list — kept off
+`/test-dashboard` itself (which only links to it) since an inline list
+becomes hard to scan as entries accumulate. Like Principle VI's
 mockup-agreement gate (ADR-0004), this is a soft/process gate — a Skill
 procedure and this constitution's text, not a CI check — because whether a
 given finding is genuinely a pre-existing 品質不具合 under this definition
 (versus a design choice, a newly-introduced bug, or a harness-coverage gap)
-needs human judgment no script can reliably automate. Rationale: this
-project had already been doing this informally every time a new harness
-surfaced a real defect (ADR-0011, 0019, 0021, 0022, 0023, 0024); the user
-asked that the practice be made durable and visible instead of scattered
-across ADR prose, so future defects accumulate into one place that shows
-whether the same root cause recurs and whether it was checked for
-elsewhere. The narrow プログラムバグ/設計書のエラー definition was added
-after the initial rollout, once the user pointed out it needed a precise
-boundary; applying it to the initially-recorded entries showed roughly half
-did not qualify (they were harness-coverage gaps, not defects) and were
-removed from the ledger. See ADR-0025 (including its 2026-09-02 addendum)
-in `doc/common/adr/`.
+needs human judgment no script can reliably automate; only the resulting
+種別 classification, once a human has made that call, is then
+machine-validated. Rationale: this project had already been doing this
+informally every time a new harness surfaced a real defect (ADR-0011, 0019,
+0021, 0022, 0023, 0024); the user asked that the practice be made durable
+and visible instead of scattered across ADR prose, so future defects
+accumulate into one place that shows whether the same root cause recurs and
+whether it was checked for elsewhere. The narrow プログラムバグ/設計書のエラー
+definition was added after the initial rollout, once the user pointed out it
+needed a precise boundary; applying it to the initially-recorded entries
+showed roughly half did not qualify (they were harness-coverage gaps, not
+defects) and were removed from the ledger. The 種別 field and the dedicated
+`/defect-log` page were both added in a further follow-up, once the user
+asked that the definition be enforced (not just documented) and that the
+growing entry list move off `/test-dashboard` before it became unwieldy.
+See ADR-0025 (including its 2026-09-02 and 2026-09-05 addenda) in
+`doc/common/adr/`.
 
 ## Technology & Deployment Constraints
 
@@ -1255,4 +1298,4 @@ a CI workflow/script — including one made directly in conversation, not
 through `/speckit-tasks` — create or reuse a GitHub Issue for the change
 and reference it in the PR body or a commit message (Principle VIII).
 
-**Version**: 2.22.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-09-02
+**Version**: 2.23.0 | **Ratified**: 2026-08-29 | **Last Amended**: 2026-09-05

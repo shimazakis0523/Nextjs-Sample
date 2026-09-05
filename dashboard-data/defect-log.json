@@ -1,10 +1,11 @@
 {
-  "generatedAt": "2026-09-02T15:11:27.475Z",
+  "generatedAt": "2026-09-05T01:11:44.526Z",
   "entries": [
     {
       "id": "BUG-003",
       "title": "jest.config.tsに`@/*`パスエイリアスのmoduleNameMapperが無かった",
       "discoveredAt": "2026-08-31",
+      "type": "プログラムバグ",
       "discoveryKind": "既存ハーネス実行中の副次的発見",
       "discoveryDetail": "route.tsのサーバー側バリデーションにユニットテストを追加する作業中、実行時import(`jest.mock(\"@/lib/backend\")`)を初めて書いたときに発覚(既存テストは全て`import type`経由だったため、型のみのimportではモジュール解決の不備が表面化しなかった)",
       "categories": [
@@ -24,6 +25,7 @@
       "id": "BUG-005",
       "title": "OpenAPI YAML(BFF/Backend)がservers.description欠落・tags未定義等の複数箇所で規約に不適合だった",
       "discoveredAt": "2026-08-31",
+      "type": "設計書のエラー",
       "discoveryKind": "新規ハーネス導入時",
       "discoveryDetail": "Spectralルールセット(Future Architect社OpenAPI規約準拠)導入時の実行結果",
       "categories": [
@@ -44,6 +46,7 @@
       "id": "BUG-007",
       "title": "TodoList.tsx・mockup/page.tsxの操作列ヘッダーがaxe-coreのempty-table-header違反だった",
       "discoveredAt": "2026-09-01",
+      "type": "プログラムバグ",
       "discoveryKind": "新規ハーネス導入時",
       "discoveryDetail": "`jest-axe`導入時の実行結果(Automated Accessibility Test Coverageハーネス新設に伴う)",
       "categories": [
@@ -64,6 +67,7 @@
       "id": "BUG-009",
       "title": "doc/API仕様書/Backend/openapi.yamlにPUT /todos/{id}の定義が漏れていた",
       "discoveredAt": "2026-09-01",
+      "type": "設計書のエラー",
       "discoveryKind": "既存スキルでの整合性確認",
       "discoveryDetail": "`check-openapi-contract`スキルによる整合性確認(Todo編集機能の実装完了確認として実行)。BFF契約には`PUT /todos/{id}`を追加していたが、`backend.ts`の実バックエンド分岐が呼ぶBackend契約側への反映が漏れていた。",
       "categories": [
@@ -83,6 +87,7 @@
       "id": "BUG-010",
       "title": "test-dashboard.ymlのpaths-ignoreが広すぎ、business-map.json単独の変更を見逃す",
       "discoveredAt": "2026-09-01",
+      "type": "プログラムバグ",
       "discoveryKind": "既存ハーネス実行中の副次的発見",
       "discoveryDetail": "この品質不具合台帳自体の追加作業で、`defect-log.json`もコミット対象に含めるため`.github/workflows/test-dashboard.yml`のpaths-ignoreを見直していて発覚。`dashboard-data/**`という指定は生成物(`summary.json`)だけでなく手動保守ファイル(`business-map.json`)も含んでしまい、`business-map.json`だけを変更するpush(他に変更ファイルが無い場合)ではワークフロー自体が起動しない。過去3回の変更はいずれも他のファイルと同時だったため一度も表面化していなかった(git logで確認)。",
       "categories": [
@@ -101,6 +106,10 @@
   ],
   "summary": {
     "total": 5,
+    "byType": {
+      "プログラムバグ": 3,
+      "設計書のエラー": 2
+    },
     "byCategory": {
       "設定不備": 2,
       "品質ルール未導入": 2,
